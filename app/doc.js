@@ -39,7 +39,7 @@
     if (o.mode === "partner" && d.action === "remove") return "";
     const st = s.verification?.status || "verified";
     const text = d.action === "edit" && d.text ? d.text : s.text;
-    const refs = (s.citations || []).map((c) => `<span class="ref${c.status && c.status !== "ok" && c.status !== "quote_too_long" ? " bad" : ""}">${esc(c.passage_id)}</span>`).join("");
+    const refs = (s.citations || []).map((c) => `<span class="chip${c.status && c.status !== "ok" && c.status !== "quote_too_long" ? " bad" : ""}">${esc(c.passage_id)}</span>`).join("");
     const cls = ["claim", st, o.selected === id ? "lit" : "", o.mode === "review" && d.action === "remove" ? "removed" : ""].join(" ");
     let acts = "";
     if (o.mode === "review") {
@@ -51,7 +51,7 @@
       ? `<div class="editor"><textarea class="textarea" data-edit="${id}">${esc(d.text || s.text)}</textarea><div class="r"><button class="btn sm primary" data-editsave="${id}">Save</button><button class="btn sm quiet" data-editcancel="${id}">Cancel</button></div></div>`
       : "";
     const edited = d.action === "edit" && d.text ? `<span class="ed">${o.mode === "review" ? "edited" : ""}</span>` : "";
-    return `<li class="${cls}" data-id="${id}"><span class="d"></span><span class="t">${esc(text)}${refs}${s.basis !== "stated" ? `<span class="ref">${s.basis}</span>` : ""}${edited}</span>${acts}${editor}</li>`;
+    return `<li class="${cls}" data-id="${id}"><span class="d"></span><span class="t">${esc(text)}${refs}${s.basis !== "stated" ? `<span class="chip">${s.basis}</span>` : ""}${edited}</span>${acts}${editor}</li>`;
   }
 
   function document(c, o) {
@@ -88,14 +88,15 @@
     const entry = statements(c.record.assessment).get(id);
     if (!entry) return `<p class="none">Nothing selected.</p>`;
     const { stmt, where } = entry, st = stmt.verification?.status || "verified";
-    let h = `<div class="cl">${esc(stmt.text)}<div class="st ${st}">${esc(where)} · ${st === "verified" ? "quote verified" : st === "warning" ? "warning: " + (stmt.verification?.issues || []).join(", ").replace(/_/g, " ") : "not verified: " + (stmt.verification?.issues || []).join(", ").replace(/_/g, " ")} · ${stmt.basis}</div></div>`;
+    const issues = (stmt.verification?.issues || []).join(", ").replace(/_/g, " ");
+    let h = `<div class="cl">${esc(stmt.text)}<div class="st"><span class="badge ${st === "verified" ? "green" : st === "warning" ? "amber" : "red"}">${st === "verified" ? "Quote verified" : st === "warning" ? "Warning: " + esc(issues) : "Not verified: " + esc(issues)}</span><span class="badge">${esc(where)}</span><span class="badge">${stmt.basis}</span></div></div>`;
     if (!stmt.citations.length) h += `<p class="none">No citation.</p>`;
     for (const cit of stmt.citations) {
       const ps = c.record.passages[cit.passage_id];
-      if (!ps) { h += `<div class="src"><div class="sh"><span class="id">${esc(cit.passage_id)}</span><span class="nm">no such passage</span></div></div>`; continue; }
+      if (!ps) { h += `<div class="src"><div class="sh"><span class="chip bad">${esc(cit.passage_id)}</span><span class="nm">no such passage</span></div></div>`; continue; }
       const title = c.record.sources.find((s) => s.key === ps.source)?.title || ps.source;
       const hl = highlight(ps.text, cit.quote);
-      h += `<div class="src"><div class="sh"><span class="id">${esc(cit.passage_id)}</span><span class="nm">${esc(title)}</span></div><div class="tx">${hl !== null ? hl : esc(ps.text)}</div>${hl === null ? `<div class="warn">Quote not found here: “${esc(cit.quote)}”</div>` : ""}</div>`;
+      h += `<div class="src"><div class="sh"><span class="chip">${esc(cit.passage_id)}</span><span class="nm">${esc(title)}</span></div><div class="tx">${hl !== null ? hl : esc(ps.text)}</div>${hl === null ? `<div class="warn">Quote not found here: “${esc(cit.quote)}”</div>` : ""}</div>`;
     }
     return h;
   }
@@ -103,7 +104,7 @@
   function browse(c) {
     const bySource = {};
     for (const [id, p] of Object.entries(c.record.passages)) (bySource[p.source] ||= []).push([id, p]);
-    return c.record.sources.map((s) => `<div class="src"><h5>${esc(s.key)} · ${esc(s.title)}</h5>${(bySource[s.key] || []).map(([id, p]) => `<div class="src"><div class="sh"><span class="id">${esc(id)}</span></div><div class="tx">${esc(p.text)}</div></div>`).join("")}</div>`).join("");
+    return c.record.sources.map((s) => `<div class="src"><h5>${esc(s.key)} · ${esc(s.title)}</h5>${(bySource[s.key] || []).map(([id, p]) => `<div class="src"><div class="sh"><span class="chip">${esc(id)}</span></div><div class="tx">${esc(p.text)}</div></div>`).join("")}</div>`).join("");
   }
 
   window.Doc = { esc, highlight, statements, document, provenance, browse };
