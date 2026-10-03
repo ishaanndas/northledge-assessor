@@ -38,7 +38,7 @@ About 930 lines of JavaScript across nine files. One dependency, the Anthropic S
 | `report.mjs` | Builds the reader. Pure function of `out/`. |
 | `selftest.mjs` | Mutation test for the verifier. |
 | `serve.mjs` | App server: JSON API, server-sent drafting progress, review storage, static files. |
-| `app/` | The client: `app.html`, `app.css`, `app.js`. Hash-routed single page, no framework. |
+| `app/` | The client: `app.html`, `app.css`, `app.js`, and `doc.js` (the document renderer, also inlined into the static report). |
 | `lib/pipeline.mjs` | `draftCompany(slug, onProgress)`: the pipeline as a function, used by the CLI and the server. |
 | `lib/env.mjs` | `.env` loader, project root, model ids (`DRAFTER_MODEL`, `JUDGE_MODEL` env overrides). |
 | `lib/sources.mjs` | Example loading, passage splitting, rendering for the model. |
@@ -150,21 +150,21 @@ The page is labelled "Draft for partner review · not a recommendation" on every
 
 ## 8a. The app
 
-`serve.mjs` serves `app/` and exposes a small JSON API; `app/app.js` is a hash-routed single page with no framework. The five screens follow the user journey in the PRD.
+`serve.mjs` serves `app/` and a small JSON API. The client (`app/app.js`) is hash-routed with no framework; `app/doc.js` is the document renderer, shared with the static report so the committed artifact and the app look the same. One stylesheet, one typeface, one accent colour; the document gets the room and the chrome stays out of the way.
 
-| Route | Screen | What it does |
+| Route | Stage | What it does |
 |---|---|---|
-| `#/` | Companies | Every company with its status (sources, drafted, reviewed), source list, verification counts. |
-| `#/new` | Intake | Name, one-liner, round, and a textarea or file picker for each of the four source types. Saves to `companies/<slug>/` in the same layout as `examples/`. |
-| `#/c/:slug` | Sources | The numbered passages exactly as the model will read them. |
-| `#/c/:slug/draft` | Draft | Starts the pipeline; progress arrives over server-sent events (split, draft, verify, repair, re-verify, write) with repair failures listed; ends with the verification summary, time and tokens. |
-| `#/c/:slug/review` | Review | The reader with keep, edit and remove on every statement, the provenance pane, the eval strip, a reviewer name and an associate's note. Saves to `out/<slug>/review.json`. |
-| `#/c/:slug/partner` | Partner view | The associate's note, then the draft with removed statements gone and edits applied, byline with reviewer and time, every remaining claim still clickable. Printable. |
-| `#/c/:slug/followup` | Follow-up | The missing list and open questions as checkboxes, composed into an email to the founder, copy to clipboard. |
+| `#/` | Companies | A table: company, sources, stage, verified count, gaps, reviewer. Row click opens the company at its current stage. |
+| `#/new` | New company | Name, one-liner, round, and a paste box or file for each of the four source types. "Create and draft" saves to `companies/<slug>/` and starts the pipeline immediately. |
+| `#/c/:slug/sources` | Sources | The numbered passages exactly as the model reads them. |
+| `#/c/:slug/draft` | Draft | Progress over server-sent events (split, draft, verify, repair, re-verify, write), repair failures listed, result line; opens Review when done. |
+| `#/c/:slug/review` | Review | The document with the source panel. Edit, Remove and Restore on each statement, a note to partners with the reviewer's name; every change autosaves after 700 ms. Automated-check summary at the end. |
+| `#/c/:slug/partner` | Partner page | The note, then the draft with removed statements gone and edits applied, reviewer byline. Printable. |
+| `#/c/:slug/followup` | Follow-up | Missing items and open questions as checkboxes composed into an email; copy to clipboard. |
 
-API: `GET /api/companies`, `POST /api/companies`, `GET /api/companies/:slug`, `POST /api/companies/:slug/draft` (event stream), `PUT /api/companies/:slug/review`. A re-draft deletes the previous review, since its decisions refer to statement ids that no longer exist.
+API: `GET /api/companies`, `POST /api/companies`, `GET /api/companies/:slug`, `POST /api/companies/:slug/draft` (event stream), `PUT /api/companies/:slug/review`. Drafting again deletes the previous review, since its decisions refer to statement ids that no longer exist.
 
-Design choices: the review is stored as decisions keyed by statement id, so the model's draft is never mutated and the partner view is a projection of draft plus decisions. The server keeps one in-flight draft per company and refuses a second. Nothing is authenticated; this is a single-associate prototype.
+Storage: example companies write to `out/<slug>/`; companies created in the app keep everything, outputs included, under `companies/<slug>/` so nothing user-created lands in the committed outputs. A review is a set of decisions keyed by statement id (`keep`, `edit` with text, `remove`); the model's draft is never mutated and the partner page is a projection of draft plus decisions. The server allows one in-flight draft per company. Nothing is authenticated; this is a single-associate prototype.
 
 ## 9. Measured performance (3 October 2026 run)
 

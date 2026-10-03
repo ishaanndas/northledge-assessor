@@ -21,7 +21,7 @@ echo "ANTHROPIC_API_KEY=sk-ant-..." > .env
 npm run serve        # the app, at http://localhost:4950
 ```
 
-The app walks a company through five screens: **Sources** (paste or upload the deck, website, bios and call notes; see the numbered passages the model will read), **Draft** (run the pipeline with live progress and the verification result), **Review** (the associate keeps, edits or removes each claim, clicks any claim to see its source, and writes a note for the partners), **Partner view** (the edited draft as the partners receive it, printable), and **Follow-up** (the missing list turned into the email to the founder). The four example companies are preloaded; companies created through the form are saved under `companies/`, which is gitignored.
+The app is one workspace per company with five stages in a left rail. **Sources** shows the numbered passages the model will read. **Draft** runs the pipeline with live progress and opens the review when it finishes. **Review** is the document with the source panel beside it: click a statement to see the passage with the quoted words marked, edit or remove what you disagree with, write the note to partners; edits save as you go. **Partner page** is what the partners receive, with edits applied, printable. **Follow-up** turns the missing list into the email to the founder. "New company" takes the four inputs as pasted text or files and starts drafting in one step. The four example companies are preloaded; companies you add live under `companies/`, which is gitignored.
 
 The same pipeline runs from the command line:
 

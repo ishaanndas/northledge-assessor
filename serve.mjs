@@ -4,7 +4,7 @@ import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
 import { ROOT } from "./lib/env.mjs";
-import { OUT_DIR, COMPANIES_DIR, listCompanies, loadCompany, findCompanyDir } from "./lib/sources.mjs";
+import { OUT_DIR, COMPANIES_DIR, listCompanies, loadCompany, findCompanyDir, outDirFor } from "./lib/sources.mjs";
 import { draftCompany } from "./lib/pipeline.mjs";
 
 const PORT = Number(process.env.PORT || 4950);
@@ -29,8 +29,8 @@ const body = (req) =>
 
 function companySummary({ slug, dir, origin }) {
   const company = readJson(path.join(dir, "company.json"));
-  const record = readJson(path.join(OUT_DIR, slug, "assessment.json"));
-  const review = readJson(path.join(OUT_DIR, slug, "review.json"));
+  const record = readJson(path.join(outDirFor(slug), "assessment.json"));
+  const review = readJson(path.join(outDirFor(slug), "review.json"));
   const ex = loadCompany(dir);
   return {
     slug,
@@ -91,8 +91,8 @@ async function api(req, res, url) {
     return send(res, 200, {
       ...companySummary({ slug, dir, origin: dir.startsWith(COMPANIES_DIR) ? "intake" : "example" }),
       sourceDocs: ex.sources.map((s) => ({ key: s.key, title: s.title, file: s.file, passages: s.passages })),
-      record: readJson(path.join(OUT_DIR, slug, "assessment.json")),
-      reviewDoc: readJson(path.join(OUT_DIR, slug, "review.json")),
+      record: readJson(path.join(outDirFor(slug), "assessment.json")),
+      reviewDoc: readJson(path.join(outDirFor(slug), "review.json")),
       eval: evalData.find((e) => e.slug === slug) || null,
     });
   }
@@ -104,7 +104,7 @@ async function api(req, res, url) {
     running.set(slug, true);
     try {
       // A fresh draft supersedes any review of the previous one.
-      const reviewPath = path.join(OUT_DIR, slug, "review.json");
+      const reviewPath = path.join(outDirFor(slug), "review.json");
       if (fs.existsSync(reviewPath)) fs.unlinkSync(reviewPath);
       await draftCompany(slug, (e) => emit(e.step === "done" ? { step: "done", message: e.message, summary: e.record.verification_summary, seconds: e.record.seconds, usage: e.record.usage } : e));
     } catch (err) {
@@ -119,8 +119,8 @@ async function api(req, res, url) {
   if (action === "review" && req.method === "PUT") {
     const b = await body(req);
     const doc = { reviewer: String(b.reviewer || "").trim(), note: String(b.note || ""), decisions: b.decisions || {}, updated: new Date().toISOString().slice(0, 16).replace("T", " ") + " UTC" };
-    fs.mkdirSync(path.join(OUT_DIR, slug), { recursive: true });
-    fs.writeFileSync(path.join(OUT_DIR, slug, "review.json"), JSON.stringify(doc, null, 2));
+    fs.mkdirSync(outDirFor(slug), { recursive: true });
+    fs.writeFileSync(path.join(outDirFor(slug), "review.json"), JSON.stringify(doc, null, 2));
     return send(res, 200, doc);
   }
 
@@ -146,4 +146,8 @@ http
       send(res, 500, { error: err.message });
     }
   })
-  .listen(PORT, () => console.log(`app at http://localhost:${PORT}  (static report at /index.html)`));
+  .on("error", (err) => {
+    if (err.code === "EADDRINUSE") { console.error(`Port ${PORT} is already in use. Another copy of the app is probably running; open http://localhost:${PORT} or stop it first (lsof -ti:${PORT} | xargs kill).`); process.exit(1); }
+    throw err;
+  })
+  .listen(PORT, () => console.log(`app at http://localhost:${PORT}`));
