@@ -1,0 +1,7 @@
+{
+  "note": "Baseline. Expect clean verification and a bear case that still finds concentration, month-to-month contracts and pilot conversion risk.",
+  "failed_max": 0,
+  "bear_case_points_min": 3,
+  "bear_case_must_mention": ["24%|Cascade|month-to-month|pilot"],
+  "missing_min": 3
+}

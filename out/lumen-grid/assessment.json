@@ -1,0 +1,1902 @@
+{
+  "slug": "lumen-grid",
+  "company": {
+    "slug": "lumen-grid",
+    "name": "Lumen Grid",
+    "one_liner": "Interconnection-queue workflow software for electric utilities",
+    "ask": "$2.5M seed",
+    "design_note": "Baseline case. Sources are consistent and reasonably complete. The tool should produce a well-cited assessment and still find real gaps (churn exposure, concentration, sales cycle)."
+  },
+  "generated_at": "2026-10-03 18:50 UTC",
+  "model": "claude-opus-5",
+  "repairs": 0,
+  "first_pass_verification": {
+    "statements": 46,
+    "verified": 46,
+    "warning": 0,
+    "failed": 0,
+    "citations": 63,
+    "citations_ok": 63
+  },
+  "verification_summary": {
+    "statements": 46,
+    "verified": 46,
+    "warning": 0,
+    "failed": 0,
+    "citations": 63,
+    "citations_ok": 63
+  },
+  "sources": [
+    {
+      "key": "deck",
+      "title": "Lumen Grid — Seed Deck (June 2026)",
+      "passages": 8
+    },
+    {
+      "key": "website",
+      "title": "lumengrid.io — homepage and product pages (captured 14 June 2026)",
+      "passages": 6
+    },
+    {
+      "key": "founders",
+      "title": "Founder bios (provided by the company)",
+      "passages": 3
+    },
+    {
+      "key": "call-notes",
+      "title": "First call notes — Lumen Grid, 18 June 2026 (associate: M. Chen, 45 minutes with Priya and Daniel)",
+      "passages": 9
+    }
+  ],
+  "passages": {
+    "deck:1": {
+      "source": "deck",
+      "text": "Slide 1: Interconnection is the bottleneck of the energy transition\nOver 2,600 GW of generation and storage projects are waiting in US interconnection queues. The median project now waits almost five years for a utility study. Utilities run these studies with spreadsheets, email and a handful of overworked engineers."
+    },
+    "deck:2": {
+      "source": "deck",
+      "text": "Slide 2: What we built\nLumen Grid is workflow software for utility interconnection teams. It ingests applications, tracks study milestones, runs completeness checks against each utility's tariff, and produces the regulator-facing queue reports automatically. Engineers spend their time on power-flow analysis instead of chasing paperwork."
+    },
+    "deck:3": {
+      "source": "deck",
+      "text": "Slide 3: Traction\nSix utilities are paying customers today, representing $38,000 in monthly recurring revenue. Two additional investor-owned utilities are in paid pilots that convert to annual contracts in Q4 2026 if they hit agreed milestones. Net revenue retention across the six paying accounts is 118% on a trailing-twelve-month basis."
+    },
+    "deck:4": {
+      "source": "deck",
+      "text": "Slide 4: Customers\nPaying: Cascade Public Utility District, Three Rivers Electric Cooperative, Northfield Municipal Light, Blue Mesa Cooperative, Pinecrest Utilities, Harlan County Electric. Piloting: Great Lakes Energy (IOU, 1.1M meters) and Southern Tier Power (IOU, 640k meters)."
+    },
+    "deck:5": {
+      "source": "deck",
+      "text": "Slide 5: Business model\nAnnual SaaS subscription priced by meter count and queue volume. Current contracts range from $42,000 to $110,000 per year. Gross margin is 81%. Average sales cycle for cooperatives and munis has been 4 months; the two IOU pilots took 9 months to sign."
+    },
+    "deck:6": {
+      "source": "deck",
+      "text": "Slide 6: Market\nThere are roughly 3,000 electric utilities in the United States. We count 410 that process more than 50 interconnection applications per year, which is our serviceable market. At our current average contract value this is a $29M annual opportunity in the US before expanding into transmission-level studies and Canada."
+    },
+    "deck:7": {
+      "source": "deck",
+      "text": "Slide 7: Team\nPriya Raman (CEO) spent eight years at Pacific Gas & Electric, the last three running the distribution interconnection group. Daniel Okafor (CTO) was a forward-deployed engineer at Palantir for five years and built utility data integrations at Camus Energy. Team of seven: four engineers, one implementation lead, one account executive."
+    },
+    "deck:8": {
+      "source": "deck",
+      "text": "Slide 8: The raise\nRaising $2.5M on a post-money SAFE. Use of funds: three engineers, two implementation specialists, one utility sales lead. Target is 20 paying utilities and $1.5M ARR by December 2027."
+    },
+    "website:1": {
+      "source": "website",
+      "text": "Lumen Grid: Interconnection, in order. Software that helps utility interconnection teams clear their queue faster, with less paperwork and fewer errors."
+    },
+    "website:2": {
+      "source": "website",
+      "text": "How it works. Applicants submit through a branded portal. Lumen Grid validates every application against your tariff rules before an engineer ever sees it, assigns study milestones, tracks deadlines under FERC Order 2023 and state timelines, and generates the quarterly queue report your commission expects."
+    },
+    "website:3": {
+      "source": "website",
+      "text": "Built by people who ran interconnection. Our founding team ran a distribution interconnection group at a major California utility and has processed more than 12,000 applications first-hand."
+    },
+    "website:4": {
+      "source": "website",
+      "text": "Customers. Cascade PUD cut its average application review time from 31 days to 9 days in the first quarter on Lumen Grid. Three Rivers Electric Cooperative eliminated its backlog of 240 pending applications within five months."
+    },
+    "website:5": {
+      "source": "website",
+      "text": "Security. SOC 2 Type I report completed in March 2026. Type II audit in progress. Hosted in US regions only."
+    },
+    "website:6": {
+      "source": "website",
+      "text": "Pricing. Annual plans sized to your utility. Contact sales for a quote."
+    },
+    "founders:1": {
+      "source": "founders",
+      "text": "Priya Raman, co-founder and CEO. Eight years at Pacific Gas & Electric, 2016 to 2024. Senior engineer in distribution planning, then manager of the distribution interconnection group from 2021, overseeing a team of 14 engineers and analysts. BS and MS in electrical engineering, UC Davis. Left PG&E in September 2024 to start Lumen Grid."
+    },
+    "founders:2": {
+      "source": "founders",
+      "text": "Daniel Okafor, co-founder and CTO. Forward-deployed engineer at Palantir from 2017 to 2022, where he led utility and energy deployments. Staff engineer at Camus Energy from 2022 to 2024, building grid data integrations for cooperative utilities. BS in computer science, Georgia Tech."
+    },
+    "founders:3": {
+      "source": "founders",
+      "text": "Priya and Daniel met in 2023 when Camus Energy integrated with PG&E's interconnection systems. They have worked together full-time since October 2024."
+    },
+    "call-notes:1": {
+      "source": "call-notes",
+      "text": "Priya walked through the queue problem with specifics from her PG&E time. Credible, unusually detailed on tariff mechanics. Daniel did the product demo; the tariff rule engine is the differentiated piece and took them nine months to build."
+    },
+    "call-notes:2": {
+      "source": "call-notes",
+      "text": "Revenue. Confirmed $38k MRR. Of the six paying utilities, four are on annual contracts and two (Pinecrest and Harlan County) are month-to-month while they finish procurement approval. Cascade PUD is the largest at $110k per year and is 24% of MRR."
+    },
+    "call-notes:3": {
+      "source": "call-notes",
+      "text": "Pilots. Great Lakes Energy pilot started in April, Southern Tier in May. Both are paid at $15k for six months. Conversion criteria are written into the pilot agreements. Priya said she would put the odds of both converting at \"better than even\" but would not commit to more than that."
+    },
+    "call-notes:4": {
+      "source": "call-notes",
+      "text": "Churn. No logo churn to date. One customer (Blue Mesa) went quiet for two months during a staff change and has since re-engaged."
+    },
+    "call-notes:5": {
+      "source": "call-notes",
+      "text": "Competition. Asked about PowerClerk (Clean Power Research) which is widely used. Priya's view: PowerClerk handles application intake well but does not model study workflow or tariff completeness rules; several Lumen customers still use PowerClerk for intake and Lumen for everything after. She acknowledged PowerClerk could extend into their space. GridUnity is the other named competitor; focused on transmission-level work and larger IOUs."
+    },
+    "call-notes:6": {
+      "source": "call-notes",
+      "text": "Sales. The cooperative and muni motion is referral-driven through state cooperative associations. IOU sales require a procurement process and a security review; the SOC 2 Type I was done specifically to unblock Great Lakes."
+    },
+    "call-notes:7": {
+      "source": "call-notes",
+      "text": "Hiring. Seven people. Two engineers are contractors in Portugal they intend to convert to full-time after the raise."
+    },
+    "call-notes:8": {
+      "source": "call-notes",
+      "text": "Round. $2.5M on a $14M post-money SAFE. They have $600k soft-circled from an energy angel syndicate. Runway at current burn is 11 months without the raise."
+    },
+    "call-notes:9": {
+      "source": "call-notes",
+      "text": "Follow-ups: reference calls with Cascade PUD and Three Rivers; copy of the pilot agreements; cohort data behind the 118% NRR figure."
+    }
+  },
+  "assessment": {
+    "company_name": "Lumen Grid",
+    "summary": "Lumen Grid sells workflow software to electric utility interconnection teams: it ingests applications, validates them against each utility's tariff, tracks study milestones and generates regulator-facing queue reports. The deck reports six paying utilities and $38,000 MRR, 118% trailing NRR, 81% gross margin and contracts of $42k-$110k per year. The first call confirms the $38k but narrows the picture: only four of six are on annual contracts, Pinecrest and Harlan County are month-to-month pending procurement, and Cascade PUD alone is 24% of MRR. The deck says the two IOU pilots convert in Q4 2026 if milestones are hit; on the call Priya put the odds at \"better than even\" and would not go further. The website says the founding team ran an interconnection group and processed 12,000+ applications; the bios attribute that experience to Priya alone. Two of the seven staff are Portugal contractors. Partners would need the cohort data behind the 118% NRR, the pilot agreements with their conversion criteria, and a view on whether PowerClerk extends into the study-workflow layer.",
+    "dimensions": [
+      {
+        "name": "Team",
+        "finding": "Priya Raman brings eight years at PG&E including running its distribution interconnection group; Daniel Okafor brings Palantir forward-deployed and Camus Energy grid-integration experience. They have worked together full-time only since October 2024.",
+        "claims": [
+          {
+            "text": "Priya Raman spent eight years at PG&E and managed the distribution interconnection group from 2021, overseeing 14 engineers and analysts.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "founders:1",
+                "quote": "manager of the distribution interconnection group from 2021, overseeing a team of 14 engineers and analysts",
+                "status": "ok"
+              },
+              {
+                "passage_id": "deck:7",
+                "quote": "Priya Raman (CEO) spent eight years at Pacific Gas & Electric, the last three running the distribution interconnection group.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "Daniel Okafor was a forward-deployed engineer at Palantir from 2017 to 2022 and a staff engineer at Camus Energy from 2022 to 2024 building grid data integrations for cooperative utilities.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "founders:2",
+                "quote": "Forward-deployed engineer at Palantir from 2017 to 2022, where he led utility and energy deployments. Staff engineer at Camus Energy from 2022 to 2024",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The founders met in 2023 and have worked together full-time since October 2024.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "founders:3",
+                "quote": "Priya and Daniel met in 2023 when Camus Energy integrated with PG&E's interconnection systems. They have worked together full-time since October 2024.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "Of the seven people on the team, two engineers are contractors based in Portugal whom the company intends to convert to full-time after the raise.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:7",
+                "quote": "Two engineers are contractors in Portugal they intend to convert to full-time after the raise.",
+                "status": "ok"
+              },
+              {
+                "passage_id": "deck:7",
+                "quote": "Team of seven: four engineers, one implementation lead, one account executive.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          }
+        ],
+        "open_questions": [
+          "The deck's team breakdown lists four engineers, one implementation lead and one account executive alongside two founders; how does that reconcile with 'team of seven'?",
+          "Will the two Portugal contractors convert, and what employment or IP-assignment arrangements are in place today?",
+          "Are there founder references from PG&E and Camus Energy available?"
+        ]
+      },
+      {
+        "name": "Problem and market",
+        "finding": "The deck sizes the problem with national queue statistics and defines a serviceable market of 410 US utilities worth $29M annually at current average contract value, with the ACV used in that calculation not disclosed.",
+        "claims": [
+          {
+            "text": "The deck states over 2,600 GW of generation and storage projects sit in US interconnection queues with a median wait of almost five years for a utility study.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "deck:1",
+                "quote": "Over 2,600 GW of generation and storage projects are waiting in US interconnection queues. The median project now waits almost five years for a utility study.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The company counts 410 of roughly 3,000 US electric utilities as its serviceable market, those processing more than 50 interconnection applications per year.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "deck:6",
+                "quote": "There are roughly 3,000 electric utilities in the United States. We count 410 that process more than 50 interconnection applications per year, which is our serviceable market.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The stated $29M US annual opportunity rests on an unstated 'current average contract value' while disclosed contracts span $42,000 to $110,000 per year.",
+            "basis": "derived",
+            "citations": [
+              {
+                "passage_id": "deck:6",
+                "quote": "At our current average contract value this is a $29M annual opportunity in the US before expanding into transmission-level studies and Canada.",
+                "status": "ok"
+              },
+              {
+                "passage_id": "deck:5",
+                "quote": "Current contracts range from $42,000 to $110,000 per year.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "No source gives the methodology or data source behind the 410-utility count.",
+            "basis": "absence",
+            "citations": [
+              {
+                "passage_id": "deck:6",
+                "quote": "We count 410 that process more than 50 interconnection applications per year, which is our serviceable market.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          }
+        ],
+        "open_questions": [
+          "What average contract value underlies the $29M serviceable market figure?",
+          "How was the 410-utility count constructed, and how many of those 410 are IOUs versus co-ops and munis?",
+          "What is the size and timing of the transmission-level and Canada expansion the deck references?"
+        ]
+      },
+      {
+        "name": "Product and technology",
+        "finding": "The product covers application intake, tariff-based completeness checks, milestone tracking and regulator-facing reporting; the associate identified the tariff rule engine as the differentiated component.",
+        "claims": [
+          {
+            "text": "The product ingests applications, tracks study milestones, runs completeness checks against each utility's tariff and generates regulator-facing queue reports.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "deck:2",
+                "quote": "It ingests applications, tracks study milestones, runs completeness checks against each utility's tariff, and produces the regulator-facing queue reports automatically.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The tariff rule engine took nine months to build and was identified on the call as the differentiated piece.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:1",
+                "quote": "the tariff rule engine is the differentiated piece and took them nine months to build.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The website states the product tracks deadlines under FERC Order 2023 and state timelines and produces the quarterly commission queue report.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "website:2",
+                "quote": "tracks deadlines under FERC Order 2023 and state timelines, and generates the quarterly queue report your commission expects.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The sources do not describe how tariff rules are configured per utility or how much implementation effort each new utility requires.",
+            "basis": "absence",
+            "citations": [
+              {
+                "passage_id": "deck:2",
+                "quote": "runs completeness checks against each utility's tariff",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          }
+        ],
+        "open_questions": [
+          "How long does onboarding a new utility's tariff ruleset take, and is it engineering-led or self-serve configuration?",
+          "Does the product handle transmission-level study workflow today or only distribution?",
+          "How are FERC Order 2023 and state rule changes maintained in the product over time?"
+        ]
+      },
+      {
+        "name": "Traction and customers",
+        "finding": "Six paying utilities generate $38,000 MRR, confirmed on the call, but two of the six are month-to-month and one account is 24% of MRR; two IOU pilots are paid at $15k for six months.",
+        "claims": [
+          {
+            "text": "Six utilities pay today, representing $38,000 in monthly recurring revenue, confirmed on the first call.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "deck:3",
+                "quote": "Six utilities are paying customers today, representing $38,000 in monthly recurring revenue.",
+                "status": "ok"
+              },
+              {
+                "passage_id": "call-notes:2",
+                "quote": "Confirmed $38k MRR.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "Four of the six paying customers are on annual contracts; Pinecrest and Harlan County are month-to-month pending procurement approval.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:2",
+                "quote": "four are on annual contracts and two (Pinecrest and Harlan County) are month-to-month while they finish procurement approval",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "Cascade PUD is the largest customer at $110k per year and accounts for 24% of MRR.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:2",
+                "quote": "Cascade PUD is the largest at $110k per year and is 24% of MRR.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The two IOU pilots, Great Lakes Energy and Southern Tier Power, began in April and May and are paid at $15k for six months each.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:3",
+                "quote": "Great Lakes Energy pilot started in April, Southern Tier in May. Both are paid at $15k for six months.",
+                "status": "ok"
+              },
+              {
+                "passage_id": "deck:4",
+                "quote": "Piloting: Great Lakes Energy (IOU, 1.1M meters) and Southern Tier Power (IOU, 640k meters).",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "There has been no logo churn to date, though Blue Mesa went quiet for two months during a staff change before re-engaging.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:4",
+                "quote": "No logo churn to date. One customer (Blue Mesa) went quiet for two months during a staff change and has since re-engaged.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          }
+        ],
+        "open_questions": [
+          "What cohort data supports the 118% NRR across six accounts, and which accounts expanded?",
+          "What are the written conversion criteria in the Great Lakes and Southern Tier pilot agreements?",
+          "Will Pinecrest and Harlan County complete procurement and move to annual contracts, and by when?"
+        ]
+      },
+      {
+        "name": "Business model and unit economics",
+        "finding": "Annual SaaS priced by meter count and queue volume, contracts $42k-$110k, reported 81% gross margin, with sales cycles of 4 months for co-ops and munis versus 9 months for the IOU pilots.",
+        "claims": [
+          {
+            "text": "Pricing is an annual SaaS subscription by meter count and queue volume, with current contracts between $42,000 and $110,000 per year.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "deck:5",
+                "quote": "Annual SaaS subscription priced by meter count and queue volume. Current contracts range from $42,000 to $110,000 per year.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The deck reports 81% gross margin.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "deck:5",
+                "quote": "Gross margin is 81%.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "Average sales cycle has been 4 months for cooperatives and munis and 9 months for the two IOU pilots.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "deck:5",
+                "quote": "Average sales cycle for cooperatives and munis has been 4 months; the two IOU pilots took 9 months to sign.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "No source provides CAC, payback period, burn rate, or the cost base behind the 81% gross margin.",
+            "basis": "absence",
+            "citations": [
+              {
+                "passage_id": "deck:5",
+                "quote": "Gross margin is 81%.",
+                "status": "ok"
+              },
+              {
+                "passage_id": "call-notes:8",
+                "quote": "Runway at current burn is 11 months without the raise.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          }
+        ],
+        "open_questions": [
+          "What is monthly burn in dollars, and what does the 11-month runway assume?",
+          "Is implementation labour included in cost of revenue for the 81% margin?",
+          "What does CAC look like for referral-driven co-op deals versus IOU procurement deals?"
+        ]
+      },
+      {
+        "name": "Competition and defensibility",
+        "finding": "PowerClerk is the widely used incumbent for intake and GridUnity serves transmission and larger IOUs; the founder positions Lumen above intake but acknowledges PowerClerk could extend into the study-workflow layer.",
+        "claims": [
+          {
+            "text": "The founder's position is that PowerClerk handles application intake but does not model study workflow or tariff completeness rules, with several Lumen customers using both.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:5",
+                "quote": "PowerClerk handles application intake well but does not model study workflow or tariff completeness rules; several Lumen customers still use PowerClerk for intake and Lumen for everything after.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The founder acknowledged PowerClerk could extend into Lumen Grid's space.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:5",
+                "quote": "She acknowledged PowerClerk could extend into their space.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "GridUnity is the other named competitor and is described as focused on transmission-level work and larger IOUs.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:5",
+                "quote": "GridUnity is the other named competitor; focused on transmission-level work and larger IOUs.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The claimed defensibility rests on the tariff rule engine, which the sources describe only as nine months of build effort with no detail on data moat or switching costs.",
+            "basis": "derived",
+            "citations": [
+              {
+                "passage_id": "call-notes:1",
+                "quote": "the tariff rule engine is the differentiated piece and took them nine months to build.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          }
+        ],
+        "open_questions": [
+          "Has Lumen Grid competed head-to-head against PowerClerk or GridUnity in any deal, and what was the outcome?",
+          "How many utilities use PowerClerk for intake alongside Lumen, and does that create a displacement risk if PowerClerk expands?",
+          "What switching costs exist once a utility's tariff rules are encoded?"
+        ]
+      },
+      {
+        "name": "Round and use of funds",
+        "finding": "The raise is $2.5M on a $14M post-money SAFE with $600k soft-circled; funds go to six hires against a target of 20 paying utilities and $1.5M ARR by December 2027.",
+        "claims": [
+          {
+            "text": "The round is $2.5M on a $14M post-money SAFE, with $600k soft-circled from an energy angel syndicate.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:8",
+                "quote": "$2.5M on a $14M post-money SAFE. They have $600k soft-circled from an energy angel syndicate.",
+                "status": "ok"
+              },
+              {
+                "passage_id": "deck:8",
+                "quote": "Raising $2.5M on a post-money SAFE.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "Use of funds is three engineers, two implementation specialists and one utility sales lead.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "deck:8",
+                "quote": "Use of funds: three engineers, two implementation specialists, one utility sales lead.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The plan targets 20 paying utilities and $1.5M ARR by December 2027, from six paying utilities and $38,000 MRR today.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "deck:8",
+                "quote": "Target is 20 paying utilities and $1.5M ARR by December 2027.",
+                "status": "ok"
+              },
+              {
+                "passage_id": "deck:3",
+                "quote": "Six utilities are paying customers today, representing $38,000 in monthly recurring revenue.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "Runway at current burn is 11 months without the raise.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:8",
+                "quote": "Runway at current burn is 11 months without the raise.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "No cap table, prior SAFE terms, or existing investor list appears in any source.",
+            "basis": "absence",
+            "citations": [
+              {
+                "passage_id": "call-notes:8",
+                "quote": "$2.5M on a $14M post-money SAFE.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          }
+        ],
+        "open_questions": [
+          "What prior financing exists and on what terms, and what is the fully diluted ownership after this round?",
+          "Is the $600k soft-circled amount documented, and on the same terms?",
+          "How does the hiring plan of six map to the path from 6 to 20 paying utilities with one utility sales lead?"
+        ]
+      },
+      {
+        "name": "Operational and regulatory risk",
+        "finding": "The product sits against FERC Order 2023 and state interconnection timelines; SOC 2 Type I was completed in March 2026 specifically to unblock an IOU, with Type II still in progress.",
+        "claims": [
+          {
+            "text": "SOC 2 Type I was completed in March 2026 and the Type II audit is in progress.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "website:5",
+                "quote": "SOC 2 Type I report completed in March 2026. Type II audit in progress.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The SOC 2 Type I was undertaken specifically to unblock the Great Lakes IOU deal, and IOU sales require procurement and a security review.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:6",
+                "quote": "IOU sales require a procurement process and a security review; the SOC 2 Type I was done specifically to unblock Great Lakes.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The co-op and muni sales motion is referral-driven through state cooperative associations.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:6",
+                "quote": "The cooperative and muni motion is referral-driven through state cooperative associations.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The product's outputs are regulator-facing, including the quarterly queue report filed with commissions.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "website:2",
+                "quote": "generates the quarterly queue report your commission expects",
+                "status": "ok"
+              },
+              {
+                "passage_id": "deck:2",
+                "quote": "produces the regulator-facing queue reports automatically",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          }
+        ],
+        "open_questions": [
+          "What liability does Lumen Grid carry if an automatically generated regulator-facing report is wrong?",
+          "When is SOC 2 Type II expected to complete, and is it a gating item for Southern Tier or other IOUs?",
+          "Do the Portugal-based contractors create data residency issues given the 'US regions only' hosting claim?"
+        ]
+      }
+    ],
+    "contradictions": [
+      {
+        "text": "The deck presents six paying customers without qualification, while the call shows two of the six are month-to-month pending procurement approval.",
+        "basis": "stated",
+        "citations": [
+          {
+            "passage_id": "deck:3",
+            "quote": "Six utilities are paying customers today, representing $38,000 in monthly recurring revenue.",
+            "status": "ok"
+          },
+          {
+            "passage_id": "call-notes:2",
+            "quote": "four are on annual contracts and two (Pinecrest and Harlan County) are month-to-month while they finish procurement approval",
+            "status": "ok"
+          }
+        ],
+        "verification": {
+          "status": "verified",
+          "issues": []
+        }
+      },
+      {
+        "text": "The deck states the two IOU pilots convert to annual contracts in Q4 2026 if milestones are hit, while on the call Priya would commit only to odds of \"better than even.\"",
+        "basis": "stated",
+        "citations": [
+          {
+            "passage_id": "deck:3",
+            "quote": "Two additional investor-owned utilities are in paid pilots that convert to annual contracts in Q4 2026 if they hit agreed milestones.",
+            "status": "ok"
+          },
+          {
+            "passage_id": "call-notes:3",
+            "quote": "Priya said she would put the odds of both converting at \"better than even\" but would not commit to more than that.",
+            "status": "ok"
+          }
+        ],
+        "verification": {
+          "status": "verified",
+          "issues": []
+        }
+      },
+      {
+        "text": "The website attributes running an interconnection group and 12,000+ processed applications to the founding team, while the bios attribute that role to Priya alone and place Daniel at Palantir and Camus Energy.",
+        "basis": "stated",
+        "citations": [
+          {
+            "passage_id": "website:3",
+            "quote": "Our founding team ran a distribution interconnection group at a major California utility and has processed more than 12,000 applications first-hand.",
+            "status": "ok"
+          },
+          {
+            "passage_id": "founders:2",
+            "quote": "Forward-deployed engineer at Palantir from 2017 to 2022, where he led utility and energy deployments.",
+            "status": "ok"
+          }
+        ],
+        "verification": {
+          "status": "verified",
+          "issues": []
+        }
+      },
+      {
+        "text": "The deck describes a team of seven without noting that two of the engineers are contractors in Portugal.",
+        "basis": "stated",
+        "citations": [
+          {
+            "passage_id": "deck:7",
+            "quote": "Team of seven: four engineers, one implementation lead, one account executive.",
+            "status": "ok"
+          },
+          {
+            "passage_id": "call-notes:7",
+            "quote": "Two engineers are contractors in Portugal they intend to convert to full-time after the raise.",
+            "status": "ok"
+          }
+        ],
+        "verification": {
+          "status": "verified",
+          "issues": []
+        }
+      }
+    ],
+    "missing": [
+      {
+        "item": "Cohort data behind the 118% net revenue retention figure",
+        "why_it_matters": "NRR computed across six accounts can be driven by a single expansion; the associate already listed this as a follow-up and it underpins the growth story."
+      },
+      {
+        "item": "Copies of the Great Lakes Energy and Southern Tier Power pilot agreements with conversion criteria",
+        "why_it_matters": "The deck's Q4 2026 conversion claim and the step up from $15k pilots to annual contracts depend entirely on these terms."
+      },
+      {
+        "item": "Customer reference calls (Cascade PUD and Three Rivers were flagged as follow-ups)",
+        "why_it_matters": "Cascade is 24% of MRR and the website's time-to-review and backlog results are self-published and unverified."
+      },
+      {
+        "item": "Monthly burn, P&L and the cost base behind the 81% gross margin",
+        "why_it_matters": "Only an 11-month runway figure is given; margin quality depends on whether implementation labour is in cost of revenue."
+      },
+      {
+        "item": "Cap table, prior financings and existing SAFE terms",
+        "why_it_matters": "Only the $14M post-money of this round is disclosed, so dilution and existing investor rights are unknown."
+      },
+      {
+        "item": "Pipeline detail for the path from 6 to 20 paying utilities",
+        "why_it_matters": "The December 2027 target implies a materially faster acquisition rate with one new sales lead, and no pipeline is shown."
+      },
+      {
+        "item": "Independent competitive landscape beyond PowerClerk and GridUnity",
+        "why_it_matters": "Both competitors are described only through the founder's own framing on the call."
+      },
+      {
+        "item": "Contracts and IP assignment for the Portugal-based contractors",
+        "why_it_matters": "Two of seven team members sit outside the company's employment structure while the site advertises US-only hosting."
+      },
+      {
+        "item": "Signed contract terms for the four annual customers (term length, auto-renewal, termination)",
+        "why_it_matters": "Determines how durable the $38k MRR is beyond the next renewal cycle."
+      }
+    ],
+    "bear_case": {
+      "thesis": "Stripped of the deck's framing, this is roughly $38k of MRR across six small co-op and municipal accounts, two of which can cancel monthly and one of which is a quarter of revenue, sold into a self-defined serviceable market the company itself values at $29M. The differentiated asset is a nine-month-old tariff rule engine sitting downstream of an incumbent, PowerClerk, that already owns intake and that the founder concedes could move into the workflow layer. The IOU motion that would make the numbers work took nine months to sign two paid pilots, requires procurement and security review, and the founder would not commit beyond \"better than even\" on conversion.",
+      "points": [
+        {
+          "text": "Revenue concentration is high: Cascade PUD alone is 24% of MRR at $110k per year.",
+          "basis": "stated",
+          "citations": [
+            {
+              "passage_id": "call-notes:2",
+              "quote": "Cascade PUD is the largest at $110k per year and is 24% of MRR.",
+              "status": "ok"
+            }
+          ],
+          "verification": {
+            "status": "verified",
+            "issues": []
+          }
+        },
+        {
+          "text": "Two of the six paying customers are month-to-month rather than contracted, so a third of the logo count can lapse without notice.",
+          "basis": "stated",
+          "citations": [
+            {
+              "passage_id": "call-notes:2",
+              "quote": "four are on annual contracts and two (Pinecrest and Harlan County) are month-to-month while they finish procurement approval",
+              "status": "ok"
+            }
+          ],
+          "verification": {
+            "status": "verified",
+            "issues": []
+          }
+        },
+        {
+          "text": "The company's own serviceable market is 410 utilities and a $29M annual US opportunity, which caps domestic outcomes absent the unproven transmission and Canada expansion.",
+          "basis": "stated",
+          "citations": [
+            {
+              "passage_id": "deck:6",
+              "quote": "We count 410 that process more than 50 interconnection applications per year",
+              "status": "ok"
+            },
+            {
+              "passage_id": "deck:6",
+              "quote": "this is a $29M annual opportunity in the US before expanding into transmission-level studies and Canada",
+              "status": "ok"
+            }
+          ],
+          "verification": {
+            "status": "verified",
+            "issues": []
+          }
+        },
+        {
+          "text": "The founder concedes the widely used incumbent PowerClerk could extend into Lumen Grid's space, and several Lumen customers already run PowerClerk for intake.",
+          "basis": "stated",
+          "citations": [
+            {
+              "passage_id": "call-notes:5",
+              "quote": "several Lumen customers still use PowerClerk for intake and Lumen for everything after. She acknowledged PowerClerk could extend into their space.",
+              "status": "ok"
+            }
+          ],
+          "verification": {
+            "status": "verified",
+            "issues": []
+          }
+        },
+        {
+          "text": "The IOU path is slow and gated: 9-month sales cycles, procurement plus security review, and SOC 2 Type II still in progress.",
+          "basis": "stated",
+          "citations": [
+            {
+              "passage_id": "deck:5",
+              "quote": "the two IOU pilots took 9 months to sign",
+              "status": "ok"
+            },
+            {
+              "passage_id": "call-notes:6",
+              "quote": "IOU sales require a procurement process and a security review",
+              "status": "ok"
+            },
+            {
+              "passage_id": "website:5",
+              "quote": "Type II audit in progress.",
+              "status": "ok"
+            }
+          ],
+          "verification": {
+            "status": "verified",
+            "issues": []
+          }
+        },
+        {
+          "text": "The 118% NRR is drawn from only six paying accounts and no cohort data supporting it has been provided.",
+          "basis": "absence",
+          "citations": [
+            {
+              "passage_id": "deck:3",
+              "quote": "Net revenue retention across the six paying accounts is 118% on a trailing-twelve-month basis.",
+              "status": "ok"
+            },
+            {
+              "passage_id": "call-notes:9",
+              "quote": "cohort data behind the 118% NRR figure",
+              "status": "ok"
+            }
+          ],
+          "verification": {
+            "status": "verified",
+            "issues": []
+          }
+        },
+        {
+          "text": "The company has 11 months of runway and only $600k of the $2.5M soft-circled, so the round is not substantially committed.",
+          "basis": "stated",
+          "citations": [
+            {
+              "passage_id": "call-notes:8",
+              "quote": "They have $600k soft-circled from an energy angel syndicate. Runway at current burn is 11 months without the raise.",
+              "status": "ok"
+            }
+          ],
+          "verification": {
+            "status": "verified",
+            "issues": []
+          }
+        },
+        {
+          "text": "The plan requires going from six to 20 paying utilities and $1.5M ARR by December 2027 with one new utility sales lead, and no pipeline evidence is in the inputs.",
+          "basis": "absence",
+          "citations": [
+            {
+              "passage_id": "deck:8",
+              "quote": "Use of funds: three engineers, two implementation specialists, one utility sales lead. Target is 20 paying utilities and $1.5M ARR by December 2027.",
+              "status": "ok"
+            }
+          ],
+          "verification": {
+            "status": "verified",
+            "issues": []
+          }
+        }
+      ]
+    },
+    "integrity_notes": [
+      "No text in the inputs attempts to instruct the reviewer or an AI system on how to write this assessment.",
+      "Priya's \"better than even\" odds on both pilots converting is a founder's self-assessed probability, not evidence; the deck's Q4 2026 conversion language is more definite than what she would commit to on the call.",
+      "The website's customer outcome figures (Cascade PUD 31 days to 9 days; Three Rivers eliminating a 240-application backlog) are company-published marketing claims; reference calls with both accounts are still open follow-ups.",
+      "The $600k soft-circled from an energy angel syndicate is uncommitted by definition and was not documented in the inputs.",
+      "The 11-month runway figure is a fact about the company's position, not a reason to move faster; it should not be read as deal urgency.",
+      "Figures including $38k MRR, 118% NRR, 81% gross margin, the 410-utility serviceable market and the 12,000 applications processed are all company-provided and unaudited in these inputs; only the $38k MRR was explicitly confirmed in the call."
+    ]
+  },
+  "verification": [
+    {
+      "id": "d0.c0",
+      "where": "Team",
+      "section": "dimension",
+      "text": "Priya Raman spent eight years at PG&E and managed the distribution interconnection group from 2021, overseeing 14 engineers and analysts.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "founders:1",
+          "quote": "manager of the distribution interconnection group from 2021, overseeing a team of 14 engineers and analysts",
+          "status": "ok"
+        },
+        {
+          "passage_id": "deck:7",
+          "quote": "Priya Raman (CEO) spent eight years at Pacific Gas & Electric, the last three running the distribution interconnection group.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d0.c1",
+      "where": "Team",
+      "section": "dimension",
+      "text": "Daniel Okafor was a forward-deployed engineer at Palantir from 2017 to 2022 and a staff engineer at Camus Energy from 2022 to 2024 building grid data integrations for cooperative utilities.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "founders:2",
+          "quote": "Forward-deployed engineer at Palantir from 2017 to 2022, where he led utility and energy deployments. Staff engineer at Camus Energy from 2022 to 2024",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d0.c2",
+      "where": "Team",
+      "section": "dimension",
+      "text": "The founders met in 2023 and have worked together full-time since October 2024.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "founders:3",
+          "quote": "Priya and Daniel met in 2023 when Camus Energy integrated with PG&E's interconnection systems. They have worked together full-time since October 2024.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d0.c3",
+      "where": "Team",
+      "section": "dimension",
+      "text": "Of the seven people on the team, two engineers are contractors based in Portugal whom the company intends to convert to full-time after the raise.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:7",
+          "quote": "Two engineers are contractors in Portugal they intend to convert to full-time after the raise.",
+          "status": "ok"
+        },
+        {
+          "passage_id": "deck:7",
+          "quote": "Team of seven: four engineers, one implementation lead, one account executive.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d1.c0",
+      "where": "Problem and market",
+      "section": "dimension",
+      "text": "The deck states over 2,600 GW of generation and storage projects sit in US interconnection queues with a median wait of almost five years for a utility study.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:1",
+          "quote": "Over 2,600 GW of generation and storage projects are waiting in US interconnection queues. The median project now waits almost five years for a utility study.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d1.c1",
+      "where": "Problem and market",
+      "section": "dimension",
+      "text": "The company counts 410 of roughly 3,000 US electric utilities as its serviceable market, those processing more than 50 interconnection applications per year.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:6",
+          "quote": "There are roughly 3,000 electric utilities in the United States. We count 410 that process more than 50 interconnection applications per year, which is our serviceable market.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d1.c2",
+      "where": "Problem and market",
+      "section": "dimension",
+      "text": "The stated $29M US annual opportunity rests on an unstated 'current average contract value' while disclosed contracts span $42,000 to $110,000 per year.",
+      "basis": "derived",
+      "citations": [
+        {
+          "passage_id": "deck:6",
+          "quote": "At our current average contract value this is a $29M annual opportunity in the US before expanding into transmission-level studies and Canada.",
+          "status": "ok"
+        },
+        {
+          "passage_id": "deck:5",
+          "quote": "Current contracts range from $42,000 to $110,000 per year.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d1.c3",
+      "where": "Problem and market",
+      "section": "dimension",
+      "text": "No source gives the methodology or data source behind the 410-utility count.",
+      "basis": "absence",
+      "citations": [
+        {
+          "passage_id": "deck:6",
+          "quote": "We count 410 that process more than 50 interconnection applications per year, which is our serviceable market.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d2.c0",
+      "where": "Product and technology",
+      "section": "dimension",
+      "text": "The product ingests applications, tracks study milestones, runs completeness checks against each utility's tariff and generates regulator-facing queue reports.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:2",
+          "quote": "It ingests applications, tracks study milestones, runs completeness checks against each utility's tariff, and produces the regulator-facing queue reports automatically.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d2.c1",
+      "where": "Product and technology",
+      "section": "dimension",
+      "text": "The tariff rule engine took nine months to build and was identified on the call as the differentiated piece.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:1",
+          "quote": "the tariff rule engine is the differentiated piece and took them nine months to build.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d2.c2",
+      "where": "Product and technology",
+      "section": "dimension",
+      "text": "The website states the product tracks deadlines under FERC Order 2023 and state timelines and produces the quarterly commission queue report.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "website:2",
+          "quote": "tracks deadlines under FERC Order 2023 and state timelines, and generates the quarterly queue report your commission expects.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d2.c3",
+      "where": "Product and technology",
+      "section": "dimension",
+      "text": "The sources do not describe how tariff rules are configured per utility or how much implementation effort each new utility requires.",
+      "basis": "absence",
+      "citations": [
+        {
+          "passage_id": "deck:2",
+          "quote": "runs completeness checks against each utility's tariff",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d3.c0",
+      "where": "Traction and customers",
+      "section": "dimension",
+      "text": "Six utilities pay today, representing $38,000 in monthly recurring revenue, confirmed on the first call.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:3",
+          "quote": "Six utilities are paying customers today, representing $38,000 in monthly recurring revenue.",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:2",
+          "quote": "Confirmed $38k MRR.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d3.c1",
+      "where": "Traction and customers",
+      "section": "dimension",
+      "text": "Four of the six paying customers are on annual contracts; Pinecrest and Harlan County are month-to-month pending procurement approval.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:2",
+          "quote": "four are on annual contracts and two (Pinecrest and Harlan County) are month-to-month while they finish procurement approval",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d3.c2",
+      "where": "Traction and customers",
+      "section": "dimension",
+      "text": "Cascade PUD is the largest customer at $110k per year and accounts for 24% of MRR.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:2",
+          "quote": "Cascade PUD is the largest at $110k per year and is 24% of MRR.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d3.c3",
+      "where": "Traction and customers",
+      "section": "dimension",
+      "text": "The two IOU pilots, Great Lakes Energy and Southern Tier Power, began in April and May and are paid at $15k for six months each.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:3",
+          "quote": "Great Lakes Energy pilot started in April, Southern Tier in May. Both are paid at $15k for six months.",
+          "status": "ok"
+        },
+        {
+          "passage_id": "deck:4",
+          "quote": "Piloting: Great Lakes Energy (IOU, 1.1M meters) and Southern Tier Power (IOU, 640k meters).",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d3.c4",
+      "where": "Traction and customers",
+      "section": "dimension",
+      "text": "There has been no logo churn to date, though Blue Mesa went quiet for two months during a staff change before re-engaging.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:4",
+          "quote": "No logo churn to date. One customer (Blue Mesa) went quiet for two months during a staff change and has since re-engaged.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d4.c0",
+      "where": "Business model and unit economics",
+      "section": "dimension",
+      "text": "Pricing is an annual SaaS subscription by meter count and queue volume, with current contracts between $42,000 and $110,000 per year.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:5",
+          "quote": "Annual SaaS subscription priced by meter count and queue volume. Current contracts range from $42,000 to $110,000 per year.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d4.c1",
+      "where": "Business model and unit economics",
+      "section": "dimension",
+      "text": "The deck reports 81% gross margin.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:5",
+          "quote": "Gross margin is 81%.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d4.c2",
+      "where": "Business model and unit economics",
+      "section": "dimension",
+      "text": "Average sales cycle has been 4 months for cooperatives and munis and 9 months for the two IOU pilots.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:5",
+          "quote": "Average sales cycle for cooperatives and munis has been 4 months; the two IOU pilots took 9 months to sign.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d4.c3",
+      "where": "Business model and unit economics",
+      "section": "dimension",
+      "text": "No source provides CAC, payback period, burn rate, or the cost base behind the 81% gross margin.",
+      "basis": "absence",
+      "citations": [
+        {
+          "passage_id": "deck:5",
+          "quote": "Gross margin is 81%.",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:8",
+          "quote": "Runway at current burn is 11 months without the raise.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d5.c0",
+      "where": "Competition and defensibility",
+      "section": "dimension",
+      "text": "The founder's position is that PowerClerk handles application intake but does not model study workflow or tariff completeness rules, with several Lumen customers using both.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:5",
+          "quote": "PowerClerk handles application intake well but does not model study workflow or tariff completeness rules; several Lumen customers still use PowerClerk for intake and Lumen for everything after.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d5.c1",
+      "where": "Competition and defensibility",
+      "section": "dimension",
+      "text": "The founder acknowledged PowerClerk could extend into Lumen Grid's space.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:5",
+          "quote": "She acknowledged PowerClerk could extend into their space.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d5.c2",
+      "where": "Competition and defensibility",
+      "section": "dimension",
+      "text": "GridUnity is the other named competitor and is described as focused on transmission-level work and larger IOUs.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:5",
+          "quote": "GridUnity is the other named competitor; focused on transmission-level work and larger IOUs.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d5.c3",
+      "where": "Competition and defensibility",
+      "section": "dimension",
+      "text": "The claimed defensibility rests on the tariff rule engine, which the sources describe only as nine months of build effort with no detail on data moat or switching costs.",
+      "basis": "derived",
+      "citations": [
+        {
+          "passage_id": "call-notes:1",
+          "quote": "the tariff rule engine is the differentiated piece and took them nine months to build.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d6.c0",
+      "where": "Round and use of funds",
+      "section": "dimension",
+      "text": "The round is $2.5M on a $14M post-money SAFE, with $600k soft-circled from an energy angel syndicate.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:8",
+          "quote": "$2.5M on a $14M post-money SAFE. They have $600k soft-circled from an energy angel syndicate.",
+          "status": "ok"
+        },
+        {
+          "passage_id": "deck:8",
+          "quote": "Raising $2.5M on a post-money SAFE.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d6.c1",
+      "where": "Round and use of funds",
+      "section": "dimension",
+      "text": "Use of funds is three engineers, two implementation specialists and one utility sales lead.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:8",
+          "quote": "Use of funds: three engineers, two implementation specialists, one utility sales lead.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d6.c2",
+      "where": "Round and use of funds",
+      "section": "dimension",
+      "text": "The plan targets 20 paying utilities and $1.5M ARR by December 2027, from six paying utilities and $38,000 MRR today.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:8",
+          "quote": "Target is 20 paying utilities and $1.5M ARR by December 2027.",
+          "status": "ok"
+        },
+        {
+          "passage_id": "deck:3",
+          "quote": "Six utilities are paying customers today, representing $38,000 in monthly recurring revenue.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d6.c3",
+      "where": "Round and use of funds",
+      "section": "dimension",
+      "text": "Runway at current burn is 11 months without the raise.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:8",
+          "quote": "Runway at current burn is 11 months without the raise.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d6.c4",
+      "where": "Round and use of funds",
+      "section": "dimension",
+      "text": "No cap table, prior SAFE terms, or existing investor list appears in any source.",
+      "basis": "absence",
+      "citations": [
+        {
+          "passage_id": "call-notes:8",
+          "quote": "$2.5M on a $14M post-money SAFE.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d7.c0",
+      "where": "Operational and regulatory risk",
+      "section": "dimension",
+      "text": "SOC 2 Type I was completed in March 2026 and the Type II audit is in progress.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "website:5",
+          "quote": "SOC 2 Type I report completed in March 2026. Type II audit in progress.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d7.c1",
+      "where": "Operational and regulatory risk",
+      "section": "dimension",
+      "text": "The SOC 2 Type I was undertaken specifically to unblock the Great Lakes IOU deal, and IOU sales require procurement and a security review.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:6",
+          "quote": "IOU sales require a procurement process and a security review; the SOC 2 Type I was done specifically to unblock Great Lakes.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d7.c2",
+      "where": "Operational and regulatory risk",
+      "section": "dimension",
+      "text": "The co-op and muni sales motion is referral-driven through state cooperative associations.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:6",
+          "quote": "The cooperative and muni motion is referral-driven through state cooperative associations.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d7.c3",
+      "where": "Operational and regulatory risk",
+      "section": "dimension",
+      "text": "The product's outputs are regulator-facing, including the quarterly queue report filed with commissions.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "website:2",
+          "quote": "generates the quarterly queue report your commission expects",
+          "status": "ok"
+        },
+        {
+          "passage_id": "deck:2",
+          "quote": "produces the regulator-facing queue reports automatically",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "x0",
+      "where": "Contradictions",
+      "section": "contradiction",
+      "text": "The deck presents six paying customers without qualification, while the call shows two of the six are month-to-month pending procurement approval.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:3",
+          "quote": "Six utilities are paying customers today, representing $38,000 in monthly recurring revenue.",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:2",
+          "quote": "four are on annual contracts and two (Pinecrest and Harlan County) are month-to-month while they finish procurement approval",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "x1",
+      "where": "Contradictions",
+      "section": "contradiction",
+      "text": "The deck states the two IOU pilots convert to annual contracts in Q4 2026 if milestones are hit, while on the call Priya would commit only to odds of \"better than even.\"",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:3",
+          "quote": "Two additional investor-owned utilities are in paid pilots that convert to annual contracts in Q4 2026 if they hit agreed milestones.",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:3",
+          "quote": "Priya said she would put the odds of both converting at \"better than even\" but would not commit to more than that.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "x2",
+      "where": "Contradictions",
+      "section": "contradiction",
+      "text": "The website attributes running an interconnection group and 12,000+ processed applications to the founding team, while the bios attribute that role to Priya alone and place Daniel at Palantir and Camus Energy.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "website:3",
+          "quote": "Our founding team ran a distribution interconnection group at a major California utility and has processed more than 12,000 applications first-hand.",
+          "status": "ok"
+        },
+        {
+          "passage_id": "founders:2",
+          "quote": "Forward-deployed engineer at Palantir from 2017 to 2022, where he led utility and energy deployments.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "x3",
+      "where": "Contradictions",
+      "section": "contradiction",
+      "text": "The deck describes a team of seven without noting that two of the engineers are contractors in Portugal.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:7",
+          "quote": "Team of seven: four engineers, one implementation lead, one account executive.",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:7",
+          "quote": "Two engineers are contractors in Portugal they intend to convert to full-time after the raise.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "b0",
+      "where": "Bear case",
+      "section": "bear_case",
+      "text": "Revenue concentration is high: Cascade PUD alone is 24% of MRR at $110k per year.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:2",
+          "quote": "Cascade PUD is the largest at $110k per year and is 24% of MRR.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "b1",
+      "where": "Bear case",
+      "section": "bear_case",
+      "text": "Two of the six paying customers are month-to-month rather than contracted, so a third of the logo count can lapse without notice.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:2",
+          "quote": "four are on annual contracts and two (Pinecrest and Harlan County) are month-to-month while they finish procurement approval",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "b2",
+      "where": "Bear case",
+      "section": "bear_case",
+      "text": "The company's own serviceable market is 410 utilities and a $29M annual US opportunity, which caps domestic outcomes absent the unproven transmission and Canada expansion.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:6",
+          "quote": "We count 410 that process more than 50 interconnection applications per year",
+          "status": "ok"
+        },
+        {
+          "passage_id": "deck:6",
+          "quote": "this is a $29M annual opportunity in the US before expanding into transmission-level studies and Canada",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "b3",
+      "where": "Bear case",
+      "section": "bear_case",
+      "text": "The founder concedes the widely used incumbent PowerClerk could extend into Lumen Grid's space, and several Lumen customers already run PowerClerk for intake.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:5",
+          "quote": "several Lumen customers still use PowerClerk for intake and Lumen for everything after. She acknowledged PowerClerk could extend into their space.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "b4",
+      "where": "Bear case",
+      "section": "bear_case",
+      "text": "The IOU path is slow and gated: 9-month sales cycles, procurement plus security review, and SOC 2 Type II still in progress.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:5",
+          "quote": "the two IOU pilots took 9 months to sign",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:6",
+          "quote": "IOU sales require a procurement process and a security review",
+          "status": "ok"
+        },
+        {
+          "passage_id": "website:5",
+          "quote": "Type II audit in progress.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "b5",
+      "where": "Bear case",
+      "section": "bear_case",
+      "text": "The 118% NRR is drawn from only six paying accounts and no cohort data supporting it has been provided.",
+      "basis": "absence",
+      "citations": [
+        {
+          "passage_id": "deck:3",
+          "quote": "Net revenue retention across the six paying accounts is 118% on a trailing-twelve-month basis.",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:9",
+          "quote": "cohort data behind the 118% NRR figure",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "b6",
+      "where": "Bear case",
+      "section": "bear_case",
+      "text": "The company has 11 months of runway and only $600k of the $2.5M soft-circled, so the round is not substantially committed.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:8",
+          "quote": "They have $600k soft-circled from an energy angel syndicate. Runway at current burn is 11 months without the raise.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "b7",
+      "where": "Bear case",
+      "section": "bear_case",
+      "text": "The plan requires going from six to 20 paying utilities and $1.5M ARR by December 2027 with one new utility sales lead, and no pipeline evidence is in the inputs.",
+      "basis": "absence",
+      "citations": [
+        {
+          "passage_id": "deck:8",
+          "quote": "Use of funds: three engineers, two implementation specialists, one utility sales lead. Target is 20 paying utilities and $1.5M ARR by December 2027.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    }
+  ]
+}

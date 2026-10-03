@@ -1,0 +1,1418 @@
+{
+  "slug": "harbor-health",
+  "company": {
+    "slug": "harbor-health",
+    "name": "Harbor Health",
+    "one_liner": "AI care-coordination layer for home health agencies",
+    "ask": "$3M seed",
+    "design_note": "Sparse case. Only a marketing website and a short, evasive first call. There is no deck and no founder bio. The tool should refuse to pad: most of the value is in the missing list, and claims should be few and clearly sourced."
+  },
+  "generated_at": "2026-10-03 18:59 UTC",
+  "model": "claude-opus-5",
+  "repairs": 1,
+  "first_pass_verification": {
+    "statements": 33,
+    "verified": 30,
+    "warning": 0,
+    "failed": 3,
+    "citations": 40,
+    "citations_ok": 37
+  },
+  "verification_summary": {
+    "statements": 36,
+    "verified": 36,
+    "warning": 0,
+    "failed": 0,
+    "citations": 42,
+    "citations_ok": 42
+  },
+  "sources": [
+    {
+      "key": "website",
+      "title": "harborhealth.ai — homepage (captured 2 July 2026)",
+      "passages": 8
+    },
+    {
+      "key": "call-notes",
+      "title": "First call notes — Harbor Health, 3 July 2026 (associate: M. Chen, 25 minutes with founder Tom Alvarez; co-founder did not join)",
+      "passages": 6
+    }
+  ],
+  "passages": {
+    "website:1": {
+      "source": "website",
+      "text": "Harbor Health. The AI care coordination layer for home health agencies."
+    },
+    "website:2": {
+      "source": "website",
+      "text": "Home health agencies lose hours every day to scheduling calls, visit documentation and payer paperwork. Harbor automates the coordination work so clinicians can focus on patients."
+    },
+    "website:3": {
+      "source": "website",
+      "text": "Smart scheduling. Harbor matches visits to clinicians by skill, location and authorization status, and reschedules automatically when a visit falls through."
+    },
+    "website:4": {
+      "source": "website",
+      "text": "Documentation that writes itself. Clinicians speak their visit notes; Harbor drafts OASIS-compliant documentation for review and signature."
+    },
+    "website:5": {
+      "source": "website",
+      "text": "Payer-ready. Harbor tracks authorizations and flags visits at risk of denial before they happen."
+    },
+    "website:6": {
+      "source": "website",
+      "text": "Trusted by forward-thinking agencies. Join the agencies already using Harbor to deliver more care with the same team."
+    },
+    "website:7": {
+      "source": "website",
+      "text": "HIPAA compliant. Built for the realities of home health."
+    },
+    "website:8": {
+      "source": "website",
+      "text": "Request a demo."
+    },
+    "call-notes:1": {
+      "source": "call-notes",
+      "text": "Tom was referred by a portfolio founder. He described Harbor as \"an operating system for home health\" and spent most of the call on the size of the home health market and the staffing crisis."
+    },
+    "call-notes:2": {
+      "source": "call-notes",
+      "text": "Asked how many agencies use the product. Tom said \"a few pilots\" and that he would rather not share numbers until the round is further along. Asked whether any pilot is paying; he said one has \"committed to pay\" starting in September."
+    },
+    "call-notes:3": {
+      "source": "call-notes",
+      "text": "Asked about the team. Tom is a former home health agency operator (ran a three-branch agency in Arizona, sold it in 2023). His co-founder is \"a senior ML engineer\" he met through a friend; Tom did not give a name and said they are \"finalizing the equity split.\""
+    },
+    "call-notes:4": {
+      "source": "call-notes",
+      "text": "Asked about the OASIS documentation feature on the website. Tom said it is \"in development\" and that the pilots are using the scheduling module only."
+    },
+    "call-notes:5": {
+      "source": "call-notes",
+      "text": "Raising $3M. No lead. Tom said two other funds are \"interested.\""
+    },
+    "call-notes:6": {
+      "source": "call-notes",
+      "text": "Tom was personable and clearly knows home health operations. He was reluctant on every quantitative question. Suggested follow-up: ask for a deck, pilot names, co-founder background and a product demo before spending more time."
+    }
+  },
+  "assessment": {
+    "company_name": "Harbor Health",
+    "summary": "Harbor Health sells an AI coordination layer for home health agencies: scheduling, voice-dictated OASIS documentation and authorization tracking. The website presents all three as live and claims agencies already use the product. The first call narrows this substantially. The founder said the OASIS documentation feature is \"in development\" and that pilots use the scheduling module only. Asked for customer counts, he said \"a few pilots\" and declined to give numbers; no pilot is paying today, with one said to have committed to pay from September. The founder, Tom Alvarez, ran a three-branch Arizona home health agency and sold it in 2023, which is the most substantiated asset in the file. The co-founder is unnamed, described only as \"a senior ML engineer,\" and the equity split is unsettled. The $3M round has no lead. There is no deck, no financials, no pricing and no named customer in these inputs. The partners would need the co-founder's identity and commitment terms, and a verified list of pilot agencies with usage, before anything else.",
+    "dimensions": [
+      {
+        "name": "Team",
+        "finding": "One founder has direct operating experience in home health; the second founder is unidentified in these inputs and the founding equity is not settled.",
+        "claims": [
+          {
+            "text": "Tom Alvarez ran a three-branch home health agency in Arizona and sold it in 2023.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:3",
+                "quote": "Tom is a former home health agency operator (ran a three-branch agency in Arizona, sold it in 2023).",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The co-founder is described only as \"a senior ML engineer\" and was not named by the founder.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:3",
+                "quote": "His co-founder is \"a senior ML engineer\" he met through a friend; Tom did not give a name",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The founders have not finalized the equity split between them.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:3",
+                "quote": "said they are \"finalizing the equity split.\"",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "Everything known about the technical co-founder comes secondhand from Tom, with no direct account from the co-founder anywhere in the inputs.",
+            "basis": "absence",
+            "citations": [
+              {
+                "passage_id": "call-notes:3",
+                "quote": "His co-founder is \"a senior ML engineer\" he met through a friend; Tom did not give a name",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          }
+        ],
+        "open_questions": [
+          "Who is the co-founder, what is their ML and healthcare background, and are they full-time?",
+          "What is the current cap table and the proposed founder equity split, and is there vesting?",
+          "Are there references from buyers or staff at the Arizona agency Tom ran?"
+        ]
+      },
+      {
+        "name": "Problem and market",
+        "finding": "The problem statement is coordination overhead in home health agencies; the market framing in the inputs is assertion rather than sized data.",
+        "claims": [
+          {
+            "text": "The stated problem is that agencies lose hours daily to scheduling calls, visit documentation and payer paperwork.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "website:2",
+                "quote": "Home health agencies lose hours every day to scheduling calls, visit documentation and payer paperwork.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The founder spent most of the call on market size and the staffing crisis rather than on the business.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:1",
+                "quote": "spent most of the call on the size of the home health market and the staffing crisis",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "No market size figure, agency count or spend-per-agency number appears anywhere in the inputs.",
+            "basis": "absence",
+            "citations": [
+              {
+                "passage_id": "call-notes:1",
+                "quote": "He described Harbor as \"an operating system for home health\"",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          }
+        ],
+        "open_questions": [
+          "What is the number of target agencies and the realistic annual spend per agency?",
+          "What do agencies currently pay for scheduling and documentation tooling today?"
+        ]
+      },
+      {
+        "name": "Product and technology",
+        "finding": "The website presents three live modules; the founder confirmed only the scheduling module is in use, with documentation still in development.",
+        "claims": [
+          {
+            "text": "The website lists smart scheduling, voice-dictated OASIS-compliant documentation and authorization tracking as product capabilities.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "website:3",
+                "quote": "Smart scheduling. Harbor matches visits to clinicians by skill, location and authorization status, and reschedules automatically when a visit falls through.",
+                "status": "ok"
+              },
+              {
+                "passage_id": "website:4",
+                "quote": "Clinicians speak their visit notes; Harbor drafts OASIS-compliant documentation for review and signature.",
+                "status": "ok"
+              },
+              {
+                "passage_id": "website:5",
+                "quote": "Harbor tracks authorizations and flags visits at risk of denial before they happen.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The founder said the OASIS documentation feature is in development and that pilots use only the scheduling module.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:4",
+                "quote": "Tom said it is \"in development\" and that the pilots are using the scheduling module only.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The associate had not seen a product demo at the time of the notes and listed one as a follow-up.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:6",
+                "quote": "ask for a deck, pilot names, co-founder background and a product demo before spending more time",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The inputs contain no description of the underlying models, data sources or any technical differentiation.",
+            "basis": "absence",
+            "citations": [
+              {
+                "passage_id": "website:1",
+                "quote": "Harbor Health. The AI care coordination layer for home health agencies.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          }
+        ],
+        "open_questions": [
+          "Is the scheduling module rule-based automation or ML, and what is the measured scheduling improvement at a pilot?",
+          "What is the development timeline and clinical validation plan for OASIS documentation?",
+          "What EHR or agency systems does Harbor integrate with today?"
+        ]
+      },
+      {
+        "name": "Traction and customers",
+        "finding": "Traction is described only qualitatively; the founder declined to share customer numbers and no pilot is paying yet.",
+        "claims": [
+          {
+            "text": "The founder said Harbor has \"a few pilots\" and declined to share numbers until the round is further along.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:2",
+                "quote": "Tom said \"a few pilots\" and that he would rather not share numbers until the round is further along.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "No pilot is paying today; one is said to have committed to pay starting in September.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:2",
+                "quote": "Asked whether any pilot is paying; he said one has \"committed to pay\" starting in September.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "No pilot agency is named in any input, and the associate flagged pilot names as an outstanding ask.",
+            "basis": "absence",
+            "citations": [
+              {
+                "passage_id": "call-notes:6",
+                "quote": "Suggested follow-up: ask for a deck, pilot names, co-founder background and a product demo",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The website asserts agencies are already using Harbor without naming any of them.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "website:6",
+                "quote": "Trusted by forward-thinking agencies. Join the agencies already using Harbor to deliver more care with the same team.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          }
+        ],
+        "open_questions": [
+          "How many pilots are live, since when, and what is weekly active usage per pilot?",
+          "Is the September commitment a signed contract or a verbal intent, and at what price?",
+          "What visit volume or clinician count do the pilot agencies represent?"
+        ]
+      },
+      {
+        "name": "Business model and unit economics",
+        "finding": "The inputs contain no pricing, revenue, cost or margin data; the only commercial signal is one unquantified future payment.",
+        "claims": [
+          {
+            "text": "The only commercial datapoint in the inputs is a pilot's commitment to begin paying in September, with no amount stated.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:2",
+                "quote": "he said one has \"committed to pay\" starting in September",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The website's only conversion mechanism is a demo request, with no pricing published.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "website:8",
+                "quote": "Request a demo.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The founder was reluctant on every quantitative question in the call, per the associate.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:6",
+                "quote": "He was reluctant on every quantitative question.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          }
+        ],
+        "open_questions": [
+          "What is the pricing model: per agency, per clinician, per visit, or percentage of billings?",
+          "What is current burn and runway, and what revenue exists to date?",
+          "What does implementation cost per agency in time and services?"
+        ]
+      },
+      {
+        "name": "Competition and defensibility",
+        "finding": "Neither source names a competitor or describes any moat; the only defensibility signal is the founder's operating background.",
+        "claims": [
+          {
+            "text": "No competitor, incumbent EHR vendor or alternative tool is named anywhere in the website or call notes.",
+            "basis": "absence",
+            "citations": [
+              {
+                "passage_id": "website:1",
+                "quote": "Harbor Health. The AI care coordination layer for home health agencies.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The deployed product is a single scheduling module, which limits any claim of workflow lock-in today.",
+            "basis": "derived",
+            "citations": [
+              {
+                "passage_id": "call-notes:4",
+                "quote": "the pilots are using the scheduling module only",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The associate noted the founder clearly knows home health operations, which is the only stated differentiator in the inputs.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:6",
+                "quote": "Tom was personable and clearly knows home health operations.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          }
+        ],
+        "open_questions": [
+          "Which vendors do pilot agencies currently use for scheduling and documentation, and what did Harbor displace?",
+          "What proprietary data, if any, accrues from usage?",
+          "What would stop an incumbent home health EHR from shipping the same scheduling automation?"
+        ]
+      },
+      {
+        "name": "Round and use of funds",
+        "finding": "A $3M seed is being raised with no lead committed and no stated use of proceeds.",
+        "claims": [
+          {
+            "text": "Harbor is raising $3M with no lead investor, and the founder said two other funds are \"interested.\"",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:5",
+                "quote": "Raising $3M. No lead. Tom said two other funds are \"interested.\"",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The inputs contain no valuation, instrument, prior financing history or planned use of funds.",
+            "basis": "absence",
+            "citations": [
+              {
+                "passage_id": "call-notes:5",
+                "quote": "Raising $3M. No lead.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "No deck existed in the inputs at the time of the call; the associate listed obtaining one as a follow-up.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:6",
+                "quote": "Suggested follow-up: ask for a deck, pilot names, co-founder background and a product demo before spending more time.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          }
+        ],
+        "open_questions": [
+          "What valuation and instrument are proposed, and has any capital been raised previously?",
+          "Which two funds are interested and at what stage of diligence?",
+          "What milestones is the $3M intended to reach?"
+        ]
+      },
+      {
+        "name": "Operational and regulatory risk",
+        "finding": "The product touches HIPAA-regulated clinical data and OASIS submissions; the inputs assert compliance without documentation.",
+        "claims": [
+          {
+            "text": "The website states Harbor is HIPAA compliant, with no supporting audit or certification referenced in the inputs.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "website:7",
+                "quote": "HIPAA compliant. Built for the realities of home health.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The documentation feature is intended to draft OASIS-compliant records for clinician review and signature, placing it in a regulated reimbursement workflow.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "website:4",
+                "quote": "Harbor drafts OASIS-compliant documentation for review and signature.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The authorization-denial feature implies payer-facing risk, but the inputs contain no evidence of payer relationships or denial-rate results.",
+            "basis": "absence",
+            "citations": [
+              {
+                "passage_id": "website:5",
+                "quote": "Payer-ready. Harbor tracks authorizations and flags visits at risk of denial before they happen.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          }
+        ],
+        "open_questions": [
+          "Are BAAs signed with pilot agencies and is there a SOC 2 or equivalent security review?",
+          "Who bears liability if AI-drafted OASIS documentation leads to a denied or clawed-back claim?",
+          "How is PHI handled by any third-party model providers?"
+        ]
+      }
+    ],
+    "contradictions": [
+      {
+        "text": "The website presents OASIS documentation as a working feature while the founder said it is in development and pilots use scheduling only.",
+        "basis": "stated",
+        "citations": [
+          {
+            "passage_id": "website:4",
+            "quote": "Documentation that writes itself. Clinicians speak their visit notes; Harbor drafts OASIS-compliant documentation for review and signature.",
+            "status": "ok"
+          },
+          {
+            "passage_id": "call-notes:4",
+            "quote": "Tom said it is \"in development\" and that the pilots are using the scheduling module only.",
+            "status": "ok"
+          }
+        ],
+        "verification": {
+          "status": "verified",
+          "issues": []
+        }
+      },
+      {
+        "text": "The website claims agencies already use Harbor, while the founder described only \"a few pilots\" with none currently paying.",
+        "basis": "stated",
+        "citations": [
+          {
+            "passage_id": "website:6",
+            "quote": "Join the agencies already using Harbor to deliver more care with the same team.",
+            "status": "ok"
+          },
+          {
+            "passage_id": "call-notes:2",
+            "quote": "Tom said \"a few pilots\" and that he would rather not share numbers until the round is further along.",
+            "status": "ok"
+          }
+        ],
+        "verification": {
+          "status": "verified",
+          "issues": []
+        }
+      },
+      {
+        "text": "The founder called Harbor \"an operating system for home health\" while the deployed scope is one scheduling module.",
+        "basis": "stated",
+        "citations": [
+          {
+            "passage_id": "call-notes:1",
+            "quote": "He described Harbor as \"an operating system for home health\"",
+            "status": "ok"
+          },
+          {
+            "passage_id": "call-notes:4",
+            "quote": "the pilots are using the scheduling module only",
+            "status": "ok"
+          }
+        ],
+        "verification": {
+          "status": "verified",
+          "issues": []
+        }
+      }
+    ],
+    "missing": [
+      {
+        "item": "A pitch deck or any written company materials",
+        "why_it_matters": "The entire assessment rests on one short call and a marketing homepage; there is no primary document stating metrics, plan or team."
+      },
+      {
+        "item": "Named pilot agencies with start dates, usage data and reference contacts",
+        "why_it_matters": "\"A few pilots\" cannot be verified or sized; usage depth determines whether scheduling automation actually works in production."
+      },
+      {
+        "item": "Co-founder identity, CV and employment status",
+        "why_it_matters": "The technical half of the team is unverified and the equity split is open, which is a core founding-risk question at seed."
+      },
+      {
+        "item": "Pricing, revenue, burn, runway and any financial model",
+        "why_it_matters": "Without pricing or cost data, neither the September payment commitment nor the $3M ask can be evaluated against milestones."
+      },
+      {
+        "item": "Competitive landscape and win/loss detail",
+        "why_it_matters": "The inputs name no competitor; home health scheduling and documentation are served by incumbent EHR and workforce vendors whose presence would shape wedge and pricing."
+      },
+      {
+        "item": "Security and compliance documentation (BAAs, SOC 2, HIPAA assessment)",
+        "why_it_matters": "HIPAA compliance is asserted on the homepage only; agencies and payers will diligence this before purchase."
+      },
+      {
+        "item": "Term sheet details: valuation, instrument, existing investors and the identity of the two interested funds",
+        "why_it_matters": "Round structure and who else is at the table determine both price and the realistic path to a close."
+      },
+      {
+        "item": "Founder references, including from the 2023 agency sale",
+        "why_it_matters": "The operator background is the strongest stated asset and is currently uncorroborated."
+      }
+    ],
+    "bear_case": {
+      "thesis": "On these inputs, Harbor is a single verified founder with a domain story, one scheduling module in unpaid pilots, and a website that describes a product that does not yet exist. Every quantitative question in the only call was deflected, so there is no evidence base to underwrite beyond the founder's biography. A $3M seed with no lead and no deck is being asked for against marketing claims the founder himself narrowed within minutes of being asked.",
+      "points": [
+        {
+          "text": "The headline documentation feature, which is the hardest and most differentiated part of the offering, is not built.",
+          "basis": "stated",
+          "citations": [
+            {
+              "passage_id": "call-notes:4",
+              "quote": "Tom said it is \"in development\" and that the pilots are using the scheduling module only.",
+              "status": "ok"
+            }
+          ],
+          "verification": {
+            "status": "verified",
+            "issues": []
+          }
+        },
+        {
+          "text": "There is no revenue; the strongest commercial fact is a verbal commitment to begin paying in a future month.",
+          "basis": "stated",
+          "citations": [
+            {
+              "passage_id": "call-notes:2",
+              "quote": "Asked whether any pilot is paying; he said one has \"committed to pay\" starting in September.",
+              "status": "ok"
+            }
+          ],
+          "verification": {
+            "status": "verified",
+            "issues": []
+          }
+        },
+        {
+          "text": "The founder declined to provide customer numbers, so the pilot base cannot be verified or sized.",
+          "basis": "stated",
+          "citations": [
+            {
+              "passage_id": "call-notes:2",
+              "quote": "he would rather not share numbers until the round is further along",
+              "status": "ok"
+            }
+          ],
+          "verification": {
+            "status": "verified",
+            "issues": []
+          }
+        },
+        {
+          "text": "The technical co-founder is unnamed and not yet committed to a fixed equity stake, so the founding team may not be stable.",
+          "basis": "stated",
+          "citations": [
+            {
+              "passage_id": "call-notes:3",
+              "quote": "Tom did not give a name and said they are \"finalizing the equity split.\"",
+              "status": "ok"
+            }
+          ],
+          "verification": {
+            "status": "verified",
+            "issues": []
+          }
+        },
+        {
+          "text": "The website claims agencies are already using the product while the founder's own account describes unpaid pilots, a gap a buyer or later investor may also notice.",
+          "basis": "derived",
+          "citations": [
+            {
+              "passage_id": "website:6",
+              "quote": "Trusted by forward-thinking agencies. Join the agencies already using Harbor",
+              "status": "ok"
+            },
+            {
+              "passage_id": "call-notes:2",
+              "quote": "Tom said \"a few pilots\"",
+              "status": "ok"
+            }
+          ],
+          "verification": {
+            "status": "verified",
+            "issues": []
+          }
+        },
+        {
+          "text": "No competitor, pricing, financial or market-size data exists anywhere in the inputs, so no part of the opportunity can be independently tested at this stage.",
+          "basis": "absence",
+          "citations": [
+            {
+              "passage_id": "call-notes:6",
+              "quote": "Suggested follow-up: ask for a deck, pilot names, co-founder background and a product demo before spending more time.",
+              "status": "ok"
+            }
+          ],
+          "verification": {
+            "status": "verified",
+            "issues": []
+          }
+        }
+      ]
+    },
+    "integrity_notes": [
+      "The founder's statement that \"two other funds are interested\" is unverified social proof with no named parties; it is not evidence of validation.",
+      "The website line \"Trusted by forward-thinking agencies\" names no customer and is contradicted in substance by the founder's own account of unpaid pilots.",
+      "The founder's refusal to share customer numbers \"until the round is further along\" means the traction section of this draft rests entirely on self-reported, unquantified statements.",
+      "\"HIPAA compliant\" and \"OASIS-compliant\" on the website are vendor assertions with no audit, certification or third-party evidence in the inputs.",
+      "No source in these inputs contained instructions addressed to reviewers or AI systems, and no third-party scores, ratings or deadlines were present."
+    ]
+  },
+  "verification": [
+    {
+      "id": "d0.c0",
+      "where": "Team",
+      "section": "dimension",
+      "text": "Tom Alvarez ran a three-branch home health agency in Arizona and sold it in 2023.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:3",
+          "quote": "Tom is a former home health agency operator (ran a three-branch agency in Arizona, sold it in 2023).",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d0.c1",
+      "where": "Team",
+      "section": "dimension",
+      "text": "The co-founder is described only as \"a senior ML engineer\" and was not named by the founder.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:3",
+          "quote": "His co-founder is \"a senior ML engineer\" he met through a friend; Tom did not give a name",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d0.c2",
+      "where": "Team",
+      "section": "dimension",
+      "text": "The founders have not finalized the equity split between them.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:3",
+          "quote": "said they are \"finalizing the equity split.\"",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d0.c3",
+      "where": "Team",
+      "section": "dimension",
+      "text": "Everything known about the technical co-founder comes secondhand from Tom, with no direct account from the co-founder anywhere in the inputs.",
+      "basis": "absence",
+      "citations": [
+        {
+          "passage_id": "call-notes:3",
+          "quote": "His co-founder is \"a senior ML engineer\" he met through a friend; Tom did not give a name",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d1.c0",
+      "where": "Problem and market",
+      "section": "dimension",
+      "text": "The stated problem is that agencies lose hours daily to scheduling calls, visit documentation and payer paperwork.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "website:2",
+          "quote": "Home health agencies lose hours every day to scheduling calls, visit documentation and payer paperwork.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d1.c1",
+      "where": "Problem and market",
+      "section": "dimension",
+      "text": "The founder spent most of the call on market size and the staffing crisis rather than on the business.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:1",
+          "quote": "spent most of the call on the size of the home health market and the staffing crisis",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d1.c2",
+      "where": "Problem and market",
+      "section": "dimension",
+      "text": "No market size figure, agency count or spend-per-agency number appears anywhere in the inputs.",
+      "basis": "absence",
+      "citations": [
+        {
+          "passage_id": "call-notes:1",
+          "quote": "He described Harbor as \"an operating system for home health\"",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d2.c0",
+      "where": "Product and technology",
+      "section": "dimension",
+      "text": "The website lists smart scheduling, voice-dictated OASIS-compliant documentation and authorization tracking as product capabilities.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "website:3",
+          "quote": "Smart scheduling. Harbor matches visits to clinicians by skill, location and authorization status, and reschedules automatically when a visit falls through.",
+          "status": "ok"
+        },
+        {
+          "passage_id": "website:4",
+          "quote": "Clinicians speak their visit notes; Harbor drafts OASIS-compliant documentation for review and signature.",
+          "status": "ok"
+        },
+        {
+          "passage_id": "website:5",
+          "quote": "Harbor tracks authorizations and flags visits at risk of denial before they happen.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d2.c1",
+      "where": "Product and technology",
+      "section": "dimension",
+      "text": "The founder said the OASIS documentation feature is in development and that pilots use only the scheduling module.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:4",
+          "quote": "Tom said it is \"in development\" and that the pilots are using the scheduling module only.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d2.c2",
+      "where": "Product and technology",
+      "section": "dimension",
+      "text": "The associate had not seen a product demo at the time of the notes and listed one as a follow-up.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:6",
+          "quote": "ask for a deck, pilot names, co-founder background and a product demo before spending more time",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d2.c3",
+      "where": "Product and technology",
+      "section": "dimension",
+      "text": "The inputs contain no description of the underlying models, data sources or any technical differentiation.",
+      "basis": "absence",
+      "citations": [
+        {
+          "passage_id": "website:1",
+          "quote": "Harbor Health. The AI care coordination layer for home health agencies.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d3.c0",
+      "where": "Traction and customers",
+      "section": "dimension",
+      "text": "The founder said Harbor has \"a few pilots\" and declined to share numbers until the round is further along.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:2",
+          "quote": "Tom said \"a few pilots\" and that he would rather not share numbers until the round is further along.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d3.c1",
+      "where": "Traction and customers",
+      "section": "dimension",
+      "text": "No pilot is paying today; one is said to have committed to pay starting in September.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:2",
+          "quote": "Asked whether any pilot is paying; he said one has \"committed to pay\" starting in September.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d3.c2",
+      "where": "Traction and customers",
+      "section": "dimension",
+      "text": "No pilot agency is named in any input, and the associate flagged pilot names as an outstanding ask.",
+      "basis": "absence",
+      "citations": [
+        {
+          "passage_id": "call-notes:6",
+          "quote": "Suggested follow-up: ask for a deck, pilot names, co-founder background and a product demo",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d3.c3",
+      "where": "Traction and customers",
+      "section": "dimension",
+      "text": "The website asserts agencies are already using Harbor without naming any of them.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "website:6",
+          "quote": "Trusted by forward-thinking agencies. Join the agencies already using Harbor to deliver more care with the same team.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d4.c0",
+      "where": "Business model and unit economics",
+      "section": "dimension",
+      "text": "The only commercial datapoint in the inputs is a pilot's commitment to begin paying in September, with no amount stated.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:2",
+          "quote": "he said one has \"committed to pay\" starting in September",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d4.c1",
+      "where": "Business model and unit economics",
+      "section": "dimension",
+      "text": "The website's only conversion mechanism is a demo request, with no pricing published.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "website:8",
+          "quote": "Request a demo.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d4.c2",
+      "where": "Business model and unit economics",
+      "section": "dimension",
+      "text": "The founder was reluctant on every quantitative question in the call, per the associate.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:6",
+          "quote": "He was reluctant on every quantitative question.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d5.c0",
+      "where": "Competition and defensibility",
+      "section": "dimension",
+      "text": "No competitor, incumbent EHR vendor or alternative tool is named anywhere in the website or call notes.",
+      "basis": "absence",
+      "citations": [
+        {
+          "passage_id": "website:1",
+          "quote": "Harbor Health. The AI care coordination layer for home health agencies.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d5.c1",
+      "where": "Competition and defensibility",
+      "section": "dimension",
+      "text": "The deployed product is a single scheduling module, which limits any claim of workflow lock-in today.",
+      "basis": "derived",
+      "citations": [
+        {
+          "passage_id": "call-notes:4",
+          "quote": "the pilots are using the scheduling module only",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d5.c2",
+      "where": "Competition and defensibility",
+      "section": "dimension",
+      "text": "The associate noted the founder clearly knows home health operations, which is the only stated differentiator in the inputs.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:6",
+          "quote": "Tom was personable and clearly knows home health operations.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d6.c0",
+      "where": "Round and use of funds",
+      "section": "dimension",
+      "text": "Harbor is raising $3M with no lead investor, and the founder said two other funds are \"interested.\"",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:5",
+          "quote": "Raising $3M. No lead. Tom said two other funds are \"interested.\"",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d6.c1",
+      "where": "Round and use of funds",
+      "section": "dimension",
+      "text": "The inputs contain no valuation, instrument, prior financing history or planned use of funds.",
+      "basis": "absence",
+      "citations": [
+        {
+          "passage_id": "call-notes:5",
+          "quote": "Raising $3M. No lead.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d6.c2",
+      "where": "Round and use of funds",
+      "section": "dimension",
+      "text": "No deck existed in the inputs at the time of the call; the associate listed obtaining one as a follow-up.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:6",
+          "quote": "Suggested follow-up: ask for a deck, pilot names, co-founder background and a product demo before spending more time.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d7.c0",
+      "where": "Operational and regulatory risk",
+      "section": "dimension",
+      "text": "The website states Harbor is HIPAA compliant, with no supporting audit or certification referenced in the inputs.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "website:7",
+          "quote": "HIPAA compliant. Built for the realities of home health.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d7.c1",
+      "where": "Operational and regulatory risk",
+      "section": "dimension",
+      "text": "The documentation feature is intended to draft OASIS-compliant records for clinician review and signature, placing it in a regulated reimbursement workflow.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "website:4",
+          "quote": "Harbor drafts OASIS-compliant documentation for review and signature.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d7.c2",
+      "where": "Operational and regulatory risk",
+      "section": "dimension",
+      "text": "The authorization-denial feature implies payer-facing risk, but the inputs contain no evidence of payer relationships or denial-rate results.",
+      "basis": "absence",
+      "citations": [
+        {
+          "passage_id": "website:5",
+          "quote": "Payer-ready. Harbor tracks authorizations and flags visits at risk of denial before they happen.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "x0",
+      "where": "Contradictions",
+      "section": "contradiction",
+      "text": "The website presents OASIS documentation as a working feature while the founder said it is in development and pilots use scheduling only.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "website:4",
+          "quote": "Documentation that writes itself. Clinicians speak their visit notes; Harbor drafts OASIS-compliant documentation for review and signature.",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:4",
+          "quote": "Tom said it is \"in development\" and that the pilots are using the scheduling module only.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "x1",
+      "where": "Contradictions",
+      "section": "contradiction",
+      "text": "The website claims agencies already use Harbor, while the founder described only \"a few pilots\" with none currently paying.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "website:6",
+          "quote": "Join the agencies already using Harbor to deliver more care with the same team.",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:2",
+          "quote": "Tom said \"a few pilots\" and that he would rather not share numbers until the round is further along.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "x2",
+      "where": "Contradictions",
+      "section": "contradiction",
+      "text": "The founder called Harbor \"an operating system for home health\" while the deployed scope is one scheduling module.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:1",
+          "quote": "He described Harbor as \"an operating system for home health\"",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:4",
+          "quote": "the pilots are using the scheduling module only",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "b0",
+      "where": "Bear case",
+      "section": "bear_case",
+      "text": "The headline documentation feature, which is the hardest and most differentiated part of the offering, is not built.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:4",
+          "quote": "Tom said it is \"in development\" and that the pilots are using the scheduling module only.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "b1",
+      "where": "Bear case",
+      "section": "bear_case",
+      "text": "There is no revenue; the strongest commercial fact is a verbal commitment to begin paying in a future month.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:2",
+          "quote": "Asked whether any pilot is paying; he said one has \"committed to pay\" starting in September.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "b2",
+      "where": "Bear case",
+      "section": "bear_case",
+      "text": "The founder declined to provide customer numbers, so the pilot base cannot be verified or sized.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:2",
+          "quote": "he would rather not share numbers until the round is further along",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "b3",
+      "where": "Bear case",
+      "section": "bear_case",
+      "text": "The technical co-founder is unnamed and not yet committed to a fixed equity stake, so the founding team may not be stable.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:3",
+          "quote": "Tom did not give a name and said they are \"finalizing the equity split.\"",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "b4",
+      "where": "Bear case",
+      "section": "bear_case",
+      "text": "The website claims agencies are already using the product while the founder's own account describes unpaid pilots, a gap a buyer or later investor may also notice.",
+      "basis": "derived",
+      "citations": [
+        {
+          "passage_id": "website:6",
+          "quote": "Trusted by forward-thinking agencies. Join the agencies already using Harbor",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:2",
+          "quote": "Tom said \"a few pilots\"",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "b5",
+      "where": "Bear case",
+      "section": "bear_case",
+      "text": "No competitor, pricing, financial or market-size data exists anywhere in the inputs, so no part of the opportunity can be independently tested at this stage.",
+      "basis": "absence",
+      "citations": [
+        {
+          "passage_id": "call-notes:6",
+          "quote": "Suggested follow-up: ask for a deck, pilot names, co-founder background and a product demo before spending more time.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    }
+  ]
+}

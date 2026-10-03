@@ -1,0 +1,2098 @@
+{
+  "slug": "quill-robotics",
+  "company": {
+    "slug": "quill-robotics",
+    "name": "Quill Robotics",
+    "one_liner": "Robotic sewing cells for apparel manufacturers",
+    "ask": "$4M seed",
+    "design_note": "Contradiction case. The deck and founder bio make claims the call notes undercut: ARR of $1.4M vs $410k contracted, 'led perception at Tesla' vs a seven-month contract role, a $48B TAM figure that describes a different market. The tool should surface each contradiction explicitly and prefer the primary source, not average them."
+  },
+  "generated_at": "2026-10-03 18:52 UTC",
+  "model": "claude-opus-5",
+  "repairs": 0,
+  "first_pass_verification": {
+    "statements": 51,
+    "verified": 51,
+    "warning": 0,
+    "failed": 0,
+    "citations": 73,
+    "citations_ok": 73
+  },
+  "verification_summary": {
+    "statements": 51,
+    "verified": 51,
+    "warning": 0,
+    "failed": 0,
+    "citations": 73,
+    "citations_ok": 73
+  },
+  "sources": [
+    {
+      "key": "deck",
+      "title": "Quill Robotics — Seed Round (May 2026)",
+      "passages": 7
+    },
+    {
+      "key": "website",
+      "title": "quillrobotics.com (captured 20 May 2026)",
+      "passages": 5
+    },
+    {
+      "key": "founders",
+      "title": "Founder bios (provided by the company)",
+      "passages": 2
+    },
+    {
+      "key": "call-notes",
+      "title": "First call notes — Quill Robotics, 27 May 2026 (associate: M. Chen, 50 minutes with Elena Marsh and Raj Venkat)",
+      "passages": 9
+    }
+  ],
+  "passages": {
+    "deck:1": {
+      "source": "deck",
+      "text": "Slide 1: Apparel is the last unautomated manufacturing industry\nGarments are still sewn by hand. 60 million people work in apparel manufacturing and labor is 25 to 35% of garment cost. Brands want to reshore production but cannot find the sewing labor to do it."
+    },
+    "deck:2": {
+      "source": "deck",
+      "text": "Slide 2: Quill sews\nQuill builds robotic sewing cells. A vision system tracks fabric deformation in real time and a two-arm manipulator feeds the garment through a standard industrial sewing head. One cell replaces 2.5 sewing operators on simple seams: side seams, hems, pocket attachment."
+    },
+    "deck:3": {
+      "source": "deck",
+      "text": "Slide 3: Traction\n$1.4M ARR. Three paying customers: two US contract manufacturers and one brand-owned facility in Mexico. 14 cells deployed. Pipeline of $6.2M with signed LOIs."
+    },
+    "deck:4": {
+      "source": "deck",
+      "text": "Slide 4: Market\nWarehouse and industrial automation is a $48B market growing 17% a year (McKinsey, 2024). Sewing automation is the largest untouched segment within it."
+    },
+    "deck:5": {
+      "source": "deck",
+      "text": "Slide 5: Business model\nRobotics-as-a-service. $4,200 per cell per month on 36-month terms, including maintenance. Hardware cost per cell is $31,000 at current volume; payback on hardware is 8 months."
+    },
+    "deck:6": {
+      "source": "deck",
+      "text": "Slide 6: Team\nElena Marsh (CEO) led perception at Tesla and spent four years in apparel sourcing at Gap Inc. Raj Venkat (CTO) did his PhD on deformable object manipulation at CMU and co-authored the DeformNet benchmark. Team of nine."
+    },
+    "deck:7": {
+      "source": "deck",
+      "text": "Slide 7: Raise\n$4M seed to scale to 60 cells, hire a field service team and open a Mexico service hub."
+    },
+    "website:1": {
+      "source": "website",
+      "text": "Quill Robotics. Robots that sew."
+    },
+    "website:2": {
+      "source": "website",
+      "text": "Our cells handle the seams that make up 70% of sewing time on a basic garment: side seams, hems, and pocket attachment. Vision-guided fabric handling means no fixtures, no special fabric treatment, and changeovers in under ten minutes."
+    },
+    "website:3": {
+      "source": "website",
+      "text": "Deployed with contract manufacturers in North Carolina, Texas and Monterrey."
+    },
+    "website:4": {
+      "source": "website",
+      "text": "Robotics-as-a-service. No capital expenditure. One monthly fee covers the cell, software updates and maintenance."
+    },
+    "website:5": {
+      "source": "website",
+      "text": "Leadership. Elena Marsh, CEO: former Tesla perception engineer and Gap Inc. sourcing lead. Raj Venkat, CTO: Carnegie Mellon Robotics Institute."
+    },
+    "founders:1": {
+      "source": "founders",
+      "text": "Elena Marsh, CEO. Led perception engineering at Tesla on the Optimus humanoid program. Previously four years at Gap Inc. in global sourcing, where she managed supplier relationships across Vietnam and Central America. MBA, Wharton."
+    },
+    "founders:2": {
+      "source": "founders",
+      "text": "Raj Venkat, CTO. PhD in robotics from Carnegie Mellon University, advised by Professor David Held. Thesis on learned manipulation of deformable objects. Co-author of the DeformNet benchmark (CoRL 2023). Previously research intern at Google DeepMind robotics."
+    },
+    "call-notes:1": {
+      "source": "call-notes",
+      "text": "Strong demo video. Raj is clearly the technical engine; the deformable-handling approach is genuinely hard and his CMU work is real and well cited."
+    },
+    "call-notes:2": {
+      "source": "call-notes",
+      "text": "Revenue. I asked Elena to walk through the $1.4M ARR. Contracted ARR today is $410k: 14 cells at roughly $2,400 per cell per month (early customers got a discount from the $4,200 list price). The $1.4M figure is contracted ARR plus the annualized value of signed LOIs that have not yet converted to orders. Elena agreed the deck should say \"contracted plus committed\" and said she would update it."
+    },
+    "call-notes:3": {
+      "source": "call-notes",
+      "text": "Customers. Two contract manufacturers (North Carolina and Texas) and one brand facility in Monterrey. The Monterrey facility has 8 of the 14 cells and is 55% of contracted revenue."
+    },
+    "call-notes:4": {
+      "source": "call-notes",
+      "text": "Team background. Asked Elena about the Tesla role. She was a contractor on the Optimus perception team for seven months in 2022 through an agency, working on data labeling pipelines. She did not lead the team. She was open about this when asked directly but the deck and bio overstate it. Raj's background checks out."
+    },
+    "call-notes:5": {
+      "source": "call-notes",
+      "text": "Market. The $48B figure on slide 4 is McKinsey's number for warehouse and industrial automation broadly. Elena acknowledged there is no good market-size figure for sewing automation specifically. Her bottom-up estimate: 8,000 apparel factories in the Americas with more than 50 operators, each a candidate for 5 to 20 cells."
+    },
+    "call-notes:6": {
+      "source": "call-notes",
+      "text": "Unit economics. Hardware cost per cell $31k confirmed. At the discounted $2,400 rate, hardware payback is 13 months, not 8. Field maintenance has been done by Raj personally flying to sites; they have no service team yet."
+    },
+    "call-notes:7": {
+      "source": "call-notes",
+      "text": "Reliability. Cells average 71% uptime at the Monterrey site because of fabric variation on new SKUs. The two US sites, which run fewer SKUs, are above 90%."
+    },
+    "call-notes:8": {
+      "source": "call-notes",
+      "text": "Round. $4M at $18M post. No lead yet. Two angels committed $350k total."
+    },
+    "call-notes:9": {
+      "source": "call-notes",
+      "text": "Follow-ups: cell-level uptime logs, customer contracts and LOIs, reference call with the Monterrey plant manager, confirmation of Elena's Tesla engagement dates."
+    }
+  },
+  "assessment": {
+    "company_name": "Quill Robotics",
+    "summary": "Quill builds robotic sewing cells that use vision-guided deformable-fabric handling to feed garments through a standard industrial sewing head, sold as robotics-as-a-service to apparel contract manufacturers. The deck and the first call disagree on the two numbers that matter most. The deck shows $1.4M ARR; on the call Elena Marsh said contracted ARR is $410k and that the rest is annualized value of unconverted LOIs. The deck shows 8-month hardware payback at a $4,200 list price; at the $2,400 price customers actually pay, payback is 13 months. The deck and website say Marsh led perception at Tesla; she described a seven-month agency contract on data-labeling pipelines and did not lead the team. Raj Venkat's CMU deformable-manipulation work was checked and held up. Revenue is concentrated: one Monterrey facility holds 8 of 14 cells and 55% of contracted revenue, and runs 71% uptime versus above 90% at the two US sites. Partners would need the uptime logs and contracts, and a view on whether the fabric-variation problem is solvable at SKU scale.",
+    "dimensions": [
+      {
+        "name": "Team",
+        "finding": "Venkat's technical credentials were verified on the call; Marsh's Tesla credential as presented in the deck, website and bio is narrower than stated.",
+        "claims": [
+          {
+            "text": "The deck states Marsh \"led perception at Tesla\" and spent four years in apparel sourcing at Gap Inc.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "deck:6",
+                "quote": "Elena Marsh (CEO) led perception at Tesla and spent four years in apparel sourcing at Gap Inc.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "On the call Marsh described a seven-month agency contract on the Optimus perception team working on data labeling pipelines, and said she did not lead the team.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:4",
+                "quote": "She was a contractor on the Optimus perception team for seven months in 2022 through an agency, working on data labeling pipelines. She did not lead the team.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "Venkat holds a CMU robotics PhD under Professor David Held with a thesis on deformable object manipulation and co-authorship of the DeformNet benchmark.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "founders:2",
+                "quote": "PhD in robotics from Carnegie Mellon University, advised by Professor David Held. Thesis on learned manipulation of deformable objects. Co-author of the DeformNet benchmark (CoRL 2023).",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The associate recorded that Venkat's background checks out and his CMU work is real and well cited.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:1",
+                "quote": "the deformable-handling approach is genuinely hard and his CMU work is real and well cited",
+                "status": "ok"
+              },
+              {
+                "passage_id": "call-notes:4",
+                "quote": "Raj's background checks out.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The company reports a team of nine, with no breakdown of roles in any source.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "deck:6",
+                "quote": "Team of nine.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          }
+        ],
+        "open_questions": [
+          "What were Marsh's exact Tesla engagement dates and employer of record?",
+          "Who are the other seven employees and how many are engineers versus field staff?",
+          "Why were the deck, website and bio all written with the same overstated Tesla description?"
+        ]
+      },
+      {
+        "name": "Problem and market",
+        "finding": "The labor problem is stated clearly, but the headline market number is a proxy from an adjacent sector that the CEO acknowledged does not measure sewing automation.",
+        "claims": [
+          {
+            "text": "The deck states 60 million people work in apparel manufacturing and labor is 25 to 35% of garment cost.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "deck:1",
+                "quote": "60 million people work in apparel manufacturing and labor is 25 to 35% of garment cost.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The $48B market figure is McKinsey's number for warehouse and industrial automation broadly, not for sewing.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "deck:4",
+                "quote": "Warehouse and industrial automation is a $48B market growing 17% a year (McKinsey, 2024).",
+                "status": "ok"
+              },
+              {
+                "passage_id": "call-notes:5",
+                "quote": "The $48B figure on slide 4 is McKinsey's number for warehouse and industrial automation broadly.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "Marsh acknowledged there is no good market-size figure for sewing automation specifically.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:5",
+                "quote": "Elena acknowledged there is no good market-size figure for sewing automation specifically.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "Her bottom-up estimate is 8,000 apparel factories in the Americas with more than 50 operators, each a candidate for 5 to 20 cells.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:5",
+                "quote": "8,000 apparel factories in the Americas with more than 50 operators, each a candidate for 5 to 20 cells.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The claim that brands want to reshore but cannot find sewing labor appears only as a deck assertion with no supporting data in any source.",
+            "basis": "absence",
+            "citations": [
+              {
+                "passage_id": "deck:1",
+                "quote": "Brands want to reshore production but cannot find the sewing labor to do it.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          }
+        ],
+        "open_questions": [
+          "What share of the 8,000 factories can afford $4,200 per cell per month?",
+          "How many cells per factory are realistic given that cells cover only simple seams?",
+          "Is there third-party data on reshoring volume or sewing labor shortages?"
+        ]
+      },
+      {
+        "name": "Product and technology",
+        "finding": "The cells automate a defined subset of seams using vision-guided fabric handling with no fixtures; performance varies sharply with SKU mix.",
+        "claims": [
+          {
+            "text": "The system uses a vision system tracking fabric deformation in real time with a two-arm manipulator feeding a standard industrial sewing head.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "deck:2",
+                "quote": "A vision system tracks fabric deformation in real time and a two-arm manipulator feeds the garment through a standard industrial sewing head.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "Coverage is limited to side seams, hems and pocket attachment, which the website says account for 70% of sewing time on a basic garment.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "deck:2",
+                "quote": "One cell replaces 2.5 sewing operators on simple seams: side seams, hems, pocket attachment.",
+                "status": "ok"
+              },
+              {
+                "passage_id": "website:2",
+                "quote": "Our cells handle the seams that make up 70% of sewing time on a basic garment: side seams, hems, and pocket attachment.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The website claims no fixtures, no special fabric treatment and changeovers in under ten minutes.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "website:2",
+                "quote": "Vision-guided fabric handling means no fixtures, no special fabric treatment, and changeovers in under ten minutes.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "Uptime is 71% at the Monterrey site due to fabric variation on new SKUs, versus above 90% at the two US sites that run fewer SKUs.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:7",
+                "quote": "Cells average 71% uptime at the Monterrey site because of fabric variation on new SKUs. The two US sites, which run fewer SKUs, are above 90%.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "No source contains cell-level uptime logs; these remain an open follow-up item.",
+            "basis": "absence",
+            "citations": [
+              {
+                "passage_id": "call-notes:9",
+                "quote": "Follow-ups: cell-level uptime logs, customer contracts and LOIs",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          }
+        ],
+        "open_questions": [
+          "Does the 71% figure include changeover downtime or only faults?",
+          "How much new-SKU tuning is required per fabric, and by whom?",
+          "Is the 2.5-operator replacement rate measured at customer sites or modeled?"
+        ]
+      },
+      {
+        "name": "Traction and customers",
+        "finding": "Three customers and 14 cells are consistent across sources, but the revenue figure in the deck is roughly 3.4x the contracted figure Marsh gave on the call, and over half of contracted revenue sits with one site.",
+        "claims": [
+          {
+            "text": "The deck states $1.4M ARR, three paying customers, 14 cells deployed and a $6.2M pipeline with signed LOIs.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "deck:3",
+                "quote": "$1.4M ARR. Three paying customers: two US contract manufacturers and one brand-owned facility in Mexico. 14 cells deployed. Pipeline of $6.2M with signed LOIs.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "On the call Marsh said contracted ARR today is $410k and that the $1.4M figure adds annualized value of signed LOIs not yet converted to orders.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:2",
+                "quote": "Contracted ARR today is $410k: 14 cells at roughly $2,400 per cell per month",
+                "status": "ok"
+              },
+              {
+                "passage_id": "call-notes:2",
+                "quote": "The $1.4M figure is contracted ARR plus the annualized value of signed LOIs that have not yet converted to orders.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The deck's ARR figure is about 3.4 times the contracted figure, derived by dividing $1.4M by $410k.",
+            "basis": "derived",
+            "citations": [
+              {
+                "passage_id": "deck:3",
+                "quote": "$1.4M ARR.",
+                "status": "ok"
+              },
+              {
+                "passage_id": "call-notes:2",
+                "quote": "Contracted ARR today is $410k",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "One Monterrey facility holds 8 of 14 cells and 55% of contracted revenue.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:3",
+                "quote": "The Monterrey facility has 8 of the 14 cells and is 55% of contracted revenue.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The site with the largest share of cells and revenue is also the one running 71% uptime.",
+            "basis": "derived",
+            "citations": [
+              {
+                "passage_id": "call-notes:3",
+                "quote": "The Monterrey facility has 8 of the 14 cells and is 55% of contracted revenue.",
+                "status": "ok"
+              },
+              {
+                "passage_id": "call-notes:7",
+                "quote": "Cells average 71% uptime at the Monterrey site because of fabric variation on new SKUs.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          }
+        ],
+        "open_questions": [
+          "How long has each cell been deployed and has any customer expanded after an initial order?",
+          "What are the conversion terms and expiry on the LOIs behind the $6.2M pipeline?",
+          "Is any customer paying list price, or are all 14 cells at $2,400?"
+        ]
+      },
+      {
+        "name": "Business model and unit economics",
+        "finding": "Robotics-as-a-service at a $4,200 list price, but realized pricing is $2,400 and the deck's payback figure uses list rather than realized price.",
+        "claims": [
+          {
+            "text": "The deck prices cells at $4,200 per month on 36-month terms including maintenance, with hardware cost of $31,000 and 8-month hardware payback.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "deck:5",
+                "quote": "$4,200 per cell per month on 36-month terms, including maintenance. Hardware cost per cell is $31,000 at current volume; payback on hardware is 8 months.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "Early customers received a discount and pay roughly $2,400 per cell per month.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:2",
+                "quote": "14 cells at roughly $2,400 per cell per month (early customers got a discount from the $4,200 list price)",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "At the $2,400 rate hardware payback is 13 months, not 8, and the $31,000 hardware cost was confirmed on the call.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:6",
+                "quote": "Hardware cost per cell $31k confirmed. At the discounted $2,400 rate, hardware payback is 13 months, not 8.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The monthly fee covers the cell, software updates and maintenance, so service cost sits with Quill rather than the customer.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "website:4",
+                "quote": "Robotics-as-a-service. No capital expenditure. One monthly fee covers the cell, software updates and maintenance.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "No source gives gross margin, service cost per cell, cell lifetime or churn.",
+            "basis": "absence",
+            "citations": [
+              {
+                "passage_id": "deck:5",
+                "quote": "Hardware cost per cell is $31,000 at current volume; payback on hardware is 8 months.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          }
+        ],
+        "open_questions": [
+          "What does maintenance cost per cell per month once a field team replaces founder travel?",
+          "Will new customers accept $4,200 or will the $2,400 discount become the market price?",
+          "What happens at the end of a 36-month term — renewal, refurbishment, or write-off?"
+        ]
+      },
+      {
+        "name": "Competition and defensibility",
+        "finding": "No source names a competitor or an alternative automation approach; the deck asserts the segment is untouched.",
+        "claims": [
+          {
+            "text": "The deck asserts sewing automation is the largest untouched segment within industrial automation.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "deck:4",
+                "quote": "Sewing automation is the largest untouched segment within it.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The deck's opening claim is that apparel is the last unautomated manufacturing industry and garments are still sewn by hand.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "deck:1",
+                "quote": "Apparel is the last unautomated manufacturing industry Garments are still sewn by hand.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "No source in this set names a competitor, a prior attempt at sewing automation, or any patent or IP position.",
+            "basis": "absence",
+            "citations": [
+              {
+                "passage_id": "deck:4",
+                "quote": "Sewing automation is the largest untouched segment within it.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The stated technical moat rests on deformable object manipulation, which the associate described as genuinely hard.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:1",
+                "quote": "the deformable-handling approach is genuinely hard and his CMU work is real and well cited",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          }
+        ],
+        "open_questions": [
+          "Who else is building sewing automation, and why have prior attempts not taken the market?",
+          "Does Quill hold patents or is the moat the team's know-how?",
+          "What stops a sewing-machine OEM from bundling a vision module?"
+        ]
+      },
+      {
+        "name": "Round and use of funds",
+        "finding": "A $4M raise at $18M post with no lead and $350k of angel commitments; the use of funds targets a 4x increase in deployed cells plus a service organization.",
+        "claims": [
+          {
+            "text": "The round is $4M at $18M post, with no lead and two angels committed for $350k total.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:8",
+                "quote": "$4M at $18M post. No lead yet. Two angels committed $350k total.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "Proceeds are earmarked to scale to 60 cells, hire a field service team and open a Mexico service hub.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "deck:7",
+                "quote": "$4M seed to scale to 60 cells, hire a field service team and open a Mexico service hub.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "Going from 14 deployed cells to 60 is an increase of 46 cells, which at $31,000 hardware cost is about $1.4M of hardware, derived from the deck's cell count and unit cost.",
+            "basis": "derived",
+            "citations": [
+              {
+                "passage_id": "deck:3",
+                "quote": "14 cells deployed.",
+                "status": "ok"
+              },
+              {
+                "passage_id": "deck:7",
+                "quote": "$4M seed to scale to 60 cells",
+                "status": "ok"
+              },
+              {
+                "passage_id": "deck:5",
+                "quote": "Hardware cost per cell is $31,000 at current volume",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The $4M raise on an $18M post represents roughly 22% dilution, derived by dividing $4M by $18M.",
+            "basis": "derived",
+            "citations": [
+              {
+                "passage_id": "call-notes:8",
+                "quote": "$4M at $18M post.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "No source states current burn rate, runway, or existing capital raised.",
+            "basis": "absence",
+            "citations": [
+              {
+                "passage_id": "call-notes:8",
+                "quote": "$4M at $18M post. No lead yet.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          }
+        ],
+        "open_questions": [
+          "What is monthly burn and how long does $4M last at 60 cells?",
+          "Is the $18M post priced against the $1.4M headline or the $410k contracted ARR?",
+          "Are the 46 additional cells backed by orders or by the unconverted LOIs?"
+        ]
+      },
+      {
+        "name": "Operational and regulatory risk",
+        "finding": "Field service is currently performed by the CTO in person and there is no service organization; cross-border deployment in Mexico is noted but no regulatory or trade detail appears in any source.",
+        "claims": [
+          {
+            "text": "Field maintenance has been done by Venkat personally flying to sites and the company has no service team.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:6",
+                "quote": "Field maintenance has been done by Raj personally flying to sites; they have no service team yet.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "Deployments span North Carolina, Texas and Monterrey, so service coverage is already cross-border.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "website:3",
+                "quote": "Deployed with contract manufacturers in North Carolina, Texas and Monterrey.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The CTO who performs field service is also the technical lead whose deformable-manipulation work underpins the product.",
+            "basis": "derived",
+            "citations": [
+              {
+                "passage_id": "call-notes:1",
+                "quote": "Raj is clearly the technical engine",
+                "status": "ok"
+              },
+              {
+                "passage_id": "call-notes:6",
+                "quote": "Field maintenance has been done by Raj personally flying to sites",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "No source addresses import duties, machinery safety certification, labor-displacement rules or customer workforce agreements for the Mexico deployment.",
+            "basis": "absence",
+            "citations": [
+              {
+                "passage_id": "deck:7",
+                "quote": "open a Mexico service hub",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          }
+        ],
+        "open_questions": [
+          "How many engineering hours per month is the CTO spending on field service?",
+          "What safety certification do the cells carry for US and Mexican factory floors?",
+          "Are there customer-side union or labor agreements affecting cell deployment?"
+        ]
+      }
+    ],
+    "contradictions": [
+      {
+        "text": "The deck reports $1.4M ARR while Marsh said on the call that contracted ARR is $410k and the remainder is annualized LOI value not yet converted to orders.",
+        "basis": "stated",
+        "citations": [
+          {
+            "passage_id": "deck:3",
+            "quote": "$1.4M ARR.",
+            "status": "ok"
+          },
+          {
+            "passage_id": "call-notes:2",
+            "quote": "Contracted ARR today is $410k",
+            "status": "ok"
+          },
+          {
+            "passage_id": "call-notes:2",
+            "quote": "The $1.4M figure is contracted ARR plus the annualized value of signed LOIs that have not yet converted to orders.",
+            "status": "ok"
+          }
+        ],
+        "verification": {
+          "status": "verified",
+          "issues": []
+        }
+      },
+      {
+        "text": "The deck states 8-month hardware payback at the $4,200 list price, while the call establishes 13-month payback at the $2,400 price customers actually pay.",
+        "basis": "stated",
+        "citations": [
+          {
+            "passage_id": "deck:5",
+            "quote": "$4,200 per cell per month on 36-month terms, including maintenance.",
+            "status": "ok"
+          },
+          {
+            "passage_id": "call-notes:6",
+            "quote": "At the discounted $2,400 rate, hardware payback is 13 months, not 8.",
+            "status": "ok"
+          }
+        ],
+        "verification": {
+          "status": "verified",
+          "issues": []
+        }
+      },
+      {
+        "text": "The deck, website and founder bio describe Marsh as having led perception at Tesla, while the call records a seven-month agency contract on data labeling pipelines in which she did not lead the team.",
+        "basis": "stated",
+        "citations": [
+          {
+            "passage_id": "deck:6",
+            "quote": "Elena Marsh (CEO) led perception at Tesla",
+            "status": "ok"
+          },
+          {
+            "passage_id": "founders:1",
+            "quote": "Led perception engineering at Tesla on the Optimus humanoid program.",
+            "status": "ok"
+          },
+          {
+            "passage_id": "call-notes:4",
+            "quote": "She was a contractor on the Optimus perception team for seven months in 2022 through an agency, working on data labeling pipelines. She did not lead the team.",
+            "status": "ok"
+          }
+        ],
+        "verification": {
+          "status": "verified",
+          "issues": []
+        }
+      },
+      {
+        "text": "The deck frames a $48B market as the opportunity, while the call confirms that figure covers warehouse and industrial automation broadly and that no sewing-automation figure exists.",
+        "basis": "stated",
+        "citations": [
+          {
+            "passage_id": "deck:4",
+            "quote": "Warehouse and industrial automation is a $48B market growing 17% a year (McKinsey, 2024).",
+            "status": "ok"
+          },
+          {
+            "passage_id": "call-notes:5",
+            "quote": "Elena acknowledged there is no good market-size figure for sewing automation specifically.",
+            "status": "ok"
+          }
+        ],
+        "verification": {
+          "status": "verified",
+          "issues": []
+        }
+      },
+      {
+        "text": "The deck's pitch includes hiring a field service team while the website already markets maintenance as included in the monthly fee, though maintenance is currently performed by the CTO in person.",
+        "basis": "stated",
+        "citations": [
+          {
+            "passage_id": "website:4",
+            "quote": "One monthly fee covers the cell, software updates and maintenance.",
+            "status": "ok"
+          },
+          {
+            "passage_id": "call-notes:6",
+            "quote": "Field maintenance has been done by Raj personally flying to sites; they have no service team yet.",
+            "status": "ok"
+          }
+        ],
+        "verification": {
+          "status": "verified",
+          "issues": []
+        }
+      }
+    ],
+    "missing": [
+      {
+        "item": "Signed customer contracts and the LOIs behind the $6.2M pipeline",
+        "why_it_matters": "The gap between $410k contracted and $1.4M claimed rests entirely on LOI conversion; contract terms determine whether that revenue is real, cancellable or conditional."
+      },
+      {
+        "item": "Cell-level uptime and throughput logs",
+        "why_it_matters": "The 71% versus 90% uptime split is the core technical risk; without logs there is no way to tell whether the Monterrey gap is a tuning issue or a limit of the approach."
+      },
+      {
+        "item": "Financial statements, burn rate, runway and capital raised to date",
+        "why_it_matters": "No source gives any cost structure, so the $4M cannot be sized against the plan to reach 60 cells and build a service organization."
+      },
+      {
+        "item": "Cap table and existing investor list",
+        "why_it_matters": "The $18M post is stated but prior dilution, option pool and any outstanding notes are unknown."
+      },
+      {
+        "item": "Competitive landscape",
+        "why_it_matters": "No source names a single competitor or prior sewing-automation attempt, so the \"untouched segment\" claim cannot be tested, nor can the reasons earlier efforts failed."
+      },
+      {
+        "item": "Customer references, especially the Monterrey plant manager",
+        "why_it_matters": "One site is 55% of contracted revenue and has the worst uptime; a reference call is the only way to gauge renewal risk."
+      },
+      {
+        "item": "Gross margin and service cost per cell",
+        "why_it_matters": "RaaS includes maintenance, so the economics depend on service cost, which is currently hidden inside the CTO's travel time."
+      },
+      {
+        "item": "IP position and patent filings",
+        "why_it_matters": "The stated moat is deformable-object manipulation know-how; no source indicates whether anything is protected."
+      },
+      {
+        "item": "Regulatory, safety certification and cross-border trade status for the Mexico deployment",
+        "why_it_matters": "Half the deployed fleet and the planned service hub are in Mexico, and no source addresses machinery certification or import treatment."
+      },
+      {
+        "item": "Independent confirmation of Marsh's Tesla engagement dates and role",
+        "why_it_matters": "The same overstatement appears in three company-controlled documents; verification bears on how other company-supplied numbers should be read."
+      }
+    ],
+    "bear_case": {
+      "thesis": "Every headline number in the deck was revised downward when the associate asked for the underlying figure: ARR fell from $1.4M to $410k, payback moved from 8 to 13 months, and the CEO's Tesla credential narrowed from leading perception to a seven-month agency data-labeling contract. What remains is a sub-$500k-revenue hardware company whose largest customer holds over half the revenue and runs at 71% uptime because the core technical problem — fabric variation across SKUs — is unsolved at the one site with a real SKU mix. The round is priced at $18M post with no lead.",
+      "points": [
+        {
+          "text": "Three separate company-authored sources repeat the same overstated Tesla credential, and the correction only came when the associate asked directly.",
+          "basis": "stated",
+          "citations": [
+            {
+              "passage_id": "deck:6",
+              "quote": "Elena Marsh (CEO) led perception at Tesla",
+              "status": "ok"
+            },
+            {
+              "passage_id": "website:5",
+              "quote": "Elena Marsh, CEO: former Tesla perception engineer and Gap Inc. sourcing lead.",
+              "status": "ok"
+            },
+            {
+              "passage_id": "call-notes:4",
+              "quote": "She was open about this when asked directly but the deck and bio overstate it.",
+              "status": "ok"
+            }
+          ],
+          "verification": {
+            "status": "verified",
+            "issues": []
+          }
+        },
+        {
+          "text": "Contracted revenue is $410k against an $18M post-money valuation, implying a multiple of roughly 44x contracted ARR, derived by dividing $18M by $410k.",
+          "basis": "derived",
+          "citations": [
+            {
+              "passage_id": "call-notes:2",
+              "quote": "Contracted ARR today is $410k",
+              "status": "ok"
+            },
+            {
+              "passage_id": "call-notes:8",
+              "quote": "$4M at $18M post.",
+              "status": "ok"
+            }
+          ],
+          "verification": {
+            "status": "verified",
+            "issues": []
+          }
+        },
+        {
+          "text": "The uptime data suggests the system works where SKU variety is low and degrades where it is high, and the high-variety site is 55% of revenue.",
+          "basis": "derived",
+          "citations": [
+            {
+              "passage_id": "call-notes:7",
+              "quote": "Cells average 71% uptime at the Monterrey site because of fabric variation on new SKUs. The two US sites, which run fewer SKUs, are above 90%.",
+              "status": "ok"
+            },
+            {
+              "passage_id": "call-notes:3",
+              "quote": "The Monterrey facility has 8 of the 14 cells and is 55% of contracted revenue.",
+              "status": "ok"
+            }
+          ],
+          "verification": {
+            "status": "verified",
+            "issues": []
+          }
+        },
+        {
+          "text": "The business model promises included maintenance at a fixed monthly fee while service is currently unpriced founder labor, so true unit economics at 60 cells are unknown.",
+          "basis": "derived",
+          "citations": [
+            {
+              "passage_id": "website:4",
+              "quote": "One monthly fee covers the cell, software updates and maintenance.",
+              "status": "ok"
+            },
+            {
+              "passage_id": "call-notes:6",
+              "quote": "Field maintenance has been done by Raj personally flying to sites; they have no service team yet.",
+              "status": "ok"
+            }
+          ],
+          "verification": {
+            "status": "verified",
+            "issues": []
+          }
+        },
+        {
+          "text": "Pricing has already been cut from the $4,200 list to $2,400 for the only customers acquired so far, and no source shows any customer paying list.",
+          "basis": "stated",
+          "citations": [
+            {
+              "passage_id": "call-notes:2",
+              "quote": "early customers got a discount from the $4,200 list price",
+              "status": "ok"
+            },
+            {
+              "passage_id": "deck:5",
+              "quote": "$4,200 per cell per month on 36-month terms, including maintenance.",
+              "status": "ok"
+            }
+          ],
+          "verification": {
+            "status": "verified",
+            "issues": []
+          }
+        },
+        {
+          "text": "No lead investor has committed, with only $350k of the $4M raised from two angels.",
+          "basis": "stated",
+          "citations": [
+            {
+              "passage_id": "call-notes:8",
+              "quote": "No lead yet. Two angels committed $350k total.",
+              "status": "ok"
+            }
+          ],
+          "verification": {
+            "status": "verified",
+            "issues": []
+          }
+        },
+        {
+          "text": "The market case rests on a proxy figure the CEO conceded does not measure sewing automation, leaving only an unvalidated bottom-up factory count.",
+          "basis": "stated",
+          "citations": [
+            {
+              "passage_id": "call-notes:5",
+              "quote": "Elena acknowledged there is no good market-size figure for sewing automation specifically. Her bottom-up estimate: 8,000 apparel factories in the Americas",
+              "status": "ok"
+            }
+          ],
+          "verification": {
+            "status": "verified",
+            "issues": []
+          }
+        },
+        {
+          "text": "No source identifies a competitor or explains why sewing automation remains untouched, so the risk that prior attempts failed for structural reasons cannot be assessed from these inputs.",
+          "basis": "absence",
+          "citations": [
+            {
+              "passage_id": "deck:4",
+              "quote": "Sewing automation is the largest untouched segment within it.",
+              "status": "ok"
+            }
+          ],
+          "verification": {
+            "status": "verified",
+            "issues": []
+          }
+        }
+      ]
+    },
+    "integrity_notes": [
+      "The deck's $48B market figure is attributed to McKinsey (2024) but is a third-party statistic for an adjacent sector; the call confirms it does not measure sewing automation, and it should not be treated as sizing for this business.",
+      "The deck's $1.4M ARR, 8-month payback and \"led perception at Tesla\" claims were each narrowed by the first-call notes; claims in this draft are built on the narrower figures.",
+      "Marsh said she would update the deck to say \"contracted plus committed\"; no corrected deck is in the inputs, so the uncorrected version is what was circulated.",
+      "No text addressed to reviewers or AI systems was found in the inputs, and no deadline, expiring term sheet or other urgency pressure appears in any source.",
+      "The associate's subjective remarks (\"Strong demo video\", \"Raj is clearly the technical engine\") are one reviewer's impression from a 50-minute call, not verified evidence."
+    ]
+  },
+  "verification": [
+    {
+      "id": "d0.c0",
+      "where": "Team",
+      "section": "dimension",
+      "text": "The deck states Marsh \"led perception at Tesla\" and spent four years in apparel sourcing at Gap Inc.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:6",
+          "quote": "Elena Marsh (CEO) led perception at Tesla and spent four years in apparel sourcing at Gap Inc.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d0.c1",
+      "where": "Team",
+      "section": "dimension",
+      "text": "On the call Marsh described a seven-month agency contract on the Optimus perception team working on data labeling pipelines, and said she did not lead the team.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:4",
+          "quote": "She was a contractor on the Optimus perception team for seven months in 2022 through an agency, working on data labeling pipelines. She did not lead the team.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d0.c2",
+      "where": "Team",
+      "section": "dimension",
+      "text": "Venkat holds a CMU robotics PhD under Professor David Held with a thesis on deformable object manipulation and co-authorship of the DeformNet benchmark.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "founders:2",
+          "quote": "PhD in robotics from Carnegie Mellon University, advised by Professor David Held. Thesis on learned manipulation of deformable objects. Co-author of the DeformNet benchmark (CoRL 2023).",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d0.c3",
+      "where": "Team",
+      "section": "dimension",
+      "text": "The associate recorded that Venkat's background checks out and his CMU work is real and well cited.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:1",
+          "quote": "the deformable-handling approach is genuinely hard and his CMU work is real and well cited",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:4",
+          "quote": "Raj's background checks out.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d0.c4",
+      "where": "Team",
+      "section": "dimension",
+      "text": "The company reports a team of nine, with no breakdown of roles in any source.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:6",
+          "quote": "Team of nine.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d1.c0",
+      "where": "Problem and market",
+      "section": "dimension",
+      "text": "The deck states 60 million people work in apparel manufacturing and labor is 25 to 35% of garment cost.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:1",
+          "quote": "60 million people work in apparel manufacturing and labor is 25 to 35% of garment cost.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d1.c1",
+      "where": "Problem and market",
+      "section": "dimension",
+      "text": "The $48B market figure is McKinsey's number for warehouse and industrial automation broadly, not for sewing.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:4",
+          "quote": "Warehouse and industrial automation is a $48B market growing 17% a year (McKinsey, 2024).",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:5",
+          "quote": "The $48B figure on slide 4 is McKinsey's number for warehouse and industrial automation broadly.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d1.c2",
+      "where": "Problem and market",
+      "section": "dimension",
+      "text": "Marsh acknowledged there is no good market-size figure for sewing automation specifically.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:5",
+          "quote": "Elena acknowledged there is no good market-size figure for sewing automation specifically.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d1.c3",
+      "where": "Problem and market",
+      "section": "dimension",
+      "text": "Her bottom-up estimate is 8,000 apparel factories in the Americas with more than 50 operators, each a candidate for 5 to 20 cells.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:5",
+          "quote": "8,000 apparel factories in the Americas with more than 50 operators, each a candidate for 5 to 20 cells.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d1.c4",
+      "where": "Problem and market",
+      "section": "dimension",
+      "text": "The claim that brands want to reshore but cannot find sewing labor appears only as a deck assertion with no supporting data in any source.",
+      "basis": "absence",
+      "citations": [
+        {
+          "passage_id": "deck:1",
+          "quote": "Brands want to reshore production but cannot find the sewing labor to do it.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d2.c0",
+      "where": "Product and technology",
+      "section": "dimension",
+      "text": "The system uses a vision system tracking fabric deformation in real time with a two-arm manipulator feeding a standard industrial sewing head.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:2",
+          "quote": "A vision system tracks fabric deformation in real time and a two-arm manipulator feeds the garment through a standard industrial sewing head.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d2.c1",
+      "where": "Product and technology",
+      "section": "dimension",
+      "text": "Coverage is limited to side seams, hems and pocket attachment, which the website says account for 70% of sewing time on a basic garment.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:2",
+          "quote": "One cell replaces 2.5 sewing operators on simple seams: side seams, hems, pocket attachment.",
+          "status": "ok"
+        },
+        {
+          "passage_id": "website:2",
+          "quote": "Our cells handle the seams that make up 70% of sewing time on a basic garment: side seams, hems, and pocket attachment.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d2.c2",
+      "where": "Product and technology",
+      "section": "dimension",
+      "text": "The website claims no fixtures, no special fabric treatment and changeovers in under ten minutes.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "website:2",
+          "quote": "Vision-guided fabric handling means no fixtures, no special fabric treatment, and changeovers in under ten minutes.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d2.c3",
+      "where": "Product and technology",
+      "section": "dimension",
+      "text": "Uptime is 71% at the Monterrey site due to fabric variation on new SKUs, versus above 90% at the two US sites that run fewer SKUs.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:7",
+          "quote": "Cells average 71% uptime at the Monterrey site because of fabric variation on new SKUs. The two US sites, which run fewer SKUs, are above 90%.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d2.c4",
+      "where": "Product and technology",
+      "section": "dimension",
+      "text": "No source contains cell-level uptime logs; these remain an open follow-up item.",
+      "basis": "absence",
+      "citations": [
+        {
+          "passage_id": "call-notes:9",
+          "quote": "Follow-ups: cell-level uptime logs, customer contracts and LOIs",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d3.c0",
+      "where": "Traction and customers",
+      "section": "dimension",
+      "text": "The deck states $1.4M ARR, three paying customers, 14 cells deployed and a $6.2M pipeline with signed LOIs.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:3",
+          "quote": "$1.4M ARR. Three paying customers: two US contract manufacturers and one brand-owned facility in Mexico. 14 cells deployed. Pipeline of $6.2M with signed LOIs.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d3.c1",
+      "where": "Traction and customers",
+      "section": "dimension",
+      "text": "On the call Marsh said contracted ARR today is $410k and that the $1.4M figure adds annualized value of signed LOIs not yet converted to orders.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:2",
+          "quote": "Contracted ARR today is $410k: 14 cells at roughly $2,400 per cell per month",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:2",
+          "quote": "The $1.4M figure is contracted ARR plus the annualized value of signed LOIs that have not yet converted to orders.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d3.c2",
+      "where": "Traction and customers",
+      "section": "dimension",
+      "text": "The deck's ARR figure is about 3.4 times the contracted figure, derived by dividing $1.4M by $410k.",
+      "basis": "derived",
+      "citations": [
+        {
+          "passage_id": "deck:3",
+          "quote": "$1.4M ARR.",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:2",
+          "quote": "Contracted ARR today is $410k",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d3.c3",
+      "where": "Traction and customers",
+      "section": "dimension",
+      "text": "One Monterrey facility holds 8 of 14 cells and 55% of contracted revenue.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:3",
+          "quote": "The Monterrey facility has 8 of the 14 cells and is 55% of contracted revenue.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d3.c4",
+      "where": "Traction and customers",
+      "section": "dimension",
+      "text": "The site with the largest share of cells and revenue is also the one running 71% uptime.",
+      "basis": "derived",
+      "citations": [
+        {
+          "passage_id": "call-notes:3",
+          "quote": "The Monterrey facility has 8 of the 14 cells and is 55% of contracted revenue.",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:7",
+          "quote": "Cells average 71% uptime at the Monterrey site because of fabric variation on new SKUs.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d4.c0",
+      "where": "Business model and unit economics",
+      "section": "dimension",
+      "text": "The deck prices cells at $4,200 per month on 36-month terms including maintenance, with hardware cost of $31,000 and 8-month hardware payback.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:5",
+          "quote": "$4,200 per cell per month on 36-month terms, including maintenance. Hardware cost per cell is $31,000 at current volume; payback on hardware is 8 months.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d4.c1",
+      "where": "Business model and unit economics",
+      "section": "dimension",
+      "text": "Early customers received a discount and pay roughly $2,400 per cell per month.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:2",
+          "quote": "14 cells at roughly $2,400 per cell per month (early customers got a discount from the $4,200 list price)",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d4.c2",
+      "where": "Business model and unit economics",
+      "section": "dimension",
+      "text": "At the $2,400 rate hardware payback is 13 months, not 8, and the $31,000 hardware cost was confirmed on the call.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:6",
+          "quote": "Hardware cost per cell $31k confirmed. At the discounted $2,400 rate, hardware payback is 13 months, not 8.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d4.c3",
+      "where": "Business model and unit economics",
+      "section": "dimension",
+      "text": "The monthly fee covers the cell, software updates and maintenance, so service cost sits with Quill rather than the customer.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "website:4",
+          "quote": "Robotics-as-a-service. No capital expenditure. One monthly fee covers the cell, software updates and maintenance.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d4.c4",
+      "where": "Business model and unit economics",
+      "section": "dimension",
+      "text": "No source gives gross margin, service cost per cell, cell lifetime or churn.",
+      "basis": "absence",
+      "citations": [
+        {
+          "passage_id": "deck:5",
+          "quote": "Hardware cost per cell is $31,000 at current volume; payback on hardware is 8 months.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d5.c0",
+      "where": "Competition and defensibility",
+      "section": "dimension",
+      "text": "The deck asserts sewing automation is the largest untouched segment within industrial automation.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:4",
+          "quote": "Sewing automation is the largest untouched segment within it.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d5.c1",
+      "where": "Competition and defensibility",
+      "section": "dimension",
+      "text": "The deck's opening claim is that apparel is the last unautomated manufacturing industry and garments are still sewn by hand.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:1",
+          "quote": "Apparel is the last unautomated manufacturing industry Garments are still sewn by hand.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d5.c2",
+      "where": "Competition and defensibility",
+      "section": "dimension",
+      "text": "No source in this set names a competitor, a prior attempt at sewing automation, or any patent or IP position.",
+      "basis": "absence",
+      "citations": [
+        {
+          "passage_id": "deck:4",
+          "quote": "Sewing automation is the largest untouched segment within it.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d5.c3",
+      "where": "Competition and defensibility",
+      "section": "dimension",
+      "text": "The stated technical moat rests on deformable object manipulation, which the associate described as genuinely hard.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:1",
+          "quote": "the deformable-handling approach is genuinely hard and his CMU work is real and well cited",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d6.c0",
+      "where": "Round and use of funds",
+      "section": "dimension",
+      "text": "The round is $4M at $18M post, with no lead and two angels committed for $350k total.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:8",
+          "quote": "$4M at $18M post. No lead yet. Two angels committed $350k total.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d6.c1",
+      "where": "Round and use of funds",
+      "section": "dimension",
+      "text": "Proceeds are earmarked to scale to 60 cells, hire a field service team and open a Mexico service hub.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:7",
+          "quote": "$4M seed to scale to 60 cells, hire a field service team and open a Mexico service hub.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d6.c2",
+      "where": "Round and use of funds",
+      "section": "dimension",
+      "text": "Going from 14 deployed cells to 60 is an increase of 46 cells, which at $31,000 hardware cost is about $1.4M of hardware, derived from the deck's cell count and unit cost.",
+      "basis": "derived",
+      "citations": [
+        {
+          "passage_id": "deck:3",
+          "quote": "14 cells deployed.",
+          "status": "ok"
+        },
+        {
+          "passage_id": "deck:7",
+          "quote": "$4M seed to scale to 60 cells",
+          "status": "ok"
+        },
+        {
+          "passage_id": "deck:5",
+          "quote": "Hardware cost per cell is $31,000 at current volume",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d6.c3",
+      "where": "Round and use of funds",
+      "section": "dimension",
+      "text": "The $4M raise on an $18M post represents roughly 22% dilution, derived by dividing $4M by $18M.",
+      "basis": "derived",
+      "citations": [
+        {
+          "passage_id": "call-notes:8",
+          "quote": "$4M at $18M post.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d6.c4",
+      "where": "Round and use of funds",
+      "section": "dimension",
+      "text": "No source states current burn rate, runway, or existing capital raised.",
+      "basis": "absence",
+      "citations": [
+        {
+          "passage_id": "call-notes:8",
+          "quote": "$4M at $18M post. No lead yet.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d7.c0",
+      "where": "Operational and regulatory risk",
+      "section": "dimension",
+      "text": "Field maintenance has been done by Venkat personally flying to sites and the company has no service team.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:6",
+          "quote": "Field maintenance has been done by Raj personally flying to sites; they have no service team yet.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d7.c1",
+      "where": "Operational and regulatory risk",
+      "section": "dimension",
+      "text": "Deployments span North Carolina, Texas and Monterrey, so service coverage is already cross-border.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "website:3",
+          "quote": "Deployed with contract manufacturers in North Carolina, Texas and Monterrey.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d7.c2",
+      "where": "Operational and regulatory risk",
+      "section": "dimension",
+      "text": "The CTO who performs field service is also the technical lead whose deformable-manipulation work underpins the product.",
+      "basis": "derived",
+      "citations": [
+        {
+          "passage_id": "call-notes:1",
+          "quote": "Raj is clearly the technical engine",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:6",
+          "quote": "Field maintenance has been done by Raj personally flying to sites",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d7.c3",
+      "where": "Operational and regulatory risk",
+      "section": "dimension",
+      "text": "No source addresses import duties, machinery safety certification, labor-displacement rules or customer workforce agreements for the Mexico deployment.",
+      "basis": "absence",
+      "citations": [
+        {
+          "passage_id": "deck:7",
+          "quote": "open a Mexico service hub",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "x0",
+      "where": "Contradictions",
+      "section": "contradiction",
+      "text": "The deck reports $1.4M ARR while Marsh said on the call that contracted ARR is $410k and the remainder is annualized LOI value not yet converted to orders.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:3",
+          "quote": "$1.4M ARR.",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:2",
+          "quote": "Contracted ARR today is $410k",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:2",
+          "quote": "The $1.4M figure is contracted ARR plus the annualized value of signed LOIs that have not yet converted to orders.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "x1",
+      "where": "Contradictions",
+      "section": "contradiction",
+      "text": "The deck states 8-month hardware payback at the $4,200 list price, while the call establishes 13-month payback at the $2,400 price customers actually pay.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:5",
+          "quote": "$4,200 per cell per month on 36-month terms, including maintenance.",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:6",
+          "quote": "At the discounted $2,400 rate, hardware payback is 13 months, not 8.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "x2",
+      "where": "Contradictions",
+      "section": "contradiction",
+      "text": "The deck, website and founder bio describe Marsh as having led perception at Tesla, while the call records a seven-month agency contract on data labeling pipelines in which she did not lead the team.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:6",
+          "quote": "Elena Marsh (CEO) led perception at Tesla",
+          "status": "ok"
+        },
+        {
+          "passage_id": "founders:1",
+          "quote": "Led perception engineering at Tesla on the Optimus humanoid program.",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:4",
+          "quote": "She was a contractor on the Optimus perception team for seven months in 2022 through an agency, working on data labeling pipelines. She did not lead the team.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "x3",
+      "where": "Contradictions",
+      "section": "contradiction",
+      "text": "The deck frames a $48B market as the opportunity, while the call confirms that figure covers warehouse and industrial automation broadly and that no sewing-automation figure exists.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:4",
+          "quote": "Warehouse and industrial automation is a $48B market growing 17% a year (McKinsey, 2024).",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:5",
+          "quote": "Elena acknowledged there is no good market-size figure for sewing automation specifically.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "x4",
+      "where": "Contradictions",
+      "section": "contradiction",
+      "text": "The deck's pitch includes hiring a field service team while the website already markets maintenance as included in the monthly fee, though maintenance is currently performed by the CTO in person.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "website:4",
+          "quote": "One monthly fee covers the cell, software updates and maintenance.",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:6",
+          "quote": "Field maintenance has been done by Raj personally flying to sites; they have no service team yet.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "b0",
+      "where": "Bear case",
+      "section": "bear_case",
+      "text": "Three separate company-authored sources repeat the same overstated Tesla credential, and the correction only came when the associate asked directly.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:6",
+          "quote": "Elena Marsh (CEO) led perception at Tesla",
+          "status": "ok"
+        },
+        {
+          "passage_id": "website:5",
+          "quote": "Elena Marsh, CEO: former Tesla perception engineer and Gap Inc. sourcing lead.",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:4",
+          "quote": "She was open about this when asked directly but the deck and bio overstate it.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "b1",
+      "where": "Bear case",
+      "section": "bear_case",
+      "text": "Contracted revenue is $410k against an $18M post-money valuation, implying a multiple of roughly 44x contracted ARR, derived by dividing $18M by $410k.",
+      "basis": "derived",
+      "citations": [
+        {
+          "passage_id": "call-notes:2",
+          "quote": "Contracted ARR today is $410k",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:8",
+          "quote": "$4M at $18M post.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "b2",
+      "where": "Bear case",
+      "section": "bear_case",
+      "text": "The uptime data suggests the system works where SKU variety is low and degrades where it is high, and the high-variety site is 55% of revenue.",
+      "basis": "derived",
+      "citations": [
+        {
+          "passage_id": "call-notes:7",
+          "quote": "Cells average 71% uptime at the Monterrey site because of fabric variation on new SKUs. The two US sites, which run fewer SKUs, are above 90%.",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:3",
+          "quote": "The Monterrey facility has 8 of the 14 cells and is 55% of contracted revenue.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "b3",
+      "where": "Bear case",
+      "section": "bear_case",
+      "text": "The business model promises included maintenance at a fixed monthly fee while service is currently unpriced founder labor, so true unit economics at 60 cells are unknown.",
+      "basis": "derived",
+      "citations": [
+        {
+          "passage_id": "website:4",
+          "quote": "One monthly fee covers the cell, software updates and maintenance.",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:6",
+          "quote": "Field maintenance has been done by Raj personally flying to sites; they have no service team yet.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "b4",
+      "where": "Bear case",
+      "section": "bear_case",
+      "text": "Pricing has already been cut from the $4,200 list to $2,400 for the only customers acquired so far, and no source shows any customer paying list.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:2",
+          "quote": "early customers got a discount from the $4,200 list price",
+          "status": "ok"
+        },
+        {
+          "passage_id": "deck:5",
+          "quote": "$4,200 per cell per month on 36-month terms, including maintenance.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "b5",
+      "where": "Bear case",
+      "section": "bear_case",
+      "text": "No lead investor has committed, with only $350k of the $4M raised from two angels.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:8",
+          "quote": "No lead yet. Two angels committed $350k total.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "b6",
+      "where": "Bear case",
+      "section": "bear_case",
+      "text": "The market case rests on a proxy figure the CEO conceded does not measure sewing automation, leaving only an unvalidated bottom-up factory count.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:5",
+          "quote": "Elena acknowledged there is no good market-size figure for sewing automation specifically. Her bottom-up estimate: 8,000 apparel factories in the Americas",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "b7",
+      "where": "Bear case",
+      "section": "bear_case",
+      "text": "No source identifies a competitor or explains why sewing automation remains untouched, so the risk that prior attempts failed for structural reasons cannot be assessed from these inputs.",
+      "basis": "absence",
+      "citations": [
+        {
+          "passage_id": "deck:4",
+          "quote": "Sewing automation is the largest untouched segment within it.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    }
+  ]
+}

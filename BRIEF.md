@@ -1,0 +1,58 @@
+# Product brief: first-pass assessment drafter
+
+## The user and the moment
+
+The primary user is the associate. After the first call, they sit down with the deck, website, founder bios and their own notes to write a one-page assessment for the partners. That step takes about 90 minutes and happens about 150 times a month. The tool runs at the start of it and produces a draft the associate edits and signs. The associate owns the document.
+
+The secondary reader is the partner, who scans the one-pager before the Monday meeting and wants two things the current process does not give reliably: where each claim came from, and the honest argument against. The partner never interacts with the model. They read the associate's edited draft with the sources one click away.
+
+## What v1 does
+
+It takes the four inputs as text, splits each into numbered passages, and drafts the assessment in a fixed shape: a two-minute summary, six to eight dimensions, where the sources disagree, what is missing, the strongest case against, and integrity notes. Every claim carries the passage it came from and a verbatim quote. A verifier checks every quote mechanically, gives the model one round to fix or drop what failed, and marks anything still unverified rather than hiding it. The draft ships as a document and as a reader where clicking a claim shows the passage with the quote highlighted.
+
+## What v1 deliberately does not do
+
+It does not score, rank or recommend. It reads nothing the associate did not give it: no web, no databases, no LinkedIn. That is a constraint, not a gap: a draft is only fully traceable if its universe of evidence is closed and visible. It does not remember previous companies, judge thesis fit, or parse slides as images. It drafts, the associate edits, the partners decide.
+
+## What a good assessment contains
+
+A summary that says what the company does, what the evidence shows, where the sources disagree, and the one or two things the partners would need to find out. Description, not advocacy.
+
+Claims that are specific, numbered and cited, built on the most primary source available. When the deck says $1.4M ARR and the call notes say $410k contracted, the claim says $410k and the disagreement is recorded with both passages.
+
+The disagreements, named. A marketing claim narrowed by a primary source is the most useful thing an associate can hand a partner, and the current process loses it.
+
+A missing list that names documents and data points, not categories: "pilot agreements and conversion criteria," not "more traction data."
+
+A bear case that is an argument, not a risk checklist. It is the best case a skeptical partner could make from these inputs, and it may rest on absence of evidence when it says so.
+
+Integrity notes: anything in the inputs that tried to steer the reader. Third-party scores, deadlines, text addressed to reviewers.
+
+## How to measure success after 60 days
+
+Sixty days is about 300 companies: enough to measure the process, nowhere near enough to measure outcomes.
+
+- Associate time from first call to partner-ready draft. Baseline 90 minutes; target under 40 including editing.
+- Provenance incidents: a partner asks where a claim came from and nobody can answer in the meeting. Baseline is "often"; target is zero.
+- Claim accuracy: twenty claims sampled weekly and checked by a human against the source. Target above 95% supported; any unsupported claim that reached a partner is a reviewed incident.
+- Draft survival: fraction of drafted claims the associate kept, and how often they rewrote the bear case. Under 60% kept means the draft is not saving time; a bear case rewritten every time means the model is not finding the real objection.
+- Missing-list conversion: how often a listed gap became a follow-up request to the founder before the partner meeting.
+- Adoption without mandate: share of reviewed companies that went through the tool once associates are free to skip it. Target above 80% by week eight.
+
+## The three biggest risks
+
+**A claim that reads as sourced but is not.** This is the failure that destroys partner trust and the model's most natural one. A citation is a passage id plus a verbatim quote; the quote is checked mechanically; every number in a claim must appear in the cited passage; the model gets one repair round; what still fails is marked, not deleted. The eval adds a second model as judge, reading each claim against the full passage, because a quote can match and still not support the sentence built on it. "Verified" means the quote is real, not that the claim is true, and the label says so.
+
+**Laundered marketing and manipulated inputs.** Decks overstate, and once founders know an AI reads their materials, some will write for it. One test company has an instruction to AI reviewers hidden in its website and a third-party "probability of success" planted in its deck. The design ranks call notes above the deck and the deck above the website, requires a contradictions section, treats input text as data rather than instruction, and reports steering attempts in integrity notes where the partner can see them.
+
+**The tool becomes the decision.** Not through a score but through anchoring: a fluent summary is persuasive, and a partner who reads it first has half-decided. The schema has no field for a verdict, the eval scans every draft for recommendation and probability language, the bear case is mandatory and sits at the same level as the assessment, and the associate's name goes on the document, not the model's.
+
+## Should v1 show a probability of success? No.
+
+A probability needs calibration, and calibration needs outcomes. This fund will know whether its 2026 decisions were right somewhere between 2031 and 2036. Until then any number on the page is the model's impression formatted as precision, and the partners are better calibrated than the model on the thing it would be guessing at.
+
+It also breaks the two principles the partners put first. A score has no citation; it is the one claim on the page that cannot be traced. And a score is a decision. Once it is on the page the evidence becomes supporting material for a number, the bear case becomes a footnote, and the meeting becomes an argument about the number rather than the company.
+
+What v1 shows instead is traceable: how much of each dimension is sourced versus missing, how often the sources disagree, and the bear case at full weight. Those tell a partner how much to trust the picture, which is the useful part of what a probability would have said.
+
+The thing to revisit after a year of logged decisions is not a probability but a comparison: "the evidence profile resembles these three companies we passed on and this one we backed," with the cases linked, shown after the partner records their own view so it informs rather than anchors. That needs a real evaluation behind it and belongs in v3, not v1.

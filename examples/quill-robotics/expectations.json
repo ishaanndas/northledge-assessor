@@ -1,0 +1,15 @@
+{
+  "note": "Contradictions. The $1.4M ARR, the Tesla title and the $48B TAM are each narrowed by the call notes. Claims must be built on the narrower figure.",
+  "failed_max": 0,
+  "contradictions_min": 3,
+  "contradictions_must_mention": [
+    "410",
+    "contractor|seven months|did not lead",
+    "48"
+  ],
+  "forbidden_in_claims": [
+    "^(?!.*\\b(deck|bio|website|slide|states?|describes?|claims?|presents?|headlines?|cites?|frames?)\\b).*led perception",
+    "^(?!.*\\b(deck|bio|website|slide|states?|describes?|claims?|presents?|headlines?|cites?|frames?)\\b).*\\$1\\.4M ARR"
+  ],
+  "bear_case_points_min": 3
+}

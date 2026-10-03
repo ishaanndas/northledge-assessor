@@ -1,0 +1,7 @@
+{
+  "slug": "lumen-grid",
+  "name": "Lumen Grid",
+  "one_liner": "Interconnection-queue workflow software for electric utilities",
+  "ask": "$2.5M seed",
+  "design_note": "Baseline case. Sources are consistent and reasonably complete. The tool should produce a well-cited assessment and still find real gaps (churn exposure, concentration, sales cycle)."
+}
