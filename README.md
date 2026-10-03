@@ -2,11 +2,14 @@
 
 A small program that takes what a seed fund has on a company (deck, website, founder bios, first-call notes) and drafts the one-page assessment an associate would otherwise write by hand. Every claim cites the passage it came from with a verbatim quote. The draft includes what is missing, where the sources disagree, and the strongest honest case against. It never recommends and never scores.
 
-Three deliverables live here:
+The deliverables, mapped to the assignment:
 
-- `BRIEF.md`: the product brief, including the position on a probability-of-success score.
-- The prototype: `assess.mjs` drafts, `eval.mjs` checks, `report.mjs` renders. Outputs for the four example companies are committed under `out/`.
-- `out/eval-report.md`: what the automated checks found on this run, including what they did not catch.
+| Assignment item | Where |
+|---|---|
+| 1. Product brief (max 2 pages) | `BRIEF.md`. The full PRD behind it is `docs/PRD.md`. |
+| 2. Working prototype, 3 to 4 example inputs with outputs | `assess.mjs` and `lib/`; `examples/`; committed outputs in `out/`. Architecture and decisions in `docs/TECHNICAL.md`. |
+| 3. Evaluation, honest report, year-later plan | `eval.mjs`, `selftest.mjs`; results in `out/eval-report.md`; method, results and the year-later plan in `docs/EVALUATION.md`. |
+| 4. README | This file: how to run, key decisions, cuts, next steps, AI usage. |
 
 ## Run it
 
@@ -18,7 +21,7 @@ echo "ANTHROPIC_API_KEY=sk-ant-..." > .env
 npm start
 ```
 
-`npm start` drafts all four examples, runs the evaluation, and builds `out/index.html`. It takes about eight minutes and costs roughly $4 at current Opus 5 pricing. To look at the committed outputs without spending anything, open `out/index.html` in a browser (or `npm run serve` and visit http://localhost:4950) and read `out/*/assessment.md`.
+`npm start` drafts all four examples, runs the evaluation, and builds `out/index.html`. It takes about ten minutes and costs roughly $1.60 at current Opus 5 and Sonnet 5 pricing. To look at the committed outputs without spending anything, open `out/index.html` in a browser (or `npm run serve` and visit http://localhost:4950) and read `out/*/assessment.md`.
 
 Other entry points:
 
@@ -66,7 +69,7 @@ The design notes for each are in `examples/<slug>/company.json`; the known-answe
 
 ## Evaluation
 
-See `out/eval-report.md` for the full run. Four kinds of check:
+Summary here; full method, every flagged statement and the limitations are in `docs/EVALUATION.md`, and the raw run is `out/eval-report.md`. Four kinds of check:
 
 1. **Deterministic citation checks**, re-run from scratch in the eval so they do not trust the pipeline's own annotations. Passage exists, quote is verbatim, numbers in the claim appear in the cited passages, quote under 30 words.
 2. **LLM judge** on a different model (Sonnet 5) reading every statement against the full text of its cited passages: supported, partial or unsupported. The cell that matters is "quote matched verbatim but the judge says unsupported": that is the failure a string check cannot see.
@@ -107,6 +110,8 @@ Once the fund has twelve months of drafts, partner decisions and early outcomes,
 What I would not do is train a score on a year of outcomes. Twelve months of seed decisions is perhaps 20 investments and a handful of observable outcomes, which is not a dataset. The comparison view in the brief ("this evidence profile resembles these past companies") is the first outcome-informed feature that can be evaluated honestly, and even that needs human-rated similarity to validate.
 
 ## Key decisions
+
+The short list. Reasoning for each, plus the data model, prompts, verifier, measured cost and the path to production, is in `docs/TECHNICAL.md`.
 
 - **Closed evidence universe.** The tool reads nothing the associate did not supply. This costs breadth (no competitor lookup, no LinkedIn check) and buys complete provenance. The partners asked for traceability first; this is what makes it mechanical rather than aspirational.
 - **Citation = passage id + verbatim quote.** Passage-level ids alone let a model cite a true passage for a false claim. Requiring the exact words makes the check deterministic and makes the highlighted quote in the reader meaningful.
