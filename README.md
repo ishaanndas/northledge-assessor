@@ -7,7 +7,7 @@ The deliverables, mapped to the assignment:
 | Assignment item | Where |
 |---|---|
 | 1. Product brief (max 2 pages) | `BRIEF.md`. The full PRD behind it is `docs/PRD.md`. |
-| 2. Working prototype, 3 to 4 example inputs with outputs | `assess.mjs` and `lib/`; `examples/`; committed outputs in `out/`. Architecture and decisions in `docs/TECHNICAL.md`. |
+| 2. Working prototype, 3 to 4 example inputs with outputs | The pipeline in `lib/pipeline.mjs`, the app in `serve.mjs` and `app/`, the CLI in `assess.mjs`; `examples/`; committed outputs in `out/`. Architecture and decisions in `docs/TECHNICAL.md`. |
 | 3. Evaluation, honest report, year-later plan | `eval.mjs`, `selftest.mjs`; results in `out/eval-report.md`; method, results and the year-later plan in `docs/EVALUATION.md`. |
 | 4. README | This file: how to run, key decisions, cuts, next steps, AI usage. |
 
@@ -18,20 +18,21 @@ Requires Node 20 or later and an Anthropic API key.
 ```bash
 npm install
 echo "ANTHROPIC_API_KEY=sk-ant-..." > .env
-npm start
+npm run serve        # the app, at http://localhost:4950
 ```
 
-`npm start` drafts all four examples, runs the evaluation, and builds `out/index.html`. It takes about ten minutes and costs roughly $1.60 at current Opus 5 and Sonnet 5 pricing. To look at the committed outputs without spending anything, open `out/index.html` in a browser (or `npm run serve` and visit http://localhost:4950) and read `out/*/assessment.md`.
+The app walks a company through five screens: **Sources** (paste or upload the deck, website, bios and call notes; see the numbered passages the model will read), **Draft** (run the pipeline with live progress and the verification result), **Review** (the associate keeps, edits or removes each claim, clicks any claim to see its source, and writes a note for the partners), **Partner view** (the edited draft as the partners receive it, printable), and **Follow-up** (the missing list turned into the email to the founder). The four example companies are preloaded; companies created through the form are saved under `companies/`, which is gitignored.
 
-Other entry points:
+The same pipeline runs from the command line:
 
 ```bash
+npm start                       # draft all four examples, run the eval, build the static report (about ten minutes, roughly $1.60)
 node assess.mjs mesa-pay        # draft one company
 node eval.mjs --no-judge        # deterministic checks only, no model calls
 node selftest.mjs               # plant four known defects in a real draft and confirm the checks catch them
 ```
 
-To assess a new company, add a folder under `examples/` with a `company.json` and a `sources/` directory of markdown files (`01-deck.md`, `02-website.md`, and so on). The number prefix orders them; the rest of the filename becomes the citation key.
+To look at the committed outputs without spending anything, open `out/index.html` (the static reader) and read `out/*/assessment.md`. To add a company without the app, create a folder under `examples/` with a `company.json` and a `sources/` directory of markdown files (`01-deck.md`, `02-website.md`, and so on). The number prefix orders them; the rest of the filename becomes the citation key.
 
 ## How it works
 
@@ -124,14 +125,14 @@ The short list. Reasoning for each, plus the data model, prompts, verifier, meas
 ## What I cut
 
 - **Document ingestion.** No PDF, slide or web scraping. Sources are markdown the associate pastes or exports. For the real product this is the first week of work and it is unglamorous.
-- **Claim-level editing UI.** The reader is read-only. The associate edits the markdown. A real v1 needs accept/reject/edit per claim with the edit log kept.
+- **Multi-user and persistence beyond files.** Reviews are JSON files next to the draft; there is no login, no history of edits, no concurrent editing. A real v1 needs a database and an edit log.
 - **Judge in the pipeline.** The Sonnet judge runs only in the eval. Putting it in the pipeline would let the tool demote claims the judge rejects before the associate sees them. I left it out to keep the pipeline's verification purely mechanical and explainable; I would add it as a second, clearly labelled status.
 - **Prompt caching and batching.** At 150 companies a month cost is not the constraint. Not worth the complexity yet.
 - **Multi-sample consistency.** Drafting twice and diffing would catch unstable claims. Doubles cost; deferred.
 
 ## What I would build next
 
-1. Per-claim accept/edit/reject for the associate, with the final document carrying both the model's draft and the associate's edits.
+1. Edit history and multi-user review: who changed which claim and when, with the model's draft and the associate's version both kept.
 2. The judge as a second status in the reader ("quote verified; support: partial"), with the judge's one-line reason visible.
 3. Ingestion: PDF decks through text extraction with page-level passage ids, so a citation reads `deck p.4`.
 4. A follow-up request generator: the missing list turned into an email the associate can send the founder.

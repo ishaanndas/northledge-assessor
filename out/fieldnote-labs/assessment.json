@@ -1,0 +1,1677 @@
+{
+  "slug": "fieldnote-labs",
+  "company": {
+    "slug": "fieldnote-labs",
+    "name": "Fieldnote Labs",
+    "one_liner": "Voice-to-report tooling for agronomy consultants",
+    "ask": "$1.5M pre-seed",
+    "created_at": "2026-10-03T22:36:38.573Z"
+  },
+  "generated_at": "2026-10-03 22:38 UTC",
+  "model": "claude-opus-5",
+  "usage": {
+    "input": 4386,
+    "output": 9431
+  },
+  "seconds": 98,
+  "repairs": 0,
+  "first_pass_verification": {
+    "statements": 40,
+    "verified": 40,
+    "warning": 0,
+    "failed": 0,
+    "citations": 58,
+    "citations_ok": 58
+  },
+  "first_pass_failures": [],
+  "verification_summary": {
+    "statements": 40,
+    "verified": 40,
+    "warning": 0,
+    "failed": 0,
+    "citations": 58,
+    "citations_ok": 58
+  },
+  "sources": [
+    {
+      "key": "deck",
+      "title": "Fieldnote Labs — Pre-seed deck (September 2026)",
+      "passages": 6
+    },
+    {
+      "key": "call-notes",
+      "title": "First call notes — Fieldnote Labs, 24 September 2026 (associate: M. Chen, 35 minutes with Maya Lindqvist)",
+      "passages": 8
+    }
+  ],
+  "passages": {
+    "deck:1": {
+      "source": "deck",
+      "text": "Slide 1: The problem\nIndependent agronomy consultants visit 15 to 25 farms a week and spend their evenings typing field reports. A typical report takes 40 minutes to write."
+    },
+    "deck:2": {
+      "source": "deck",
+      "text": "Slide 2: Product\nFieldnote turns a consultant's spoken notes in the truck into a structured field report with photos, GPS-tagged observations and a recommendation section the farmer can act on."
+    },
+    "deck:3": {
+      "source": "deck",
+      "text": "Slide 3: Traction\n$9,400 MRR from 78 paying consultants. 92% month-two retention. Average consultant produces 61 reports a month on Fieldnote."
+    },
+    "deck:4": {
+      "source": "deck",
+      "text": "Slide 4: Market\n14,000 independent crop consultants in the US and Canada. At $120 per month that is a $20M annual opportunity before agribusiness retail agronomists."
+    },
+    "deck:5": {
+      "source": "deck",
+      "text": "Slide 5: Team\nMaya Lindqvist (CEO) was a certified crop adviser for nine years in Saskatchewan. Jonah Reyes (CTO) built speech pipelines at Rev for four years."
+    },
+    "deck:6": {
+      "source": "deck",
+      "text": "Slide 6: Raise\n$1.5M pre-seed to hire two engineers and a sales lead, and to build the agronomy retail integration."
+    },
+    "call-notes:1": {
+      "source": "call-notes",
+      "text": "Maya is credible on the workflow; she described her own report backlog from consulting years in detail."
+    },
+    "call-notes:2": {
+      "source": "call-notes",
+      "text": "Revenue. $9,400 MRR confirmed. 78 paying consultants, but 31 of them came through one distributor deal with a Saskatchewan co-op that pays on their behalf and renews annually in January. Direct paying consultants are 47."
+    },
+    "call-notes:3": {
+      "source": "call-notes",
+      "text": "Retention. The 92% figure is month-two retention for consultants who completed onboarding. About a third of sign-ups never complete onboarding and are not counted. Maya agreed the deck should say so."
+    },
+    "call-notes:4": {
+      "source": "call-notes",
+      "text": "Product. Demo was strong. Transcription uses an off-the-shelf speech API; the differentiated piece is the agronomy term dictionary and the report templates, which took eight months of Maya's time."
+    },
+    "call-notes:5": {
+      "source": "call-notes",
+      "text": "Competition. Asked about Climate FieldView and Agworld. Maya said both are farm-management platforms that consultants find heavy; neither has a voice-first report flow today. She expects Agworld could add one."
+    },
+    "call-notes:6": {
+      "source": "call-notes",
+      "text": "Team. Jonah is full-time since June. Two part-time contractors. No sales hire yet; Maya does all sales."
+    },
+    "call-notes:7": {
+      "source": "call-notes",
+      "text": "Round. $1.5M on a $9M post SAFE. $250k committed from an ag-focused angel group. Runway is seven months."
+    },
+    "call-notes:8": {
+      "source": "call-notes",
+      "text": "Follow-ups: cohort data including non-onboarded sign-ups, the co-op distributor agreement, Jonah's Rev references."
+    }
+  },
+  "assessment": {
+    "company_name": "Fieldnote Labs",
+    "summary": "Fieldnote Labs sells voice-to-report software to independent agronomy consultants: spoken notes recorded in the truck become structured field reports with photos, GPS-tagged observations and a recommendation section. The deck reports $9,400 MRR from 78 paying consultants, 92% month-two retention and 61 reports per consultant per month. The first call narrows both headline numbers. Of the 78 accounts, 31 come from a single Saskatchewan co-op distributor deal that pays on the consultants' behalf and renews each January; direct paying consultants are 47. The 92% figure covers only consultants who completed onboarding, and about a third of sign-ups never do. Transcription is an off-the-shelf speech API; the claimed differentiation is an agronomy term dictionary and report templates built over eight months of the CEO's time. The round is $1.5M on a $9M post SAFE with $250k committed and seven months of runway. Partners would need the full cohort data including non-onboarded sign-ups, and the co-op distributor agreement with its January renewal terms, before the retention and revenue figures can be read at face value.",
+    "dimensions": [
+      {
+        "name": "Team",
+        "finding": "Two founders with directly relevant domain and technical backgrounds; the company is effectively three to five people with no sales hire.",
+        "claims": [
+          {
+            "text": "CEO Maya Lindqvist was a certified crop adviser for nine years in Saskatchewan.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "deck:5",
+                "quote": "Maya Lindqvist (CEO) was a certified crop adviser for nine years in Saskatchewan.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "CTO Jonah Reyes built speech pipelines at Rev for four years and has been full-time at Fieldnote since June.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "deck:5",
+                "quote": "Jonah Reyes (CTO) built speech pipelines at Rev for four years.",
+                "status": "ok"
+              },
+              {
+                "passage_id": "call-notes:6",
+                "quote": "Jonah is full-time since June.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "Beyond the founders the team is two part-time contractors, with no sales hire and Maya handling all sales.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:6",
+                "quote": "Two part-time contractors. No sales hire yet; Maya does all sales.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The associate's read that Maya is credible on the workflow is an impression from a 35-minute call, not a verified reference.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:1",
+                "quote": "Maya is credible on the workflow; she described her own report backlog from consulting years in detail.",
+                "status": "ok"
+              },
+              {
+                "passage_id": "call-notes:8",
+                "quote": "Jonah's Rev references.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          }
+        ],
+        "open_questions": [
+          "Was Jonah part-time or elsewhere before June 2026, and what is the founder equity split?",
+          "What do Jonah's Rev references say about his scope of ownership on speech pipelines?",
+          "What are the two contractors working on and are they convertible to full-time hires?"
+        ]
+      },
+      {
+        "name": "Problem and market",
+        "finding": "The problem statement is a concrete time cost per report; the market sizing is a simple headcount-times-price calculation on a narrow segment.",
+        "claims": [
+          {
+            "text": "The deck frames the problem as consultants visiting 15 to 25 farms a week and spending evenings typing reports that take 40 minutes each.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "deck:1",
+                "quote": "Independent agronomy consultants visit 15 to 25 farms a week and spend their evenings typing field reports. A typical report takes 40 minutes to write.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The stated market is 14,000 independent crop consultants in the US and Canada, sized at $20M annually at $120 per month.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "deck:4",
+                "quote": "14,000 independent crop consultants in the US and Canada. At $120 per month that is a $20M annual opportunity",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The larger agribusiness retail agronomist segment is named but not sized anywhere in the inputs.",
+            "basis": "absence",
+            "citations": [
+              {
+                "passage_id": "deck:4",
+                "quote": "$20M annual opportunity before agribusiness retail agronomists",
+                "status": "ok"
+              },
+              {
+                "passage_id": "deck:6",
+                "quote": "to build the agronomy retail integration",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "No source gives the share of the 14,000 consultants that is realistically addressable or any bottom-up segmentation of it.",
+            "basis": "absence",
+            "citations": [
+              {
+                "passage_id": "deck:4",
+                "quote": "14,000 independent crop consultants in the US and Canada.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          }
+        ],
+        "open_questions": [
+          "Where does the 14,000 figure come from and what is its source year?",
+          "How seasonal is consultant usage outside the growing season?",
+          "What is the size and price tolerance of the retail agronomist segment the round is meant to unlock?"
+        ]
+      },
+      {
+        "name": "Product and technology",
+        "finding": "The speech layer is bought in; the founders locate differentiation in an agronomy term dictionary and report templates built over eight months.",
+        "claims": [
+          {
+            "text": "The product converts spoken notes into a structured report with photos, GPS-tagged observations and a recommendation section.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "deck:2",
+                "quote": "Fieldnote turns a consultant's spoken notes in the truck into a structured field report with photos, GPS-tagged observations and a recommendation section",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "Transcription runs on an off-the-shelf speech API, with the agronomy term dictionary and report templates as the claimed differentiated layer, representing eight months of Maya's time.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:4",
+                "quote": "Transcription uses an off-the-shelf speech API; the differentiated piece is the agronomy term dictionary and the report templates, which took eight months of Maya's time.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The inputs contain no transcription accuracy figures, no error-rate benchmarks against generic speech-to-text, and no description of how reports are reviewed before a farmer acts on them.",
+            "basis": "absence",
+            "citations": [
+              {
+                "passage_id": "call-notes:4",
+                "quote": "Demo was strong.",
+                "status": "ok"
+              },
+              {
+                "passage_id": "deck:2",
+                "quote": "a recommendation section the farmer can act on",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          }
+        ],
+        "open_questions": [
+          "Which speech vendor is used, at what cost per minute, and what happens if its pricing or terms change?",
+          "How large is the agronomy term dictionary and how was it validated?",
+          "Is any proprietary audio or correction data being accumulated that would improve accuracy over time?"
+        ]
+      },
+      {
+        "name": "Traction and customers",
+        "finding": "Revenue is confirmed at $9,400 MRR, but the customer count and the retention figure are both narrower than the deck presents.",
+        "claims": [
+          {
+            "text": "$9,400 MRR from 78 paying consultants was confirmed on the call.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:2",
+                "quote": "Revenue. $9,400 MRR confirmed. 78 paying consultants",
+                "status": "ok"
+              },
+              {
+                "passage_id": "deck:3",
+                "quote": "$9,400 MRR from 78 paying consultants.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "31 of the 78 accounts come from one Saskatchewan co-op distributor deal and 47 are direct paying consultants.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:2",
+                "quote": "31 of them came through one distributor deal with a Saskatchewan co-op that pays on their behalf and renews annually in January. Direct paying consultants are 47.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The 92% month-two retention covers only consultants who completed onboarding, and about a third of sign-ups never complete onboarding and are excluded from the figure.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "deck:3",
+                "quote": "92% month-two retention.",
+                "status": "ok"
+              },
+              {
+                "passage_id": "call-notes:3",
+                "quote": "The 92% figure is month-two retention for consultants who completed onboarding. About a third of sign-ups never complete onboarding and are not counted.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "Usage is reported at 61 reports per consultant per month, with no breakdown between co-op and direct accounts.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "deck:3",
+                "quote": "Average consultant produces 61 reports a month on Fieldnote.",
+                "status": "ok"
+              },
+              {
+                "passage_id": "call-notes:8",
+                "quote": "cohort data including non-onboarded sign-ups",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "No retention data beyond month two appears in any source.",
+            "basis": "absence",
+            "citations": [
+              {
+                "passage_id": "deck:3",
+                "quote": "92% month-two retention.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          }
+        ],
+        "open_questions": [
+          "What is month-six and month-twelve retention for direct consultants?",
+          "Do co-op-paid consultants use the product at the same rate as direct payers?",
+          "Why do a third of sign-ups fail to complete onboarding, and has that rate moved?"
+        ]
+      },
+      {
+        "name": "Business model and unit economics",
+        "finding": "Pricing is around $120 per consultant per month on the deck's own math, and the inputs contain no acquisition cost, gross margin or payback data.",
+        "claims": [
+          {
+            "text": "Blended revenue per paying consultant is roughly the $120 per month used in the deck's market sizing, derived by dividing $9,400 MRR across 78 paying consultants.",
+            "basis": "derived",
+            "citations": [
+              {
+                "passage_id": "call-notes:2",
+                "quote": "Revenue. $9,400 MRR confirmed. 78 paying consultants",
+                "status": "ok"
+              },
+              {
+                "passage_id": "deck:4",
+                "quote": "At $120 per month that is a $20M annual opportunity",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "Part of revenue is paid by a co-op on consultants' behalf rather than by the end user, and that contract renews annually in January.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:2",
+                "quote": "one distributor deal with a Saskatchewan co-op that pays on their behalf and renews annually in January",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The inputs give no customer acquisition cost, gross margin, speech API cost per report, or payback period.",
+            "basis": "absence",
+            "citations": [
+              {
+                "passage_id": "call-notes:4",
+                "quote": "Transcription uses an off-the-shelf speech API",
+                "status": "ok"
+              },
+              {
+                "passage_id": "call-notes:6",
+                "quote": "No sales hire yet; Maya does all sales.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          }
+        ],
+        "open_questions": [
+          "What does the co-op pay per seat versus a direct consultant?",
+          "What is the variable cost per report, including speech API and storage?",
+          "How much does it cost to acquire a direct consultant today, given the founder does all selling?"
+        ]
+      },
+      {
+        "name": "Competition and defensibility",
+        "finding": "The named incumbents are farm-management platforms without a voice-first flow; the founder herself expects one of them could add it.",
+        "claims": [
+          {
+            "text": "Maya characterised Climate FieldView and Agworld as farm-management platforms consultants find heavy, with no voice-first report flow today.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:5",
+                "quote": "Maya said both are farm-management platforms that consultants find heavy; neither has a voice-first report flow today.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The founder expects Agworld could add a voice-first flow.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:5",
+                "quote": "She expects Agworld could add one.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "The claimed moat is the agronomy term dictionary and report templates, not the speech technology, which is purchased.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:4",
+                "quote": "Transcription uses an off-the-shelf speech API; the differentiated piece is the agronomy term dictionary and the report templates",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "No source covers general-purpose voice note or AI transcription tools as substitutes, nor any patent, data or switching-cost advantage.",
+            "basis": "absence",
+            "citations": [
+              {
+                "passage_id": "call-notes:5",
+                "quote": "Asked about Climate FieldView and Agworld.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          }
+        ],
+        "open_questions": [
+          "What would it cost Agworld or FieldView to replicate the agronomy dictionary?",
+          "Do consultants need Fieldnote reports to flow into the farm-management platform their clients already use?",
+          "How many consultants evaluated a generic transcription tool before choosing Fieldnote?"
+        ]
+      },
+      {
+        "name": "Round and use of funds",
+        "finding": "$1.5M on a $9M post SAFE with $250k committed, against seven months of runway, funding two engineers, a sales lead and a retail integration.",
+        "claims": [
+          {
+            "text": "The round is $1.5M on a $9M post-money SAFE with $250k committed from an ag-focused angel group.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:7",
+                "quote": "$1.5M on a $9M post SAFE. $250k committed from an ag-focused angel group.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "Current runway is seven months.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "call-notes:7",
+                "quote": "Runway is seven months.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "Proceeds are earmarked for two engineers, a sales lead and the agronomy retail integration.",
+            "basis": "stated",
+            "citations": [
+              {
+                "passage_id": "deck:6",
+                "quote": "$1.5M pre-seed to hire two engineers and a sales lead, and to build the agronomy retail integration.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "No cap table, prior SAFE terms, burn rate or milestone plan for the new capital appears in the inputs.",
+            "basis": "absence",
+            "citations": [
+              {
+                "passage_id": "call-notes:7",
+                "quote": "$1.5M on a $9M post SAFE.",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          }
+        ],
+        "open_questions": [
+          "What is the current monthly burn that produces seven months of runway?",
+          "Are there earlier SAFEs or notes stacking into the $9M post?",
+          "What specific milestone is the $1.5M meant to reach, and over how many months?"
+        ]
+      },
+      {
+        "name": "Operational and regulatory risk",
+        "finding": "The product generates agronomic recommendations a farmer acts on, and the inputs say nothing about liability, data ownership or any regulatory treatment.",
+        "claims": [
+          {
+            "text": "The product outputs a recommendation section the farmer can act on, and no source addresses liability for an incorrect recommendation or transcription error.",
+            "basis": "absence",
+            "citations": [
+              {
+                "passage_id": "deck:2",
+                "quote": "a recommendation section the farmer can act on",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "Field data is GPS-tagged and photographed, and no source states who owns that data when a co-op pays for the seat.",
+            "basis": "absence",
+            "citations": [
+              {
+                "passage_id": "deck:2",
+                "quote": "structured field report with photos, GPS-tagged observations",
+                "status": "ok"
+              },
+              {
+                "passage_id": "call-notes:2",
+                "quote": "a Saskatchewan co-op that pays on their behalf",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          },
+          {
+            "text": "Certified crop adviser reporting standards are not discussed anywhere in the inputs despite the CEO holding that background.",
+            "basis": "absence",
+            "citations": [
+              {
+                "passage_id": "deck:5",
+                "quote": "was a certified crop adviser for nine years in Saskatchewan",
+                "status": "ok"
+              }
+            ],
+            "verification": {
+              "status": "verified",
+              "issues": []
+            }
+          }
+        ],
+        "open_questions": [
+          "Do certified crop adviser or provincial reporting rules constrain how a machine-generated report may be filed?",
+          "Who owns consultant and farm data under the co-op agreement?",
+          "What indemnity does the customer contract carry for erroneous recommendations?"
+        ]
+      }
+    ],
+    "contradictions": [
+      {
+        "text": "The deck presents 78 paying consultants while the call shows 47 direct payers plus 31 seats bought through a single co-op distributor deal.",
+        "basis": "stated",
+        "citations": [
+          {
+            "passage_id": "deck:3",
+            "quote": "$9,400 MRR from 78 paying consultants.",
+            "status": "ok"
+          },
+          {
+            "passage_id": "call-notes:2",
+            "quote": "31 of them came through one distributor deal with a Saskatchewan co-op that pays on their behalf and renews annually in January. Direct paying consultants are 47.",
+            "status": "ok"
+          }
+        ],
+        "verification": {
+          "status": "verified",
+          "issues": []
+        }
+      },
+      {
+        "text": "The deck's 92% month-two retention excludes the roughly one third of sign-ups who never complete onboarding, which the call makes explicit and the founder agreed should be disclosed.",
+        "basis": "stated",
+        "citations": [
+          {
+            "passage_id": "deck:3",
+            "quote": "92% month-two retention.",
+            "status": "ok"
+          },
+          {
+            "passage_id": "call-notes:3",
+            "quote": "About a third of sign-ups never complete onboarding and are not counted. Maya agreed the deck should say so.",
+            "status": "ok"
+          }
+        ],
+        "verification": {
+          "status": "verified",
+          "issues": []
+        }
+      },
+      {
+        "text": "The deck's team slide describes both founders without noting that the CTO has been full-time only since June and that no sales hire exists.",
+        "basis": "stated",
+        "citations": [
+          {
+            "passage_id": "deck:5",
+            "quote": "Jonah Reyes (CTO) built speech pipelines at Rev for four years.",
+            "status": "ok"
+          },
+          {
+            "passage_id": "call-notes:6",
+            "quote": "Jonah is full-time since June. Two part-time contractors. No sales hire yet",
+            "status": "ok"
+          }
+        ],
+        "verification": {
+          "status": "verified",
+          "issues": []
+        }
+      }
+    ],
+    "missing": [
+      {
+        "item": "Full cohort data including sign-ups who never completed onboarding",
+        "why_it_matters": "The headline 92% retention is measured on a filtered population; true sign-up-to-paid conversion and retention cannot be assessed without it."
+      },
+      {
+        "item": "The Saskatchewan co-op distributor agreement",
+        "why_it_matters": "31 of 78 accounts and an unknown share of $9,400 MRR depend on one contract that renews in January; pricing, term, exclusivity and termination rights are unknown."
+      },
+      {
+        "item": "Jonah Reyes's Rev references",
+        "why_it_matters": "The technical hire's speech-pipeline experience is the stated basis for execution on the core workflow and is currently unverified."
+      },
+      {
+        "item": "Cap table and prior financing instruments",
+        "why_it_matters": "A $9M post SAFE cannot be evaluated for dilution or stacked instruments without knowing what already converts."
+      },
+      {
+        "item": "Monthly burn and a milestone plan for the $1.5M",
+        "why_it_matters": "Runway is seven months; partners need to know what the round buys and what metric the next round would be raised against."
+      },
+      {
+        "item": "Unit economics: CAC, gross margin, speech API cost per report",
+        "why_it_matters": "Pricing near $120 per month only works if variable costs and acquisition costs leave margin, and none of these figures appear."
+      },
+      {
+        "item": "Competitive landscape beyond the two platforms the associate named",
+        "why_it_matters": "Generic AI transcription tools and other ag-specific note apps were not discussed, so substitution risk is unmeasured."
+      },
+      {
+        "item": "Customer references from direct paying consultants",
+        "why_it_matters": "All qualitative evidence on product value comes from the founder and a demo, not from users."
+      },
+      {
+        "item": "Seasonality of usage and revenue",
+        "why_it_matters": "Agronomy consulting is seasonal; monthly MRR and 61 reports per month may not hold outside the growing season."
+      },
+      {
+        "item": "Data ownership, liability and any regulatory treatment of generated recommendations",
+        "why_it_matters": "The product issues agronomic recommendations farmers act on, and no source addresses who is responsible if one is wrong."
+      }
+    ],
+    "bear_case": {
+      "thesis": "Fieldnote is a thin application layer on a purchased speech API, selling into a segment the deck itself sizes at $20M a year, with roughly 40% of accounts resting on one co-op contract that renews in January. The two metrics that make the traction look strong, 78 customers and 92% retention, both shrink under questioning. A skeptical partner would say the company has 47 direct customers, one unproven channel, seven months of runway, and a feature that the incumbent the founder named could add.",
+      "points": [
+        {
+          "text": "The deck's own market sizing caps the core segment at $20M a year, which constrains the outcome unless the unsized retail agronomist segment works.",
+          "basis": "stated",
+          "citations": [
+            {
+              "passage_id": "deck:4",
+              "quote": "At $120 per month that is a $20M annual opportunity before agribusiness retail agronomists.",
+              "status": "ok"
+            }
+          ],
+          "verification": {
+            "status": "verified",
+            "issues": []
+          }
+        },
+        {
+          "text": "31 of 78 accounts and the revenue attached to them sit behind one Saskatchewan co-op deal that renews annually in January, and the agreement has not been reviewed.",
+          "basis": "stated",
+          "citations": [
+            {
+              "passage_id": "call-notes:2",
+              "quote": "31 of them came through one distributor deal with a Saskatchewan co-op that pays on their behalf and renews annually in January",
+              "status": "ok"
+            },
+            {
+              "passage_id": "call-notes:8",
+              "quote": "the co-op distributor agreement",
+              "status": "ok"
+            }
+          ],
+          "verification": {
+            "status": "verified",
+            "issues": []
+          }
+        },
+        {
+          "text": "Headline retention of 92% is survivor-filtered: about a third of sign-ups never complete onboarding and are excluded, so the real funnel is unmeasured.",
+          "basis": "stated",
+          "citations": [
+            {
+              "passage_id": "deck:3",
+              "quote": "92% month-two retention.",
+              "status": "ok"
+            },
+            {
+              "passage_id": "call-notes:3",
+              "quote": "About a third of sign-ups never complete onboarding and are not counted.",
+              "status": "ok"
+            }
+          ],
+          "verification": {
+            "status": "verified",
+            "issues": []
+          }
+        },
+        {
+          "text": "The technical core is bought in, and the defensible asset is a term dictionary and templates representing eight months of one founder's work, which the founder concedes Agworld could replicate.",
+          "basis": "stated",
+          "citations": [
+            {
+              "passage_id": "call-notes:4",
+              "quote": "Transcription uses an off-the-shelf speech API; the differentiated piece is the agronomy term dictionary and the report templates, which took eight months of Maya's time.",
+              "status": "ok"
+            },
+            {
+              "passage_id": "call-notes:5",
+              "quote": "She expects Agworld could add one.",
+              "status": "ok"
+            }
+          ],
+          "verification": {
+            "status": "verified",
+            "issues": []
+          }
+        },
+        {
+          "text": "Sales is entirely founder-led with no sales hire, so there is no evidence that acquisition works without Maya.",
+          "basis": "stated",
+          "citations": [
+            {
+              "passage_id": "call-notes:6",
+              "quote": "No sales hire yet; Maya does all sales.",
+              "status": "ok"
+            }
+          ],
+          "verification": {
+            "status": "verified",
+            "issues": []
+          }
+        },
+        {
+          "text": "Seven months of runway against $250k committed of a $1.5M target means the round must close quickly, and no burn figure or milestone plan was provided to show what the money buys.",
+          "basis": "stated",
+          "citations": [
+            {
+              "passage_id": "call-notes:7",
+              "quote": "$250k committed from an ag-focused angel group. Runway is seven months.",
+              "status": "ok"
+            },
+            {
+              "passage_id": "deck:6",
+              "quote": "to hire two engineers and a sales lead, and to build the agronomy retail integration",
+              "status": "ok"
+            }
+          ],
+          "verification": {
+            "status": "verified",
+            "issues": []
+          }
+        },
+        {
+          "text": "No customer reference, churn curve beyond month two, or unit economics appear anywhere in the inputs, so the durability of the $9,400 MRR cannot be tested from these materials.",
+          "basis": "absence",
+          "citations": [
+            {
+              "passage_id": "deck:3",
+              "quote": "$9,400 MRR from 78 paying consultants. 92% month-two retention.",
+              "status": "ok"
+            },
+            {
+              "passage_id": "call-notes:8",
+              "quote": "Follow-ups: cohort data including non-onboarded sign-ups",
+              "status": "ok"
+            }
+          ],
+          "verification": {
+            "status": "verified",
+            "issues": []
+          }
+        }
+      ]
+    },
+    "integrity_notes": [
+      "No text in the inputs was addressed to reviewers or AI systems, and no instruction attempting to steer the assessment was found.",
+      "Seven-month runway and a $250k commitment were stated as facts about the round; neither is evidence about the business and no expiring deadline was asserted in the inputs.",
+      "The associate's characterisations \"Maya is credible on the workflow\" and \"Demo was strong\" are subjective first-call impressions from a 35-minute conversation, not verified evidence.",
+      "All traction figures ($9,400 MRR, 78 consultants, 92% retention, 61 reports per month) are company-reported; the call confirmed the MRR verbally but no financial records were reviewed.",
+      "Three items remain explicitly unverified by the associate's own follow-up list: cohort data including non-onboarded sign-ups, the co-op distributor agreement, and Jonah's Rev references."
+    ]
+  },
+  "verification": [
+    {
+      "id": "d0.c0",
+      "where": "Team",
+      "section": "dimension",
+      "text": "CEO Maya Lindqvist was a certified crop adviser for nine years in Saskatchewan.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:5",
+          "quote": "Maya Lindqvist (CEO) was a certified crop adviser for nine years in Saskatchewan.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d0.c1",
+      "where": "Team",
+      "section": "dimension",
+      "text": "CTO Jonah Reyes built speech pipelines at Rev for four years and has been full-time at Fieldnote since June.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:5",
+          "quote": "Jonah Reyes (CTO) built speech pipelines at Rev for four years.",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:6",
+          "quote": "Jonah is full-time since June.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d0.c2",
+      "where": "Team",
+      "section": "dimension",
+      "text": "Beyond the founders the team is two part-time contractors, with no sales hire and Maya handling all sales.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:6",
+          "quote": "Two part-time contractors. No sales hire yet; Maya does all sales.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d0.c3",
+      "where": "Team",
+      "section": "dimension",
+      "text": "The associate's read that Maya is credible on the workflow is an impression from a 35-minute call, not a verified reference.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:1",
+          "quote": "Maya is credible on the workflow; she described her own report backlog from consulting years in detail.",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:8",
+          "quote": "Jonah's Rev references.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d1.c0",
+      "where": "Problem and market",
+      "section": "dimension",
+      "text": "The deck frames the problem as consultants visiting 15 to 25 farms a week and spending evenings typing reports that take 40 minutes each.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:1",
+          "quote": "Independent agronomy consultants visit 15 to 25 farms a week and spend their evenings typing field reports. A typical report takes 40 minutes to write.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d1.c1",
+      "where": "Problem and market",
+      "section": "dimension",
+      "text": "The stated market is 14,000 independent crop consultants in the US and Canada, sized at $20M annually at $120 per month.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:4",
+          "quote": "14,000 independent crop consultants in the US and Canada. At $120 per month that is a $20M annual opportunity",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d1.c2",
+      "where": "Problem and market",
+      "section": "dimension",
+      "text": "The larger agribusiness retail agronomist segment is named but not sized anywhere in the inputs.",
+      "basis": "absence",
+      "citations": [
+        {
+          "passage_id": "deck:4",
+          "quote": "$20M annual opportunity before agribusiness retail agronomists",
+          "status": "ok"
+        },
+        {
+          "passage_id": "deck:6",
+          "quote": "to build the agronomy retail integration",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d1.c3",
+      "where": "Problem and market",
+      "section": "dimension",
+      "text": "No source gives the share of the 14,000 consultants that is realistically addressable or any bottom-up segmentation of it.",
+      "basis": "absence",
+      "citations": [
+        {
+          "passage_id": "deck:4",
+          "quote": "14,000 independent crop consultants in the US and Canada.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d2.c0",
+      "where": "Product and technology",
+      "section": "dimension",
+      "text": "The product converts spoken notes into a structured report with photos, GPS-tagged observations and a recommendation section.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:2",
+          "quote": "Fieldnote turns a consultant's spoken notes in the truck into a structured field report with photos, GPS-tagged observations and a recommendation section",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d2.c1",
+      "where": "Product and technology",
+      "section": "dimension",
+      "text": "Transcription runs on an off-the-shelf speech API, with the agronomy term dictionary and report templates as the claimed differentiated layer, representing eight months of Maya's time.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:4",
+          "quote": "Transcription uses an off-the-shelf speech API; the differentiated piece is the agronomy term dictionary and the report templates, which took eight months of Maya's time.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d2.c2",
+      "where": "Product and technology",
+      "section": "dimension",
+      "text": "The inputs contain no transcription accuracy figures, no error-rate benchmarks against generic speech-to-text, and no description of how reports are reviewed before a farmer acts on them.",
+      "basis": "absence",
+      "citations": [
+        {
+          "passage_id": "call-notes:4",
+          "quote": "Demo was strong.",
+          "status": "ok"
+        },
+        {
+          "passage_id": "deck:2",
+          "quote": "a recommendation section the farmer can act on",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d3.c0",
+      "where": "Traction and customers",
+      "section": "dimension",
+      "text": "$9,400 MRR from 78 paying consultants was confirmed on the call.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:2",
+          "quote": "Revenue. $9,400 MRR confirmed. 78 paying consultants",
+          "status": "ok"
+        },
+        {
+          "passage_id": "deck:3",
+          "quote": "$9,400 MRR from 78 paying consultants.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d3.c1",
+      "where": "Traction and customers",
+      "section": "dimension",
+      "text": "31 of the 78 accounts come from one Saskatchewan co-op distributor deal and 47 are direct paying consultants.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:2",
+          "quote": "31 of them came through one distributor deal with a Saskatchewan co-op that pays on their behalf and renews annually in January. Direct paying consultants are 47.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d3.c2",
+      "where": "Traction and customers",
+      "section": "dimension",
+      "text": "The 92% month-two retention covers only consultants who completed onboarding, and about a third of sign-ups never complete onboarding and are excluded from the figure.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:3",
+          "quote": "92% month-two retention.",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:3",
+          "quote": "The 92% figure is month-two retention for consultants who completed onboarding. About a third of sign-ups never complete onboarding and are not counted.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d3.c3",
+      "where": "Traction and customers",
+      "section": "dimension",
+      "text": "Usage is reported at 61 reports per consultant per month, with no breakdown between co-op and direct accounts.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:3",
+          "quote": "Average consultant produces 61 reports a month on Fieldnote.",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:8",
+          "quote": "cohort data including non-onboarded sign-ups",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d3.c4",
+      "where": "Traction and customers",
+      "section": "dimension",
+      "text": "No retention data beyond month two appears in any source.",
+      "basis": "absence",
+      "citations": [
+        {
+          "passage_id": "deck:3",
+          "quote": "92% month-two retention.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d4.c0",
+      "where": "Business model and unit economics",
+      "section": "dimension",
+      "text": "Blended revenue per paying consultant is roughly the $120 per month used in the deck's market sizing, derived by dividing $9,400 MRR across 78 paying consultants.",
+      "basis": "derived",
+      "citations": [
+        {
+          "passage_id": "call-notes:2",
+          "quote": "Revenue. $9,400 MRR confirmed. 78 paying consultants",
+          "status": "ok"
+        },
+        {
+          "passage_id": "deck:4",
+          "quote": "At $120 per month that is a $20M annual opportunity",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d4.c1",
+      "where": "Business model and unit economics",
+      "section": "dimension",
+      "text": "Part of revenue is paid by a co-op on consultants' behalf rather than by the end user, and that contract renews annually in January.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:2",
+          "quote": "one distributor deal with a Saskatchewan co-op that pays on their behalf and renews annually in January",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d4.c2",
+      "where": "Business model and unit economics",
+      "section": "dimension",
+      "text": "The inputs give no customer acquisition cost, gross margin, speech API cost per report, or payback period.",
+      "basis": "absence",
+      "citations": [
+        {
+          "passage_id": "call-notes:4",
+          "quote": "Transcription uses an off-the-shelf speech API",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:6",
+          "quote": "No sales hire yet; Maya does all sales.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d5.c0",
+      "where": "Competition and defensibility",
+      "section": "dimension",
+      "text": "Maya characterised Climate FieldView and Agworld as farm-management platforms consultants find heavy, with no voice-first report flow today.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:5",
+          "quote": "Maya said both are farm-management platforms that consultants find heavy; neither has a voice-first report flow today.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d5.c1",
+      "where": "Competition and defensibility",
+      "section": "dimension",
+      "text": "The founder expects Agworld could add a voice-first flow.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:5",
+          "quote": "She expects Agworld could add one.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d5.c2",
+      "where": "Competition and defensibility",
+      "section": "dimension",
+      "text": "The claimed moat is the agronomy term dictionary and report templates, not the speech technology, which is purchased.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:4",
+          "quote": "Transcription uses an off-the-shelf speech API; the differentiated piece is the agronomy term dictionary and the report templates",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d5.c3",
+      "where": "Competition and defensibility",
+      "section": "dimension",
+      "text": "No source covers general-purpose voice note or AI transcription tools as substitutes, nor any patent, data or switching-cost advantage.",
+      "basis": "absence",
+      "citations": [
+        {
+          "passage_id": "call-notes:5",
+          "quote": "Asked about Climate FieldView and Agworld.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d6.c0",
+      "where": "Round and use of funds",
+      "section": "dimension",
+      "text": "The round is $1.5M on a $9M post-money SAFE with $250k committed from an ag-focused angel group.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:7",
+          "quote": "$1.5M on a $9M post SAFE. $250k committed from an ag-focused angel group.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d6.c1",
+      "where": "Round and use of funds",
+      "section": "dimension",
+      "text": "Current runway is seven months.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:7",
+          "quote": "Runway is seven months.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d6.c2",
+      "where": "Round and use of funds",
+      "section": "dimension",
+      "text": "Proceeds are earmarked for two engineers, a sales lead and the agronomy retail integration.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:6",
+          "quote": "$1.5M pre-seed to hire two engineers and a sales lead, and to build the agronomy retail integration.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d6.c3",
+      "where": "Round and use of funds",
+      "section": "dimension",
+      "text": "No cap table, prior SAFE terms, burn rate or milestone plan for the new capital appears in the inputs.",
+      "basis": "absence",
+      "citations": [
+        {
+          "passage_id": "call-notes:7",
+          "quote": "$1.5M on a $9M post SAFE.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d7.c0",
+      "where": "Operational and regulatory risk",
+      "section": "dimension",
+      "text": "The product outputs a recommendation section the farmer can act on, and no source addresses liability for an incorrect recommendation or transcription error.",
+      "basis": "absence",
+      "citations": [
+        {
+          "passage_id": "deck:2",
+          "quote": "a recommendation section the farmer can act on",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d7.c1",
+      "where": "Operational and regulatory risk",
+      "section": "dimension",
+      "text": "Field data is GPS-tagged and photographed, and no source states who owns that data when a co-op pays for the seat.",
+      "basis": "absence",
+      "citations": [
+        {
+          "passage_id": "deck:2",
+          "quote": "structured field report with photos, GPS-tagged observations",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:2",
+          "quote": "a Saskatchewan co-op that pays on their behalf",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "d7.c2",
+      "where": "Operational and regulatory risk",
+      "section": "dimension",
+      "text": "Certified crop adviser reporting standards are not discussed anywhere in the inputs despite the CEO holding that background.",
+      "basis": "absence",
+      "citations": [
+        {
+          "passage_id": "deck:5",
+          "quote": "was a certified crop adviser for nine years in Saskatchewan",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "x0",
+      "where": "Contradictions",
+      "section": "contradiction",
+      "text": "The deck presents 78 paying consultants while the call shows 47 direct payers plus 31 seats bought through a single co-op distributor deal.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:3",
+          "quote": "$9,400 MRR from 78 paying consultants.",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:2",
+          "quote": "31 of them came through one distributor deal with a Saskatchewan co-op that pays on their behalf and renews annually in January. Direct paying consultants are 47.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "x1",
+      "where": "Contradictions",
+      "section": "contradiction",
+      "text": "The deck's 92% month-two retention excludes the roughly one third of sign-ups who never complete onboarding, which the call makes explicit and the founder agreed should be disclosed.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:3",
+          "quote": "92% month-two retention.",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:3",
+          "quote": "About a third of sign-ups never complete onboarding and are not counted. Maya agreed the deck should say so.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "x2",
+      "where": "Contradictions",
+      "section": "contradiction",
+      "text": "The deck's team slide describes both founders without noting that the CTO has been full-time only since June and that no sales hire exists.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:5",
+          "quote": "Jonah Reyes (CTO) built speech pipelines at Rev for four years.",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:6",
+          "quote": "Jonah is full-time since June. Two part-time contractors. No sales hire yet",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "b0",
+      "where": "Bear case",
+      "section": "bear_case",
+      "text": "The deck's own market sizing caps the core segment at $20M a year, which constrains the outcome unless the unsized retail agronomist segment works.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:4",
+          "quote": "At $120 per month that is a $20M annual opportunity before agribusiness retail agronomists.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "b1",
+      "where": "Bear case",
+      "section": "bear_case",
+      "text": "31 of 78 accounts and the revenue attached to them sit behind one Saskatchewan co-op deal that renews annually in January, and the agreement has not been reviewed.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:2",
+          "quote": "31 of them came through one distributor deal with a Saskatchewan co-op that pays on their behalf and renews annually in January",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:8",
+          "quote": "the co-op distributor agreement",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "b2",
+      "where": "Bear case",
+      "section": "bear_case",
+      "text": "Headline retention of 92% is survivor-filtered: about a third of sign-ups never complete onboarding and are excluded, so the real funnel is unmeasured.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "deck:3",
+          "quote": "92% month-two retention.",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:3",
+          "quote": "About a third of sign-ups never complete onboarding and are not counted.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "b3",
+      "where": "Bear case",
+      "section": "bear_case",
+      "text": "The technical core is bought in, and the defensible asset is a term dictionary and templates representing eight months of one founder's work, which the founder concedes Agworld could replicate.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:4",
+          "quote": "Transcription uses an off-the-shelf speech API; the differentiated piece is the agronomy term dictionary and the report templates, which took eight months of Maya's time.",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:5",
+          "quote": "She expects Agworld could add one.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "b4",
+      "where": "Bear case",
+      "section": "bear_case",
+      "text": "Sales is entirely founder-led with no sales hire, so there is no evidence that acquisition works without Maya.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:6",
+          "quote": "No sales hire yet; Maya does all sales.",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "b5",
+      "where": "Bear case",
+      "section": "bear_case",
+      "text": "Seven months of runway against $250k committed of a $1.5M target means the round must close quickly, and no burn figure or milestone plan was provided to show what the money buys.",
+      "basis": "stated",
+      "citations": [
+        {
+          "passage_id": "call-notes:7",
+          "quote": "$250k committed from an ag-focused angel group. Runway is seven months.",
+          "status": "ok"
+        },
+        {
+          "passage_id": "deck:6",
+          "quote": "to hire two engineers and a sales lead, and to build the agronomy retail integration",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    },
+    {
+      "id": "b6",
+      "where": "Bear case",
+      "section": "bear_case",
+      "text": "No customer reference, churn curve beyond month two, or unit economics appear anywhere in the inputs, so the durability of the $9,400 MRR cannot be tested from these materials.",
+      "basis": "absence",
+      "citations": [
+        {
+          "passage_id": "deck:3",
+          "quote": "$9,400 MRR from 78 paying consultants. 92% month-two retention.",
+          "status": "ok"
+        },
+        {
+          "passage_id": "call-notes:8",
+          "quote": "Follow-ups: cohort data including non-onboarded sign-ups",
+          "status": "ok"
+        }
+      ],
+      "status": "verified",
+      "issues": []
+    }
+  ]
+}

@@ -24,7 +24,7 @@ out/<slug>/assessment.md     the document an associate would edit
 eval.mjs ──► re-verify from the record · Claude Sonnet 5 judge · leakage scan · expectations ──► out/eval.json, out/eval-report.md
 report.mjs ──► out/index.html   static reader with embedded data and click-through provenance
 selftest.mjs                    plants four defects in a real record, confirms the verifier catches them
-serve.mjs                       static file server for out/ on port 4950
+serve.mjs + app/                the app: JSON API over the same pipeline, five screens, port 4950
 ```
 
 About 930 lines of JavaScript across nine files. One dependency, the Anthropic SDK. Node 20 or later, ES modules, no build step.
@@ -33,11 +33,13 @@ About 930 lines of JavaScript across nine files. One dependency, the Anthropic S
 
 | Path | Role |
 |---|---|
-| `assess.mjs` | Drafting pipeline. One company per iteration; writes the record. |
+| `assess.mjs` | CLI over the pipeline. One company per iteration; prints progress. |
 | `eval.mjs` | Evaluation. Reads records, never the pipeline's in-memory state. |
 | `report.mjs` | Builds the reader. Pure function of `out/`. |
 | `selftest.mjs` | Mutation test for the verifier. |
-| `serve.mjs` | Static server. |
+| `serve.mjs` | App server: JSON API, server-sent drafting progress, review storage, static files. |
+| `app/` | The client: `app.html`, `app.css`, `app.js`. Hash-routed single page, no framework. |
+| `lib/pipeline.mjs` | `draftCompany(slug, onProgress)`: the pipeline as a function, used by the CLI and the server. |
 | `lib/env.mjs` | `.env` loader, project root, model ids (`DRAFTER_MODEL`, `JUDGE_MODEL` env overrides). |
 | `lib/sources.mjs` | Example loading, passage splitting, rendering for the model. |
 | `lib/schema.mjs` | The assessment JSON schema. |
@@ -146,6 +148,24 @@ Layout is three columns (companies, document, sources) above 1100px, two columns
 
 The page is labelled "Draft for partner review · not a recommendation" on every company. The automated-checks strip at the bottom of each draft shows the eval's counts and the judge's flagged statements with reasons.
 
+## 8a. The app
+
+`serve.mjs` serves `app/` and exposes a small JSON API; `app/app.js` is a hash-routed single page with no framework. The five screens follow the user journey in the PRD.
+
+| Route | Screen | What it does |
+|---|---|---|
+| `#/` | Companies | Every company with its status (sources, drafted, reviewed), source list, verification counts. |
+| `#/new` | Intake | Name, one-liner, round, and a textarea or file picker for each of the four source types. Saves to `companies/<slug>/` in the same layout as `examples/`. |
+| `#/c/:slug` | Sources | The numbered passages exactly as the model will read them. |
+| `#/c/:slug/draft` | Draft | Starts the pipeline; progress arrives over server-sent events (split, draft, verify, repair, re-verify, write) with repair failures listed; ends with the verification summary, time and tokens. |
+| `#/c/:slug/review` | Review | The reader with keep, edit and remove on every statement, the provenance pane, the eval strip, a reviewer name and an associate's note. Saves to `out/<slug>/review.json`. |
+| `#/c/:slug/partner` | Partner view | The associate's note, then the draft with removed statements gone and edits applied, byline with reviewer and time, every remaining claim still clickable. Printable. |
+| `#/c/:slug/followup` | Follow-up | The missing list and open questions as checkboxes, composed into an email to the founder, copy to clipboard. |
+
+API: `GET /api/companies`, `POST /api/companies`, `GET /api/companies/:slug`, `POST /api/companies/:slug/draft` (event stream), `PUT /api/companies/:slug/review`. A re-draft deletes the previous review, since its decisions refer to statement ids that no longer exist.
+
+Design choices: the review is stored as decisions keyed by statement id, so the model's draft is never mutated and the partner view is a projection of draft plus decisions. The server keeps one in-flight draft per company and refuses a second. Nothing is authenticated; this is a single-associate prototype.
+
 ## 9. Measured performance (3 October 2026 run)
 
 | Stage | Per company | Notes |
@@ -209,7 +229,7 @@ What changes when this becomes a service rather than a script.
 - The judge is a language model. Its partials are plausible on reading, but it has not been audited against a human.
 - Paragraph passages are coarse for long documents. A ten-page memo would produce passages that are too big for a quote to pin meaningfully; sentence or page sub-ids would be needed.
 - The number check is lexical. It will miss a number written as a word and will match a coincidental equal number.
-- The reader is read-only and the markdown is the editing surface. Edits are not tracked.
+- Reviews are JSON files with no history; one reviewer per company, no authentication.
 - Em dashes appear in model prose occasionally. A style rule in the prompt would remove them; it was not added so the committed outputs match the committed prompt.
 
 ## 15. Testing

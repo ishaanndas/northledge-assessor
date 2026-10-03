@@ -57,6 +57,8 @@ These are invariants, not preferences. A feature that violates one is out of sco
 
 ## 6. User journey (v1)
 
+Implemented in the prototype as five screens (sources, draft, review, partner view, follow-up); see `docs/TECHNICAL.md` section 8a.
+
 1. **Intake.** After the first call, the associate drops four text files into a company folder: the deck text, the website capture, founder bios, and their call notes. Any can be missing; the tool treats a missing input as missing evidence, not as an error.
 2. **Draft.** The associate runs the tool on the company. Two to three minutes later a draft exists in two forms: a document they can edit, and a reader page with click-through sources.
 3. **Review.** The associate reads the draft in the reader. Each claim shows a status (verified, warning, unverified) and its citations. Clicking a claim shows the passage with the quote marked. The associate checks anything marked, reads the contradictions and the missing list, and reads the bear case against their own sense of the call.

@@ -1,0 +1,14 @@
+{
+  "reviewer": "M. Chen",
+  "note": "Thesis fit: vertical workflow software for an underserved professional niche, which is squarely in scope. Maya is the real thing on the workflow; the open question is whether 47 direct customers plus one co-op deal is a wedge or a ceiling. I would want the co-op agreement before the meeting.",
+  "decisions": {
+    "d0.c1": {
+      "action": "remove"
+    },
+    "d0.c2": {
+      "action": "edit",
+      "text": "Beyond the founders the team is two part-time contractors, with no sales hire and Maya handling all sales. (Direct paying consultants are 47; the rest come through one co-op deal.)"
+    }
+  },
+  "updated": "2026-10-03 22:39 UTC"
+}
