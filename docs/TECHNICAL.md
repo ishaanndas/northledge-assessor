@@ -44,7 +44,7 @@ About 1,700 lines of JavaScript. Two dependencies: the Anthropic SDK and pdf-par
 | `lib/zip.mjs` | Minimal zip reader (stored and deflate) for Office files. |
 | `lib/prefill.mjs` | Reads a deck and proposes company name, one-liner, round, website and founder bios. Sonnet 5, structured output, copies rather than interprets. |
 | `lib/inbox.mjs` | The inbox: a watched drop folder shaped like a mailbox (`inbox/<id>/message.json` plus attachments); import creates a company from a message. Connector status for Gmail and Microsoft 365. |
-| `samples/`, `inbox/` | Mock decks (two Chrome-rendered PDFs, one hand-built PPTX, one DOCX) and three sample inbox messages. |
+| `samples/`, `inbox/` | `build_decks.py` generates four test decks as PPTX (python-pptx) and PDF (headless Chrome) from one content table: three ordinary, one trap (Lumina Health). Plus the earlier Northwind, Kestrel and Parcelbee mocks and a DOCX of call notes. Each deck is also a sample inbox message. `samples/README.md` lists what is planted. |
 | `lib/env.mjs` | `.env` loader, project root, model ids (`DRAFTER_MODEL`, `JUDGE_MODEL` env overrides). |
 | `lib/sources.mjs` | Example loading, passage splitting, rendering for the model. |
 | `lib/schema.mjs` | The assessment JSON schema. |
@@ -227,6 +227,10 @@ Not observed on this run, but designed for: fabricated quotes, citations to none
 - **Add a dimension or change the shape.** Edit `lib/schema.mjs` and the dimension list in `lib/prompts.mjs`. The verifier, markdown and reader walk the schema generically; only the reader's section headings are hard-coded.
 - **Add a verification rule.** Add an issue code in `verifyAssessment`, mark it hard or soft. Hard codes trigger repair and need a reason string in `hardFailures`.
 - **Add an eval check.** Expectations support count minimums and regex presence or absence per section; new field types go in `expectationChecks` in `eval.mjs`.
+
+## 12b. Hosting
+
+The app runs on Railway at https://northledge-assessor-production.up.railway.app. `Procfile` starts `node serve.mjs` (so `npm start`, the assignment's pipeline command, is not what the host runs); `railway.json` carries the same start command and a restart policy. `ANTHROPIC_API_KEY` is a service variable. A volume is mounted at `/app/companies`, so companies created through the app, with their files, drafts and reviews, survive redeploys; reviews of the five committed examples live in `out/` inside the image and reset on each deploy, which is acceptable for a demo and would move to the database in production. Chrome and python-pptx are build-time tools for the sample decks only; the runtime needs Node and the two npm dependencies.
 
 ## 13. Path to production
 

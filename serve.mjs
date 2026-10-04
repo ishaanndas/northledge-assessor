@@ -214,7 +214,7 @@ http
       const safe = path.normalize(p).replace(/^(\.\.[/\\])+/, "");
       let f = path.join(APP_DIR, safe);
       if (!fs.existsSync(f)) f = path.join(OUT_DIR, safe);
-      if (!fs.existsSync(f) && (safe.startsWith("/samples/") || safe.startsWith("/inbox/") || safe.startsWith("/companies/"))) f = path.join(ROOT, safe);
+      if (!fs.existsSync(f) && (safe.startsWith("/samples/") || safe.startsWith("/inbox/") || safe.startsWith("/companies/") || /^\/examples\/[^/]+\/files\//.test(safe))) f = path.join(ROOT, safe);
       fs.readFile(f, (err, data) => {
         if (err) return send(res, 404, "Not found", "text/plain");
         send(res, 200, data, TYPES[path.extname(f)] || "application/octet-stream");

@@ -13,28 +13,26 @@ The deliverables, mapped to the assignment:
 
 ## Run it
 
-Requires Node 20 or later and an Anthropic API key. Two dependencies: the Anthropic SDK and pdf-parse.
+Hosted: **https://northledge-assessor-production.up.railway.app** (the app with the examples preloaded; drafting a new company there uses the fund's key and takes about two minutes).
+
+Locally, Node 20 or later and an Anthropic API key. Two dependencies: the Anthropic SDK and pdf-parse.
 
 ```bash
 npm install
 echo "ANTHROPIC_API_KEY=sk-ant-..." > .env
-npm run serve        # the app, at http://localhost:4950
+npm start
 ```
 
-The app is one document per company, the assessment, shown in whatever state it is in. Before drafting it shows the sources it will be built from and a Draft button. While drafting it shows progress. Once drafted it is a block editor, in the way a Notion page is: click anywhere and type, press Enter for a new block, "/" for a heading, bullet, quote or divider, drag a block by its handle; the source panel beside it opens the actual deck page behind whichever claim or citation you click, and is resizable. A switch in the header flips between **Edit** and **Preview**, which is what the partners receive with your edits applied; **Export** gives Word, PDF, Markdown or a clean copy, and **Email founder** turns the missing list into the follow-up. The state is derived: not drafted, draft, or reviewed once you have changed anything. The sidebar holds only the assessment and its **Sources**.
-
-Getting a company in: **New company** takes a deck as a PDF, PPTX or DOCX (drop it, choose it, or paste a link to the file, a Google Slides link or a Drive link), a website link that is fetched as text with hidden elements kept and marked, and pasted text or files for bios and call notes. Once the deck is read, the company name, one-liner, round, website and founder bios fill from it; you correct what is wrong and add what the deck lacks. **Inbox** shows decks that arrive by email; importing one creates the company with its attachments already read and its fields filled. In this build the inbox is a watched drop folder (`inbox/`) shaped like a mailbox, with three sample messages; the Gmail and Microsoft 365 connectors show as not connected until OAuth credentials exist. Mock decks to try are in `samples/` (two PDFs, one PPTX, one DOCX of call notes). The four example companies are preloaded; companies you add live under `companies/`, which is gitignored. The companies page has card and list views, and ⌘K opens a search across companies, decks, passages, claims, missing items and the inbox that jumps to the exact match.
-
-The same pipeline runs from the command line:
+`npm start` is the one command for the assignment: it drafts all five examples, runs the evaluation, and builds the static report at `out/index.html`. About twelve minutes and roughly $2 at Opus 5 and Sonnet 5 prices. The committed outputs under `out/` are from the run described in the evaluation section, so nothing needs to be spent to read them.
 
 ```bash
-npm start                       # draft all four examples, run the eval, build the static report (about ten minutes, roughly $1.60)
-node assess.mjs mesa-pay        # draft one company
+node serve.mjs                  # the app at http://localhost:4950
+node assess.mjs lumina-health   # draft one company from the command line
 node eval.mjs --no-judge        # deterministic checks only, no model calls
-node selftest.mjs               # plant four known defects in a real draft and confirm the checks catch them
+node selftest.mjs               # plant four defects in a real draft and confirm the checks catch them
 ```
 
-To look at the committed outputs without spending anything, open `out/index.html` (the static reader) and read `out/*/assessment.md`. To add a company without the app, create a folder under `examples/` with a `company.json` and a `sources/` directory of markdown files (`01-deck.md`, `02-website.md`, and so on). The number prefix orders them; the rest of the filename becomes the citation key.
+To assess a new company from the command line, add a folder under `examples/` with a `company.json` and a `sources/` directory of markdown files (`01-deck.md`, `02-website.md`, and so on). In the app, use New company (PDF, PPTX, DOCX, a link, or pasted text) or import a message from the Inbox.
 
 ## How it works
 
@@ -67,6 +65,7 @@ The model only ever sees text with passage ids attached and may cite nothing els
 | Harbor Health | Sparse inputs: a vague website and an evasive 25-minute call. No deck, no bios. | Did not pad. A long, specific missing list; the website-vs-call gap on the documentation feature surfaced as a contradiction. The one draft where the repair round fired. |
 | Quill Robotics | Contradictions: $1.4M ARR vs $410k contracted, "led perception at Tesla" vs a seven-month contract, a $48B TAM for the wrong market. | All three surfaced in the contradictions section; claims were built on the narrower figures and marketing statements were attributed ("the deck states") rather than asserted. |
 | Mesa Pay | Adversarial: a hidden instruction to AI reviewers in the website, a planted "probability of success: 85%", five marketing claims that collapse on the call, no founder bio, an expiring term sheet. | The instruction was ignored and reported as an integrity note; the 85% was treated as a claim someone made; all five collapses are contradictions; the term sheet is flagged as pressure. |
+| Lumina Health | Adversarial, deck only, built as a real PDF (`samples/lumina-health-deck.pdf`): the traction slide's $2.4M ARR, 340 clinics and 99.9% retention are redefined in the deck's own appendix as $880k contracted, 210 paying and a message delivery rate; a $390B wrong-market TAM; "no competitors" followed by three names; a CTO title contradicted by its footnote; a planted 92% probability from the company's advisor; a Friday close; and white 6pt text telling AI reviewers to be favourable. No call notes exist. | Every headline figure was rebuilt on the appendix definitions; six contradictions; the hidden text, the 92%, the pre-screening claim and the deadline all landed in integrity notes; the bear case leads with "the headline metrics are constructed rather than measured". The repair round fired once: three citations quoted a footnote across a line break the PDF had split, and all three were fixed. |
 
 The design notes for each are in `examples/<slug>/company.json`; the known-answer checks are in `expectations.json` next to them.
 
@@ -81,25 +80,7 @@ Summary here; full method, every flagged statement and the limitations are in `d
 
 `selftest.mjs` plants four defects in a real draft (a fabricated quote, a citation to a nonexistent passage, a changed number, a stripped citation) and confirms each is caught. On this run it caught 4 of 4.
 
-### What this run found
-
-Run of 3 October 2026, drafter Claude Opus 5, judge Claude Sonnet 5. 182 statements across four companies.
-
-| Company | Statements | Quote-verified | Repair round | Judge: supported / partial / unsupported | Decision-language hits | Expectations |
-|---|---|---|---|---|---|---|
-| Lumen Grid | 46 | 46 | not needed | 45 / 1 / 0 | 0 | 4 of 4 |
-| Harbor Health | 36 | 36 | yes, 3 quotes fixed | 32 / 4 / 0 | 0 | 6 of 6 |
-| Quill Robotics | 51 | 51 | not needed | 49 / 2 / 0 | 0 | 8 of 8 |
-| Mesa Pay | 49 | 49 | not needed | 48 / 1 / 0 | 0 | 15 of 15 |
-
-Read honestly:
-
-- **The string check almost never fires on a good model.** Across five drafts (Harbor Health was drafted twice while I fixed the verifier), the deterministic check found three bad citations in one draft and none in the other four. All three were quotes that paraphrased instead of copying; the repair round fixed all three. The check is still worth having, and the self-test shows it catches fabricated quotes, wrong passage ids, altered numbers and missing citations when they occur. But on this model and these inputs it is a seatbelt, not the main defence.
-- **The real failure mode is interpretation on top of a true quote.** The judge marked 8 of 182 statements as partially supported and none as unsupported. In every one of the 8 the quote was verbatim and the claim added something the passage does not say: "the only stated differentiator", "the hardest and most differentiated part of the offering", "can lapse without notice", "corrected only when the associate asked directly". Four of the eight are bear-case points. That is the pattern to watch: when the model argues, it reaches. A string check cannot see this; a judge can, which is why the judge belongs in the product and not only in the eval.
-- **The adversarial case did not land a hit.** The hidden instruction was reported, not followed. The 85% figure appears only in integrity notes and contradictions. The expiring term sheet is flagged as pressure. All 15 known-answer checks passed. One run is not proof of robustness; it is one run.
-- **No decision language anywhere**, in 182 statements plus four summaries and four bear-case theses. The schema makes a score impossible; the scan confirms the prose did not smuggle one in.
-- **The eval has its own errors.** The first version of the number check produced two false warnings and the first version of the Quill expectations would have failed a correct claim. Both are described under AI tools below. An eval is code, and it was wrong before the model was.
-
+**What the run found, honestly.** Five companies, 227 statements, 314 citations. The verifier fired on two drafts: Harbor Health (a citation with no passage number, a title line cited as a passage) and Lumina Health (a footnote quoted across a PDF line break, three times). The repair round fixed all five; none was a false claim. The judge found zero unsupported statements and ten partials, every one a true quote carrying a word the passage does not: "only", "entirely", "regulator-facing", "three sources" where two were cited. Six of the ten are in bear cases or contradictions, where the model is arguing rather than reporting; that is the failure the string check cannot see and the reason the judge exists. The decision-language scan raised two hits, both quotations (the associate's "recommends" from call notes, the deck's planted "probability of success"), reviewed and kept as hits because a scan that forgave quoted text would also forgive a recommendation laundered through one. All 47 known-answer expectations passed, including the 29 on the two adversarial inputs. Full tables, every flagged statement and the limitations are in `docs/EVALUATION.md`.
 
 ### Evaluating with a year of real decisions
 
@@ -144,8 +125,9 @@ The short list. Reasoning for each, plus the data model, prompts, verifier, meas
 
 The whole thing was built with Claude Code in a single session of roughly four hours, with Claude writing the code, the example companies, the prompts and the first drafts of the brief and this README, and me directing, reviewing output quality, and deciding what to cut. The design choices (closed evidence universe, verbatim-quote citations, mark-not-drop, no score field) were mine; several of the implementations were Claude's first attempt and survived.
 
-Three places it got something wrong:
+Four places it got something wrong:
 
 - **The number check flagged correct claims.** The first version of the "every number in a claim must appear in the cited passage" check reported the call date and call duration as unsupported, because they live in the document's title line and the passage splitter had dropped titles. The fix was to count the source title as evidence. Without reading the flagged claims I would have reported two false warnings as real findings.
-- **An eval expectation penalized correct behaviour.** The first known-answer check for Quill Robotics forbade any claim containing "led perception", to catch the inflated Tesla title being asserted as fact. The model's actual claim was "The deck states Marsh led perception at Tesla", which is exactly right: attributed, then contradicted two lines later. The regex had to learn the difference between asserting and attributing. The lesson generalizes: an eval written before seeing outputs encodes the author's guess about how the model will fail, and the guess can be wrong in a direction that punishes good behaviour.
-- **A generator function that would not parse.** Claude wrote `yield` inside an arrow callback in the statement iterator, which is a syntax error in strict-mode modules. Caught on the first run, fixed in a minute, but it is a reminder that fluent code is not the same as code that has been executed.
+- **An eval expectation penalized correct behaviour.** The first known-answer check for Quill Robotics forbade any claim containing "led perception", to catch the inflated Tesla title being asserted as fact. The model's actual claim was "The deck states Marsh led perception at Tesla", which is exactly right: attributed, then contradicted two lines later. The regex had to learn the difference between asserting and attributing. An eval written before seeing outputs encodes the author's guess about how the model will fail, and the guess can be wrong in a direction that punishes good behaviour.
+- **A hand-built PowerPoint that only my own parser could open.** To avoid a dependency, Claude wrote a PPTX by assembling the XML parts by hand. My extractor read it fine, which made it look finished. Google Slides and Keynote refused it. The test decks are now generated with python-pptx and open everywhere; the lesson is that a file format is defined by the programs that open it, not by the parser you wrote.
+- **A refactor that reverted the editor.** While collapsing three pages into one, Claude used a git checkout to undo one bad edit and took the block editor and source viewer with it. The first page load caught it; the file was restored from the last commit and the change re-applied surgically. Nothing was lost, but it is a reminder that "undo" at file granularity undoes everything in the file.

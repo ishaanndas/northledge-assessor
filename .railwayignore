@@ -1,0 +1,5 @@
+companies/
+uploads/
+node_modules/
+.env
+samples/src/
