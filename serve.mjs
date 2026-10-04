@@ -25,7 +25,7 @@ const FILE_KINDS = { ".pdf": "pdf", ".pptx": "pptx", ".docx": "docx", ".md": "te
 const readJson = (f) => (fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, "utf8")) : null);
 const send = (res, code, body, type = "application/json") => {
   res.writeHead(code, { "Content-Type": type, "Cache-Control": "no-store" });
-  res.end(type === "application/json" ? JSON.stringify(body) : body);
+  res.end(type === "application/json" && !Buffer.isBuffer(body) ? JSON.stringify(body) : body);
 };
 const body = (req) =>
   new Promise((resolve, reject) => {
