@@ -146,7 +146,7 @@ async function api(req, res, url) {
 
   if (action === "review" && req.method === "PUT") {
     const b = await body(req);
-    const doc = { reviewer: String(b.reviewer || "").trim(), note: String(b.note || ""), decisions: b.decisions || {}, updated: new Date().toISOString().slice(0, 16).replace("T", " ") + " UTC" };
+    const doc = { reviewer: String(b.reviewer || "").trim(), note: String(b.note || ""), decisions: b.decisions || {}, overrides: b.overrides || {}, updated: new Date().toISOString().slice(0, 16).replace("T", " ") + " UTC" };
     fs.mkdirSync(outDirFor(slug), { recursive: true });
     fs.writeFileSync(path.join(outDirFor(slug), "review.json"), JSON.stringify(doc, null, 2));
     return send(res, 200, doc);
