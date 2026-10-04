@@ -7,7 +7,7 @@ const api = async (path, opts = {}) => {
   return r.json();
 };
 const STAGES = [["sources", "Sources"], ["draft", "Draft"], ["review", "Review"], ["partner", "Partner page"], ["followup", "Follow-up"]];
-const S = { slug: null, company: null, selected: null, decisions: {}, reviewer: localStorage.getItem("reviewer") || "", note: "", saveTimer: null, saved: "" };
+const S = { slug: null, company: null, selected: null, decisions: {}, overrides: {}, reviewer: localStorage.getItem("reviewer") || "", note: "", saveTimer: null, saved: "" };
 const fmt = (iso) => iso ? iso.replace("T", " ").slice(0, 16) : "";
 
 // ---------- shell ----------
@@ -33,8 +33,8 @@ const stagehead = (title, right = "", state = "") => `<div class="stagehead"><h2
 
 async function load(slug) {
   const c = await api(`/companies/${slug}`);
-  if (S.slug !== slug) { S.selected = null; S.note = ""; S.decisions = {}; }
-  if (c.reviewDoc) { S.decisions = c.reviewDoc.decisions || {}; S.note = c.reviewDoc.note || ""; if (c.reviewDoc.reviewer) S.reviewer = c.reviewDoc.reviewer; S.saved = c.reviewDoc.updated; }
+  if (S.slug !== slug) { S.selected = null; S.note = ""; S.decisions = {}; S.overrides = {}; S.saved = ""; }
+  if (c.reviewDoc) { S.decisions = c.reviewDoc.decisions || {}; S.overrides = c.reviewDoc.overrides || {}; S.note = c.reviewDoc.note || ""; if (c.reviewDoc.reviewer) S.reviewer = c.reviewDoc.reviewer; S.saved = c.reviewDoc.updated; }
   S.slug = slug; S.company = c;
   return c;
 }
@@ -80,7 +80,7 @@ async function pageSources(slug) {
   const c = await load(slug);
   topbar([{ label: c.name }]);
   const body = stagehead("Sources", c.record ? `<a class="btn" href="#/c/${slug}/draft">Draft again</a>` : `<a class="btn primary" href="#/c/${slug}/draft?start=1">Draft assessment <span class="arr">→</span></a>`, "What the model reads. A claim can cite nothing else.") +
-    `<div class="scroll"><div class="pad narrow">${c.sourceDocs.map((s) => `<div class="srcblock"><div class="sbh"><h3>${esc(s.key)}</h3><span class="ti">${esc(s.title)} · ${s.passages.length} passages</span></div>${s.passages.map((p) => `<div class="psg"><span class="id">${esc(p.id)}</span><span class="tx">${esc(p.text)}</span></div>`).join("")}</div>`).join("")}</div></div>`;
+    `<div class="scroll"><div class="pad narrow">${c.design_note ? `<div class="callout" style="grid-template-columns:1fr;margin-bottom:28px"><div><div class="micro">Why this example exists</div><p style="margin-top:6px">${esc(c.design_note)}</p></div></div>` : ""}${c.sourceDocs.map((s) => `<div class="srcblock"><div class="sbh"><h3>${esc(s.key)}</h3><span class="ti">${esc(s.title)} · ${s.passages.length} passages</span></div>${s.passages.map((p) => `<div class="psg"><span class="id">${esc(p.id)}</span><span class="tx">${esc(p.text)}</span></div>`).join("")}</div>`).join("")}</div></div>`;
   workspace(c, "sources", body);
 }
 
@@ -127,26 +127,46 @@ async function pageDraft(slug, autostart) {
 }
 
 // ---------- review / partner ----------
-function docOpts(mode) { return { mode, decisions: S.decisions, selected: S.selected, reviewer: S.reviewer, note: S.note }; }
+function docOpts(mode) { return { mode, decisions: S.decisions, overrides: S.overrides, selected: S.selected, reviewer: S.reviewer, note: S.note }; }
 function renderDoc(c, mode) { const el = $("#doc"); const y = el.parentElement.scrollTop; el.innerHTML = Doc.document(c, docOpts(mode)); el.parentElement.scrollTop = y; }
 function renderSide(c, browse) { $("#sideTitle").textContent = browse ? "All passages" : "Source"; $("#side").innerHTML = browse ? Doc.browse(c) : Doc.provenance(c, S.selected); }
 function splitView(c, mode) {
   return `<div class="split" id="split"><div class="docwrap"><article class="doc" id="doc">${Doc.document(c, docOpts(mode))}</article></div><aside class="sources"><div class="h"><b id="sideTitle">Source</b><button id="browse">All passages</button><button id="closeSide" hidden>Close</button></div><div class="body" id="side">${Doc.provenance(c, S.selected)}</div></aside></div>`;
 }
+function setPath(obj, path, value) {
+  const keys = path.split("."); let o = obj;
+  for (const k of keys.slice(0, -1)) o = o[k] ??= {};
+  o[keys[keys.length - 1]] = value;
+}
 function wireSplit(c, mode) {
-  $("#doc").addEventListener("click", (e) => {
+  const doc = $("#doc");
+  const showSource = (id) => { S.selected = id; doc.querySelectorAll(".claim.lit").forEach((x) => x.classList.remove("lit")); doc.querySelector(`.claim[data-id="${id}"]`)?.classList.add("lit"); renderSide(c, false); $("#split").classList.add("show"); $("#closeSide").hidden = false; };
+  doc.addEventListener("click", (e) => {
     const li = e.target.closest(".claim");
     const act = e.target.closest("button[data-act]");
-    if (act && li) { const id = li.dataset.id; S.decisions[id] = act.dataset.act === "edit" ? { ...(S.decisions[id] || {}), action: "edit", editing: true } : { action: act.dataset.act }; renderDoc(c, mode); queueSave(); return; }
-    const sv = e.target.closest("[data-editsave]"); if (sv) { const id = sv.dataset.editsave, t = $(`textarea[data-edit="${id}"]`).value.trim(); const orig = Doc.statements(c.record.assessment).get(id).stmt.text; S.decisions[id] = t && t !== orig ? { action: "edit", text: t } : { action: "keep" }; renderDoc(c, mode); queueSave(); return; }
-    const cx = e.target.closest("[data-editcancel]"); if (cx) { const id = cx.dataset.editcancel, d = S.decisions[id]; S.decisions[id] = d?.text ? { action: "edit", text: d.text } : { action: "keep" }; renderDoc(c, mode); return; }
-    if (e.target.closest("textarea,input,.reviewblock")) return;
-    if (!li) return;
-    S.selected = li.dataset.id;
-    $("#doc").querySelectorAll(".claim.lit").forEach((x) => x.classList.remove("lit")); li.classList.add("lit");
-    renderSide(c, false); $("#split").classList.add("show"); $("#closeSide").hidden = false;
+    if (act && li) { S.decisions[li.dataset.id] = { action: act.dataset.act }; renderDoc(c, mode); queueSave(); return; }
+    const gact = e.target.closest("button[data-gapact]");
+    if (gact) { const i = gact.closest("[data-gap]").dataset.gap; setPath(S.overrides, `missing.${i}.removed`, gact.dataset.gapact === "remove"); renderDoc(c, mode); queueSave(); return; }
+    if (li && !e.target.closest("[contenteditable]")) showSource(li.dataset.id);
   });
-  $("#doc").addEventListener("input", (e) => { if (e.target.id === "note") { S.note = e.target.value; queueSave(); } if (e.target.id === "reviewer") { S.reviewer = e.target.value; localStorage.setItem("reviewer", S.reviewer); queueSave(); } });
+  doc.addEventListener("focusin", (e) => { const li = e.target.closest(".claim"); if (li && e.target.hasAttribute("contenteditable")) showSource(li.dataset.id); });
+  doc.addEventListener("keydown", (e) => {
+    const el = e.target.closest("[contenteditable]"); if (!el) return;
+    const single = el.dataset.claim || el.classList.contains("inline") || el.dataset.field?.startsWith("questions.") || el.dataset.field?.startsWith("missing.");
+    if (e.key === "Enter" && single) { e.preventDefault(); el.blur(); }
+    if (e.key === "Escape") el.blur();
+    if (e.key === "Backspace" && el.dataset.claim && el.textContent.trim() === "") { e.preventDefault(); S.decisions[el.dataset.claim] = { action: "remove" }; renderDoc(c, mode); queueSave(); }
+  });
+  doc.addEventListener("input", (e) => {
+    const el = e.target.closest("[contenteditable]"); if (!el) return;
+    const text = el.innerText.replace(/\u00a0/g, " ").replace(/\n+$/, "");
+    if (el.dataset.claim) { const orig = Doc.statements(c.record.assessment).get(el.dataset.claim).stmt.text; S.decisions[el.dataset.claim] = text.trim() && text.trim() !== orig ? { action: "edit", text: text.trim() } : { action: "keep" }; }
+    else if (el.dataset.field === "note") S.note = text;
+    else if (el.dataset.field === "reviewer") { S.reviewer = text.trim(); localStorage.setItem("reviewer", S.reviewer); }
+    else if (el.dataset.field) setPath(S.overrides, el.dataset.field, text.trim());
+    queueSave();
+  });
+  doc.addEventListener("focusout", (e) => { const el = e.target.closest?.("[data-claim]"); if (el) { const d = S.decisions[el.dataset.claim]; if (d?.action === "edit") { el.classList.add("was-edited"); } } });
   $("#browse").addEventListener("click", () => { renderSide(c, true); $("#split").classList.add("show"); $("#closeSide").hidden = false; });
   $("#closeSide").addEventListener("click", () => { $("#split").classList.remove("show"); $("#closeSide").hidden = true; });
 }
@@ -155,7 +175,7 @@ function queueSave() {
   const el = $("#savestate"); if (el) el.textContent = "Saving…";
   S.saveTimer = setTimeout(async () => {
     const clean = Object.fromEntries(Object.entries(S.decisions).filter(([, d]) => d.action !== "keep").map(([k, d]) => [k, { action: d.action, text: d.text }]));
-    const doc = await api(`/companies/${S.slug}/review`, { method: "PUT", body: JSON.stringify({ reviewer: S.reviewer, note: S.note, decisions: clean }) });
+    const doc = await api(`/companies/${S.slug}/review`, { method: "PUT", body: JSON.stringify({ reviewer: S.reviewer, note: S.note, decisions: clean, overrides: S.overrides }) });
     S.saved = doc.updated; S.company.reviewDoc = doc;
     const el2 = $("#savestate"); if (el2) el2.textContent = `Saved ${doc.updated.slice(11, 16)}`;
     const st = document.querySelector('.stage[href$="/review"] small'); if (st) st.textContent = stageState(S.company, "review");
@@ -165,7 +185,7 @@ async function pageReview(slug) {
   const c = await load(slug);
   if (!c.record) return (location.hash = `#/c/${slug}/draft`);
   topbar([{ label: c.name }]);
-  workspace(c, "review", stagehead("Review", `<span class="state" id="savestate">${S.saved ? "Saved " + S.saved.slice(11, 16) : "Edits save automatically"}</span><a class="btn primary" href="#/c/${slug}/partner">Partner page <span class="arr">→</span></a>`, "Click a statement to see its source. Edit or remove what you disagree with.") + splitView(c, "review"));
+  workspace(c, "review", stagehead("Review", `<span class="state" id="savestate">${S.saved ? "Saved " + S.saved.slice(11, 16) : "Edits save automatically"}</span><a class="btn primary" href="#/c/${slug}/partner">Partner page <span class="arr">→</span></a>`, "Click anywhere to edit. Click a statement to see its source.") + splitView(c, "review"));
   wireSplit(c, "review");
 }
 async function pagePartner(slug) {

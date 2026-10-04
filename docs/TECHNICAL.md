@@ -158,13 +158,13 @@ The page is labelled "Draft for partner review · not a recommendation" on every
 | `#/new` | New company | Name, one-liner, round, and a paste box or file for each of the four source types. "Create and draft" saves to `companies/<slug>/` and starts the pipeline immediately. |
 | `#/c/:slug/sources` | Sources | The numbered passages exactly as the model reads them. |
 | `#/c/:slug/draft` | Draft | Progress over server-sent events (split, draft, verify, repair, re-verify, write), repair failures listed, result line; opens Review when done. |
-| `#/c/:slug/review` | Review | The document with the source panel. Edit, Remove and Restore on each statement, a note to partners with the reviewer's name; every change autosaves after 700 ms. Automated-check summary at the end. |
+| `#/c/:slug/review` | Review | The document as an in-place editor: click any text (note, summary, findings, claims, open questions, gaps, bear thesis) and type. Citations sit outside the editable span so they cannot be deleted. A claim is removed with the × on hover or by backspacing it to empty, and restored in place. Every change autosaves after 700 ms. Automated-check summary at the end. |
 | `#/c/:slug/partner` | Partner page | The note, then the draft with removed statements gone and edits applied, reviewer byline. Printable. |
 | `#/c/:slug/followup` | Follow-up | Missing items and open questions as checkboxes composed into an email; copy to clipboard. |
 
 API: `GET /api/companies`, `POST /api/companies`, `GET /api/companies/:slug`, `POST /api/companies/:slug/draft` (event stream), `PUT /api/companies/:slug/review`. Drafting again deletes the previous review, since its decisions refer to statement ids that no longer exist.
 
-Storage: example companies write to `out/<slug>/`; companies created in the app keep everything, outputs included, under `companies/<slug>/` so nothing user-created lands in the committed outputs. A review is a set of decisions keyed by statement id (`keep`, `edit` with text, `remove`); the model's draft is never mutated and the partner page is a projection of draft plus decisions. The server allows one in-flight draft per company. Nothing is authenticated; this is a single-associate prototype.
+Storage: example companies write to `out/<slug>/`; companies created in the app keep everything, outputs included, under `companies/<slug>/` so nothing user-created lands in the committed outputs. A review is a set of decisions keyed by statement id (`keep`, `edit` with text, `remove`) plus overrides for the prose fields (summary, findings, open questions, gaps, bear thesis) and the note and reviewer; the model's draft is never mutated and the partner page is a projection of draft plus review. The server allows one in-flight draft per company. Nothing is authenticated; this is a single-associate prototype.
 
 ## 9. Measured performance (3 October 2026 run)
 
