@@ -216,10 +216,11 @@ async function pageSources(slug, openPid) {
   const c = await load(slug);
   topbar([{ label: c.name }]);
   const body = stagehead("Sources", c.record ? `<a class="btn" href="#/c/${slug}/draft">Draft again</a>` : `<a class="btn primary" href="#/c/${slug}/draft?start=1">Draft assessment <span class="arr">→</span></a>`, "What the model reads. Click a passage to see where it came from.") +
-    `<div class="split" id="split"><div class="docwrap"><div class="pad narrow">${c.design_note ? `<div class="callout" style="grid-template-columns:1fr;margin-bottom:28px"><div><div class="micro">Why this example exists</div><p style="margin-top:6px">${esc(c.design_note)}</p></div></div>` : ""}${c.intake?.via === "inbox" ? `<div class="callout" style="grid-template-columns:1fr;margin-bottom:28px"><div><div class="micro">Imported from the inbox</div><p style="margin-top:6px">${esc(c.intake.from)} · ${esc(c.intake.subject)}. ${(c.intake.notes || []).map(esc).join(" · ")}</p></div></div>` : ""}${c.sourceDocs.map((s) => `<div class="srcblock"><div class="sbh"><h3>${esc(s.key)}</h3><span class="ti">${esc(s.title)} · ${s.passages.length} passages${c.files?.[s.key] ? ` · <a href="${fileUrl(c, s.key)}" target="_blank">${esc(c.files[s.key].name)}</a>` : ""}</span></div>${s.passages.map((p) => `<div class="psg clickable" data-pid="${esc(p.id)}"><span class="id">${esc(p.id)}</span><span class="tx">${esc(p.text)}</span></div>`).join("")}</div>`).join("")}</div></div>
-    <aside class="sources"><div class="h"><b id="sideTitle">Source</b><button id="closeSide" hidden>Close</button></div><div class="body" id="side"><p class="none">Click a passage. PDF decks open at that page; other sources show the passage as a slide.</p></div></aside></div>`;
+    `<div class="split" id="split" style="--side-w:${sideWidth()}px"><div class="docwrap"><div class="pad narrow">${c.design_note ? `<div class="callout" style="grid-template-columns:1fr;margin-bottom:28px"><div><div class="micro">Why this example exists</div><p style="margin-top:6px">${esc(c.design_note)}</p></div></div>` : ""}${c.intake?.via === "inbox" ? `<div class="callout" style="grid-template-columns:1fr;margin-bottom:28px"><div><div class="micro">Imported from the inbox</div><p style="margin-top:6px">${esc(c.intake.from)} · ${esc(c.intake.subject)}. ${(c.intake.notes || []).map(esc).join(" · ")}</p></div></div>` : ""}${c.sourceDocs.map((s) => `<div class="srcblock"><div class="sbh"><h3>${esc(s.key)}</h3><span class="ti">${esc(s.title)} · ${s.passages.length} passages${c.files?.[s.key] ? ` · <a href="${fileUrl(c, s.key)}" target="_blank">${esc(c.files[s.key].name)}</a>` : ""}</span></div>${s.passages.map((p) => `<div class="psg clickable" data-pid="${esc(p.id)}"><span class="id">${esc(p.id)}</span><span class="tx">${esc(p.text)}</span></div>`).join("")}</div>`).join("")}</div></div>
+    <div class="gutter" id="gutter" title="Drag to resize"></div><aside class="sources"><div class="h"><b id="sideTitle">Source</b><button id="closeSide" hidden>Close</button></div><div class="body" id="side"><p class="none">Click a passage and the page it came from opens here.</p></div></aside></div>`;
   workspace(c, "sources", body);
-  const show = (pid) => { $("#side").innerHTML = viewerHtml(c, pid); $("#split").classList.add("show"); $("#closeSide").hidden = false; document.querySelectorAll(".psg.lit").forEach((x) => x.classList.remove("lit")); document.querySelector(`.psg[data-pid="${CSS.escape(pid)}"]`)?.classList.add("lit"); };
+  wireGutter();
+  const show = (pid) => { $("#side").innerHTML = viewerHtml(c, pid, null); $("#split").classList.add("show"); $("#closeSide").hidden = false; document.querySelectorAll(".psg.lit").forEach((x) => x.classList.remove("lit")); document.querySelector(`.psg[data-pid="${CSS.escape(pid)}"]`)?.classList.add("lit"); };
   $("#main").addEventListener("click", (e) => { const v = e.target.closest("[data-view]"); if (v) { show(v.dataset.view); return; } const p = e.target.closest(".psg[data-pid]"); if (p) show(p.dataset.pid); });
   $("#closeSide").addEventListener("click", () => { $("#split").classList.remove("show"); $("#closeSide").hidden = true; });
   if (openPid) { show(openPid); document.querySelector(`.psg[data-pid="${CSS.escape(openPid)}"]`)?.scrollIntoView({ block: "center" }); }
@@ -269,10 +270,9 @@ async function pageDraft(slug, autostart) {
 
 // ---------- review / partner ----------
 function docOpts(mode) { return { mode, decisions: S.decisions, overrides: S.overrides, selected: S.selected, reviewer: S.reviewer, note: S.note }; }
-function renderSide(c, browse) { $("#sideTitle").textContent = browse ? "All passages" : "Source"; $("#side").innerHTML = browse ? Doc.browse(c) : Doc.provenance(c, S.selected); $("#side").querySelectorAll(".src .sh .chip").forEach((ch) => { const pid = ch.textContent.trim(); if (/^[\w-]+:\d+$/.test(pid)) { const b = document.createElement("button"); b.className = "open-slide"; b.dataset.view = pid; b.textContent = c.files?.[pid.split(":")[0]]?.kind === "pdf" ? "Open page" : "View as slide"; ch.parentElement.appendChild(b); } }); }
-function showViewer(c, pid) { $("#sideTitle").textContent = "Source"; $("#side").innerHTML = `<button class="btn sm quiet" id="backToSource" style="margin-bottom:10px">← Back to the passage</button>` + viewerHtml(c, pid); $("#split").classList.add("show"); $("#closeSide").hidden = false; }
+function renderSide(c, browse) { $("#sideTitle").textContent = browse ? "All passages" : "Source"; $("#side").innerHTML = browse ? Doc.browse(c) : S.selected ? statementSide(c, S.selected, S.focusPid) : `<p class="none">Select a statement, or click a citation, and the source opens here.</p>`; }
 function splitView(c, mode) {
-  return `<div class="split" id="split"><div class="docwrap"><article class="doc" id="doc">${Doc.document(c, docOpts(mode))}</article></div><aside class="sources"><div class="h"><b id="sideTitle">Source</b><button id="browse">All passages</button><button id="closeSide" hidden>Close</button></div><div class="body" id="side">${Doc.provenance(c, S.selected)}</div></aside></div>`;
+  return `<div class="split" id="split" style="--side-w:${sideWidth()}px"><div class="docwrap"><article class="doc" id="doc">${Doc.document(c, docOpts(mode))}</article></div><div class="gutter" id="gutter" title="Drag to resize"></div><aside class="sources"><div class="h"><b id="sideTitle">Source</b><button id="browse">All passages</button><button id="closeSide" hidden>Close</button></div><div class="body" id="side">${S.selected ? statementSide(c, S.selected, S.focusPid) : `<p class="none">Select a statement, or click a citation, and the source opens here.</p>`}</div></aside></div>`;
 }
 function setPath(obj, path, value) {
   const keys = path.split("."); let o = obj;
@@ -291,17 +291,53 @@ function slideCard(passageText, pid) {
   const body = (m ? lines.slice(1) : lines.slice(1)).filter(Boolean);
   return `<div class="slidecard"><div class="sc-title">${esc(title)}</div><div class="sc-body">${body.map((l) => `<p>${esc(l)}</p>`).join("")}</div><div class="sc-foot">${esc(pid)}</div></div>`;
 }
-function viewerHtml(c, pid) {
-  const [key, n] = pid.split(":");
-  const file = c.files?.[key];
-  const text = c.record?.passages?.[pid]?.text ?? c.sourceDocs?.find((s) => s.key === key)?.passages.find((p) => p.id === pid)?.text ?? "";
-  const url = fileUrl(c, key);
-  const title = c.sourceDocs?.find((s) => s.key === key)?.title || c.record?.sources?.find((s) => s.key === key)?.title || key;
+function passageOf(c, pid) { return c.record?.passages?.[pid]?.text ?? c.sourceDocs?.find((s) => s.key === pid.split(":")[0])?.passages.find((p) => p.id === pid)?.text ?? ""; }
+function sourceTitle(c, key) { return c.sourceDocs?.find((s) => s.key === key)?.title || c.record?.sources?.find((s) => s.key === key)?.title || key; }
+function sourceLength(c, key) { return c.files?.[key]?.pages || c.sourceDocs?.find((s) => s.key === key)?.passages.length || c.record?.sources?.find((s) => s.key === key)?.passages || 0; }
+const hl = (text, quote) => (quote ? Doc.highlight(text, quote) : null) ?? esc(text);
+// The thing itself: a PDF page, a slide, or the passage as a page card, with the quoted words marked.
+function viewerHtml(c, pid, quote) {
+  const [key, n] = pid.split(":"), i = Number(n);
+  const file = c.files?.[key], url = fileUrl(c, key), text = passageOf(c, pid), total = sourceLength(c, key);
+  const lines = text.split("\n"), slideLike = /^Slide \d+/.test(lines[0]);
   let body;
-  if (file?.kind === "pdf" && url) body = `<iframe class="pdf" src="${url}#page=${Number(n)}&toolbar=0&navpanes=0&view=Fit" title="${esc(file.name)} page ${n}"></iframe>`;
-  else body = slideCard(text, pid);
-  const nav = (() => { const total = file?.pages || c.sourceDocs?.find((s) => s.key === key)?.passages.length || c.record?.sources?.find((s) => s.key === key)?.passages || 0; const i = Number(n); return `<div class="vnav"><button class="btn sm" data-view="${key}:${i - 1}" ${i <= 1 ? "disabled" : ""}>←</button><span>${file?.kind === "pdf" ? "Page" : "Slide"} ${i}${total ? ` of ${total}` : ""}</span><button class="btn sm" data-view="${key}:${i + 1}" ${total && i >= total ? "disabled" : ""}>→</button>${url ? `<a class="btn sm" href="${url}" target="_blank" style="margin-left:auto">Open file</a>` : ""}</div>`; })();
-  return `<div class="viewer"><div class="vhead"><span class="chip">${esc(pid)}</span><span class="vt">${esc(title)}${file ? ` · ${esc(file.name)}` : ""}</span></div>${nav}${body}<div class="vtext"><div class="micro">Passage text</div>${esc(text)}</div></div>`;
+  if (file?.kind === "pdf" && url) body = `<iframe class="pdf" src="${url}#page=${i}&toolbar=0&navpanes=0&view=Fit" title="${esc(file.name)} page ${i}"></iframe><div class="vquote">${hl(text, quote)}</div>`;
+  else if (slideLike) {
+    const m = lines[0].match(/^Slide (\d+):?\s*(.*)$/), title = m?.[2] || `Slide ${m?.[1] || i}`;
+    body = `<div class="slidecard"><div class="sc-title">${hl(title, quote)}</div><div class="sc-body">${lines.slice(1).filter(Boolean).map((l) => `<p>${hl(l, quote)}</p>`).join("")}</div><div class="sc-foot">${esc(pid)}</div></div>`;
+  } else body = `<div class="pagecard">${hl(text, quote)}</div>`;
+  const nav = `<div class="vnav"><button class="vb" data-view="${key}:${i - 1}" ${i <= 1 ? "disabled" : ""} title="Previous">←</button><span>${esc(sourceTitle(c, key))}${file ? "" : ""} · ${file?.kind === "pdf" ? "page" : slideLike ? "slide" : "passage"} ${i}${total ? ` of ${total}` : ""}</span><button class="vb" data-view="${key}:${i + 1}" ${total && i >= total ? "disabled" : ""} title="Next">→</button>${url ? `<a class="vb" href="${url}" target="_blank" title="Open the file">↗</a>` : ""}</div>`;
+  return `<div class="viewer" data-pid="${esc(pid)}">${nav}${body}</div>`;
+}
+// Side panel for a statement: the claim, then each cited source shown as itself.
+function statementSide(c, id, focusPid) {
+  const entry = Doc.statements(c.record.assessment).get(id);
+  if (!entry) return `<p class="none">Nothing selected.</p>`;
+  const { stmt, where } = entry, st = stmt.verification?.status || "verified";
+  const issues = (stmt.verification?.issues || []).join(", ").replace(/_/g, " ");
+  const cits = focusPid ? stmt.citations.filter((x) => x.passage_id === focusPid) : stmt.citations;
+  let h = `<div class="cl">${esc(stmt.text)}<div class="st"><span class="badge ${st === "verified" ? "green" : st === "warning" ? "amber" : "red"}">${st === "verified" ? "Quote verified" : st === "warning" ? "Warning: " + esc(issues) : "Not verified: " + esc(issues)}</span><span class="badge">${esc(where)}</span>${stmt.basis !== "stated" ? `<span class="badge">${stmt.basis}</span>` : ""}</div></div>`;
+  if (!stmt.citations.length) return h + `<p class="none">No citation.</p>`;
+  if (focusPid && stmt.citations.length > 1) h += `<button class="btn sm quiet" data-allsources="1" style="margin-bottom:10px">Show all ${stmt.citations.length} sources</button>`;
+  for (const cit of cits) {
+    const ps = c.record.passages[cit.passage_id];
+    if (!ps) { h += `<div class="src"><div class="sh"><span class="chip bad">${esc(cit.passage_id)}</span><span class="nm">no such passage</span></div></div>`; continue; }
+    h += viewerHtml(c, cit.passage_id, cit.quote);
+  }
+  return h;
+}
+
+// ---------- resizable side panel ----------
+function sideWidth() { const w = Number(localStorage.getItem("sideW")); return w >= 320 ? Math.min(w, Math.floor(innerWidth * 0.7)) : 420; }
+function wireGutter() {
+  const g = $("#gutter"), split = $("#split"); if (!g || !split) return;
+  g.addEventListener("pointerdown", (e) => {
+    e.preventDefault(); document.body.classList.add("is-resizing");
+    const move = (ev) => { const w = Math.max(320, Math.min(Math.floor(innerWidth * 0.7), Math.round(split.getBoundingClientRect().right - ev.clientX))); split.style.setProperty("--side-w", w + "px"); };
+    const up = () => { document.body.classList.remove("is-resizing"); document.removeEventListener("pointermove", move); document.removeEventListener("pointerup", up); document.removeEventListener("pointercancel", up); localStorage.setItem("sideW", String(parseInt(split.style.getPropertyValue("--side-w")) || 420)); };
+    document.addEventListener("pointermove", move); document.addEventListener("pointerup", up); document.addEventListener("pointercancel", up);
+  });
+  g.addEventListener("dblclick", () => { split.style.setProperty("--side-w", "420px"); localStorage.setItem("sideW", "420"); });
 }
 
 // ---------- editor ----------
@@ -357,7 +393,7 @@ function showMenu(items, x, y, cls = "menu") {
 
 function wireSplit(c, mode) {
   const doc = $("#doc");
-  const showSource = (id) => { S.selected = id; doc.querySelectorAll(".t-claim.lit").forEach((x) => x.classList.remove("lit")); doc.querySelector(`.t-claim[data-id="${id}"]`)?.classList.add("lit"); renderSide(c, false); $("#split").classList.add("show"); $("#closeSide").hidden = false; };
+  const showSource = (id, pid = null) => { S.selected = id; S.focusPid = pid; doc.querySelectorAll(".t-claim.lit").forEach((x) => x.classList.remove("lit")); doc.querySelector(`.t-claim[data-id="${id}"]`)?.classList.add("lit"); renderSide(c, false); $("#split").classList.add("show"); $("#closeSide").hidden = false; };
   const change = () => { blocksCache = null; queueSave(); };
   const rerender = () => { renderDoc(c, mode); };
 
@@ -368,9 +404,11 @@ function wireSplit(c, mode) {
     const gact = e.target.closest("button[data-gapact]");
     if (gact && blk) { setPath(S.overrides, `missing.${blk.dataset.gap}.removed`, gact.dataset.gapact === "remove"); change(); rerender(); return; }
     if (e.target.closest("button[data-handle]")) { e.preventDefault(); return; }
+    const chip = e.target.closest(".chip.ref[data-pid]");
+    if (chip && blk) { e.preventDefault(); showSource(blk.dataset.id, chip.dataset.pid); return; }
     if (blk?.classList.contains("t-claim") && !e.target.closest("[contenteditable]")) showSource(blk.dataset.id);
   });
-  doc.addEventListener("focusin", (e) => { const blk = e.target.closest(".t-claim"); if (blk && e.target.hasAttribute("contenteditable")) showSource(blk.dataset.id); });
+  doc.addEventListener("focusin", (e) => { const blk = e.target.closest(".t-claim"); if (blk && e.target.hasAttribute("contenteditable") && S.selected !== blk.dataset.id) showSource(blk.dataset.id); });
 
   function openBlockMenu(key, rect) {
     const b = currentBlocks(c).find((x) => x.key === key); if (!b) return;
@@ -487,7 +525,11 @@ function wireSplit(c, mode) {
   document.addEventListener("click", (e) => { if (!e.target.closest(".menu,.slash,button[data-handle]")) closeMenus(); }, { capture: true });
   $("#browse").addEventListener("click", () => { renderSide(c, true); $("#split").classList.add("show"); $("#closeSide").hidden = false; });
   $("#closeSide").addEventListener("click", () => { $("#split").classList.remove("show"); $("#closeSide").hidden = true; });
-  $("#side").addEventListener("click", (e) => { const v = e.target.closest("[data-view]"); if (v) { showViewer(c, v.dataset.view); return; } if (e.target.closest("#backToSource")) renderSide(c, false); });
+  $("#side").addEventListener("click", (e) => {
+    const v = e.target.closest("[data-view]"); if (v) { const vw = v.closest(".viewer"); const html = viewerHtml(c, v.dataset.view, null); vw.outerHTML = html; return; }
+    if (e.target.closest("[data-allsources]")) { S.focusPid = null; renderSide(c, false); }
+  });
+  wireGutter();
 }
 function queueSave() {
   clearTimeout(S.saveTimer);

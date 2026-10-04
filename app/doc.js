@@ -128,7 +128,7 @@
       }
       case "claim": {
         const s = b.stmt, st = s.verification?.status || "verified", d = b.decision;
-        const refs = (s.citations || []).map((c) => `<span class="chip${c.status && c.status !== "ok" && c.status !== "quote_too_long" ? " bad" : ""}">${esc(c.passage_id)}</span>`).join("") + (s.basis !== "stated" ? `<span class="chip">${s.basis}</span>` : "");
+        const refs = (s.citations || []).map((c) => `<button class="chip ref${c.status && c.status !== "ok" && c.status !== "quote_too_long" ? " bad" : ""}" data-pid="${esc(c.passage_id)}" title="Open ${esc(c.passage_id)}">${esc(c.passage_id)}</button>`).join("") + (s.basis !== "stated" ? `<span class="chip">${s.basis}</span>` : "");
         const removed = d.action === "remove";
         return `<div class="${cls} ${st}${removed ? " removed" : ""}${d.action === "edit" && d.text ? " edited" : ""}${o.selected === b.id ? " lit" : ""}" data-key="${esc(b.key)}" data-id="${b.id}">${handle}<span class="dot"></span><div class="body"><span class="bc"${removed ? "" : ce} data-key="${esc(b.key)}">${inner}</span><span class="refs">${refs}</span></div>${review ? (removed ? `<button class="x" data-act="keep">Restore</button>` : `<button class="x" data-act="remove" title="Remove">×</button>`) : ""}</div>`;
       }

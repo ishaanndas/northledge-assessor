@@ -147,7 +147,11 @@ mark{background:var(--amber-bg);color:var(--heading);box-shadow:inset 0 -1.5px 0
 .run .result{display:flex;align-items:center;gap:18px;font-size:13px;color:var(--muted-foreground);padding:14px 16px;border-top:1px solid var(--border);background:var(--muted)}
 .run .result b{color:var(--heading);font-weight:600}
 /* document + sources panel. A block editor: every block has a handle, Enter adds a block. */
-.split{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 400px}
+.split{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 6px var(--side-w,420px)}
+.gutter{cursor:col-resize;background:transparent;position:relative;z-index:3;margin:0 -3px 0 -3px;width:12px}
+.gutter::after{content:"";position:absolute;left:5px;top:0;bottom:0;width:2px;background:transparent;transition:background .12s}
+.gutter:hover::after,body.is-resizing .gutter::after{background:var(--ring)}
+body.is-resizing{cursor:col-resize;user-select:none}body.is-resizing iframe{pointer-events:none}
 .docwrap{overflow:auto;min-width:0;background:#fff}
 .doc{max-width:760px;margin:0 auto;padding:48px 56px 200px;font-size:15px;line-height:1.65;color:var(--foreground)}
 .blk{position:relative}
@@ -349,6 +353,21 @@ body.is-dragging{user-select:none;cursor:grabbing}
 body.is-dragging *{cursor:grabbing!important}
 .drag-ghost{position:fixed;left:0;top:0;z-index:60;pointer-events:none;opacity:.85;background:#fff;box-shadow:0 10px 30px rgba(0,0,0,.18);border:1px solid var(--border-2);padding:6px 10px;max-height:80px;overflow:hidden;font-size:14px}
 .drag-ghost .handle,.drag-ghost .x{display:none}
+
+/* source panel: the thing itself */
+.chip.ref{cursor:pointer;border:0}
+.chip.ref:hover{background:var(--amber-bg);color:var(--heading)}
+.viewer{display:flex;flex-direction:column;gap:8px;margin-bottom:18px}
+.viewer .vnav{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted-foreground)}
+.viewer .vnav span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center}
+.viewer .vb{display:inline-flex;align-items:center;justify-content:center;width:26px;height:24px;border:1px solid var(--border-2);background:#fff;color:var(--muted-foreground);font-size:12px}
+.viewer .vb:hover{color:var(--heading);background:var(--muted)}
+.viewer .vb[disabled]{opacity:.35;pointer-events:none}
+.viewer iframe.pdf{width:100%;aspect-ratio:16/9;min-height:220px;border:1px solid var(--border-2);background:#525659}
+.viewer .vquote{font-size:12.5px;line-height:1.6;color:var(--muted-foreground);white-space:pre-wrap;max-height:120px;overflow:auto;padding:8px 10px;border:1px solid var(--border);background:oklch(99.2% 0 0)}
+.viewer .vquote mark,.pagecard mark,.slidecard mark{background:var(--amber-bg);color:var(--heading);box-shadow:inset 0 -1.5px 0 var(--amber-line)}
+.pagecard{border:1px solid var(--border-2);background:#fff;box-shadow:var(--shadow);padding:18px 20px;font-size:13.5px;line-height:1.7;color:var(--foreground);white-space:pre-wrap}
+aside.sources .body{padding:14px 16px 40px}
 </style>
 </head><body>
 <header class="top"><span class="name">Assessments</span><div class="crumbs"><span>/</span><b>Static report</b></div><div class="right"><span class="ter" style="font-size:12.5px">Committed run. No scores, no recommendations.</span></div></header>
@@ -484,7 +503,7 @@ body.is-dragging *{cursor:grabbing!important}
       }
       case "claim": {
         const s = b.stmt, st = s.verification?.status || "verified", d = b.decision;
-        const refs = (s.citations || []).map((c) => `<span class="chip${c.status && c.status !== "ok" && c.status !== "quote_too_long" ? " bad" : ""}">${esc(c.passage_id)}</span>`).join("") + (s.basis !== "stated" ? `<span class="chip">${s.basis}</span>` : "");
+        const refs = (s.citations || []).map((c) => `<button class="chip ref${c.status && c.status !== "ok" && c.status !== "quote_too_long" ? " bad" : ""}" data-pid="${esc(c.passage_id)}" title="Open ${esc(c.passage_id)}">${esc(c.passage_id)}</button>`).join("") + (s.basis !== "stated" ? `<span class="chip">${s.basis}</span>` : "");
         const removed = d.action === "remove";
         return `<div class="${cls} ${st}${removed ? " removed" : ""}${d.action === "edit" && d.text ? " edited" : ""}${o.selected === b.id ? " lit" : ""}" data-key="${esc(b.key)}" data-id="${b.id}">${handle}<span class="dot"></span><div class="body"><span class="bc"${removed ? "" : ce} data-key="${esc(b.key)}">${inner}</span><span class="refs">${refs}</span></div>${review ? (removed ? `<button class="x" data-act="keep">Restore</button>` : `<button class="x" data-act="remove" title="Remove">×</button>`) : ""}</div>`;
       }
