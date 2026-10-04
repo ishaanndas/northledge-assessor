@@ -49,7 +49,7 @@ Three more ordinary decks (Relay Voice, Grainline, Tidewatch) sit in `samples/` 
 
 ## What the evaluation found
 
-Five companies, 227 statements, 314 citations. Every quote was verified against its source after one repair round; the round fired on two drafts, both for citation mechanics (a missing passage number, a title line cited as a passage, a footnote quoted across a PDF line break), never for a false claim. A second model found zero unsupported claims and ten partials, each a true quote carrying a word the source does not: "only", "entirely", "three sources" where two were cited. Six of the ten are in the case against or the contradictions, where the model is arguing. That is the failure a string check cannot see and the reason the second model exists. The language scan raised two hits, both quotations of someone else's words, kept as hits on purpose. All 47 expectations passed. Details, limits and the year-later plan are in `docs/EVALUATION.md`.
+Four checks run over every draft: is each quote real, does the quote actually support its sentence (a second AI reads it), did the tool use decision words, and did it fall for the traps built into two of the examples. Across five companies and 227 sentences, every quote was real after one round of fixes, nothing was found unsupported, and ten sentences were marked partly supported, each one a real quote carrying a word too strong, mostly in the case against. That is the one weakness found: the tool does not invent, but when it argues it reaches. Both traps were handled. The full story, including what the checks cannot see and how we would judge the tool after a year of real decisions, is in `docs/EVALUATION.md`.
 
 ## Key decisions
 
