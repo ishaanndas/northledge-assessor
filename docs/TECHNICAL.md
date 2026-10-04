@@ -157,15 +157,16 @@ The page is labelled "Draft for partner review · not a recommendation" on every
 
 `serve.mjs` serves `app/` and a small JSON API. The client (`app/app.js`) is hash-routed with no framework; `app/doc.js` is the document renderer, shared with the static report so the committed artifact and the app look the same. One stylesheet, one typeface, one accent colour; the document gets the room and the chrome stays out of the way.
 
-| Route | Stage | What it does |
+| Route | View | What it does |
 |---|---|---|
-| `#/` | Companies | A table: company, sources, stage, verified count, gaps, reviewer. Row click opens the company at its current stage. |
-| `#/new` | New company | Name, one-liner, round, and a paste box or file for each of the four source types. "Create and draft" saves to `companies/<slug>/` and starts the pipeline immediately. |
-| `#/c/:slug/sources` | Sources | The numbered passages exactly as the model reads them. Clicking a passage opens it in the side panel: for a PDF deck, the real page in the browser's PDF viewer at that page, with previous and next; for PPTX or text sources, the passage rendered as a slide card. The same viewer is reachable from any cited passage in the Review and Partner source panel ("Open page" or "View as slide"). |
-| `#/c/:slug/draft` | Draft | Progress over server-sent events (split, draft, verify, repair, re-verify, write), repair failures listed, result line; opens Review when done. |
-| `#/c/:slug/review` | Review | A block editor over the draft. Every block has a handle: drag it to move the block (a drop line shows where it lands), click it for the menu (remove, restore, revert, turn into, move up or down, add below). Enter adds a block, Backspace on an empty block deletes it (or removes a claim), arrows move between blocks, Alt+arrows move the block, "/" on an empty block opens the type menu (text, heading, bullet, quote, divider), Cmd+B and Cmd+I format the associate's own text. Model text (summary, findings, claims, questions, gaps, thesis) is edited in place as plain text; citations sit outside the editable span so they cannot be deleted; removed claims strike through and restore. Everything autosaves after 700 ms. |
-| `#/c/:slug/partner` | Partner page | The note, then the draft with removed statements gone and edits applied, reviewer byline. Printable. |
-| `#/c/:slug/followup` | Follow-up | Missing items and open questions as checkboxes composed into an email; copy to clipboard. |
+| `#/` | Companies | Cards or a list: company, sources, state (not drafted, drafting, draft, reviewed), verified count, gaps, reviewer. |
+| `#/new` | New company | Deck as file or link, website link, bios, call notes; fields fill from the deck; "Create and draft" starts drafting. |
+| `#/inbox` | Inbox | Decks that arrived by email; import creates the company. |
+| `#/c/:slug` | Assessment | One document, one place. Not drafted: the sources it will be built from and a Draft button; drafting: live progress; drafted: the block editor with the source panel. The header carries the state and an Edit / Partner view switch. `?mode=partner` shows what the partners receive (edits applied, printable). `?s=`, `?g=`, `?k=` deep-link to a claim, a missing item or a section. Old `/draft`, `/review` and `/partner` paths redirect here. |
+| `#/c/:slug/sources` | Sources | Evidence, not a step: the numbered passages; click one and the page it came from opens beside it. `?p=` opens a passage. |
+| `#/c/:slug/followup` | Follow-up email | Missing items and open questions composed into the email to the founder. |
+
+State is derived, never set by hand: a company is *not drafted* until a record exists, *draft* once it does, and *reviewed* as soon as the associate changes anything (a note, an edit, a removal, an inserted block).
 
 API: `GET /api/companies`, `POST /api/companies`, `GET /api/companies/:slug`, `POST /api/companies/:slug/draft` (event stream), `PUT /api/companies/:slug/review`, `GET /api/search?q=` (companies, files, source passages, claims, missing items, integrity notes, summaries, bear theses and inbox messages, scored by phrase then by all-terms match; the palette on ⌘K opens results at the exact claim or passage). Drafting again deletes the previous review, since its decisions refer to statement ids that no longer exist.
 

@@ -6,7 +6,6 @@ const api = async (path, opts = {}) => {
   if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || r.statusText);
   return r.json();
 };
-const STAGES = [["sources", "Sources"], ["draft", "Draft"], ["review", "Review"], ["partner", "Partner page"], ["followup", "Follow-up"]];
 const S = { slug: null, company: null, selected: null, decisions: {}, overrides: {}, reviewer: localStorage.getItem("reviewer") || "", note: "", saveTimer: null, saved: "" };
 const fmt = (iso) => iso ? iso.replace("T", " ").slice(0, 16) : "";
 
@@ -17,20 +16,21 @@ function topbar(crumbs = [], right = "") {
   $("#openSearch").addEventListener("click", openPalette);
   if (inboxCount === null) api("/inbox").then((r) => { inboxCount = r.messages.filter((m) => !m.imported).length; const el = $("#inboxLink"); if (el) el.innerHTML = `Inbox${inboxCount ? ` <span class="count">${inboxCount}</span>` : ""}`; }).catch(() => {});
 }
-function stageState(c, key) {
+// The assessment's state, derived: nothing is set by hand.
+function assessmentState(c) {
+  if (c.running) return { key: "drafting", label: "Drafting", tone: "blue" };
+  if (!c.record) return { key: "none", label: "Not drafted", tone: "" };
   const d = Object.values(c.reviewDoc?.decisions || {});
-  switch (key) {
-    case "sources": return `${c.sources.reduce((n, s) => n + s.passages, 0)} passages`;
-    case "draft": return c.running ? "running" : c.record ? `${c.record.verification_summary.verified}/${c.record.verification_summary.statements} verified` : "not started";
-    case "review": return !c.record ? "" : c.reviewDoc ? `${d.filter((x) => x.action === "remove").length} removed, ${d.filter((x) => x.action === "edit").length} edited` : "not started";
-    case "partner": return c.record ? (c.reviewDoc ? "ready" : "unreviewed") : "";
-    case "followup": return c.record ? `${c.record.assessment.missing.length} items` : "";
-  }
+  const touched = c.reviewDoc && (d.length || (c.reviewDoc.note || "").trim() || Object.keys(c.reviewDoc.overrides || {}).some((k) => k !== "inserts" ? Object.keys(c.reviewDoc.overrides[k] || {}).length || typeof c.reviewDoc.overrides[k] === "string" : Object.keys(c.reviewDoc.overrides.inserts || {}).length));
+  if (touched) return { key: "reviewed", label: "Reviewed", tone: "green", detail: `${d.filter((x) => x.action === "remove").length} removed, ${d.filter((x) => x.action === "edit").length} edited${c.reviewDoc.reviewer ? ` · ${c.reviewDoc.reviewer}` : ""}` };
+  return { key: "draft", label: "Draft", tone: "amber", detail: `${c.record.verification_summary.verified}/${c.record.verification_summary.statements} verified` };
 }
 function workspace(c, current, body) {
-  const rail = STAGES.map(([k, label]) => `<a class="stage ${k === current ? "on" : ""} ${k !== "sources" && k !== "draft" && !c.record ? "off" : ""}" href="#/c/${c.slug}/${k}"><span>${label}</span><small>${esc(stageState(c, k))}</small></a>`).join("");
-  const ref = `<a class="stage" href="#/">All companies</a>${c.record ? `<a class="stage" href="/${c.origin === "example" ? c.slug : "companies/" + c.slug + "/out"}/assessment.md" target="_blank">Markdown draft</a>` : ""}`;
-  $("#main").innerHTML = `<div class="ws"><nav class="rail"><div class="co"><b>${esc(c.name)}</b><span>${esc(c.one_liner || "")}${c.ask ? ` · ${esc(c.ask)}` : ""}</span></div><div class="grp"><div class="seclabel">Workflow</div>${rail}</div><div class="grp"><div class="seclabel">Reference</div>${ref}</div><div class="foot">${c.origin === "example" ? "Example company" : "Added " + fmt(c.created_at)}</div></nav><div class="content">${body}</div></div>`;
+  const st = assessmentState(c);
+  const item = (key, label, small, href) => `<a class="stage ${key === current ? "on" : ""}" href="${href}"><span>${label}</span><small>${esc(small || "")}</small></a>`;
+  const rail = `<div class="grp"><div class="seclabel">Assessment</div>${item("assessment", "Assessment", st.label, `#/c/${c.slug}`)}${c.record ? item("partner", "Partner view", st.key === "reviewed" ? "ready" : "unreviewed", `#/c/${c.slug}?mode=partner`) : ""}</div>
+    <div class="grp"><div class="seclabel">Evidence and tools</div>${item("sources", "Sources", `${c.sources.reduce((n, s) => n + s.passages, 0)} passages`, `#/c/${c.slug}/sources`)}${c.record ? item("followup", "Follow-up email", `${c.record.assessment.missing.length} items`, `#/c/${c.slug}/followup`) : ""}${c.record ? `<a class="stage" href="/${c.origin === "example" ? c.slug : "companies/" + c.slug + "/out"}/assessment.md" target="_blank"><span>Markdown</span></a>` : ""}<a class="stage" href="#/"><span>All companies</span></a></div>`;
+  $("#main").innerHTML = `<div class="ws"><nav class="rail"><div class="co"><b>${esc(c.name)}</b><span>${esc(c.one_liner || "")}${c.ask ? ` · ${esc(c.ask)}` : ""}</span></div>${rail}<div class="foot">${c.origin === "example" ? "Example company" : "Added " + fmt(c.created_at)}</div></nav><div class="content">${body}</div></div>`;
 }
 const stagehead = (title, right = "", state = "") => `<div class="stagehead"><h2>${title}</h2>${state ? `<span class="state">${state}</span>` : ""}<div class="r">${right}</div></div>`;
 
@@ -100,13 +100,13 @@ async function pageCompanies() {
   const inbox = await api("/inbox").catch(() => ({ messages: [] }));
   const waiting = inbox.messages.filter((m) => !m.imported);
   const view = localStorage.getItem("view") || "grid";
-  const badge = (c) => c.running ? `<span class="badge blue">Drafting</span>` : c.status === "reviewed" ? `<span class="badge green">Reviewed</span>` : c.status === "drafted" ? `<span class="badge amber">Needs review</span>` : `<span class="badge">Sources only</span>`;
+  const badge = (c) => c.running ? `<span class="badge blue">Drafting</span>` : c.status === "reviewed" ? `<span class="badge green">Reviewed</span>` : c.status === "drafted" ? `<span class="badge amber">Draft</span>` : `<span class="badge">Not drafted</span>`;
   const tone = (c) => c.running ? "run" : c.status === "reviewed" ? "ok" : c.status === "drafted" ? "warn" : "";
-  const target = (c) => `#/c/${c.slug}/${c.status === "sources" ? "sources" : "review"}`;
+  const target = (c) => `#/c/${c.slug}`;
   const initials = (n) => n.split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
   const via = (c) => c.intake?.via === "inbox" ? "Inbox" : c.origin === "example" ? "Example" : "Manual";
   const filler = list.length % 3 ? `<div class="cardx add" data-href="#/new"><div class="ico">+</div><h3>New company</h3><p class="desc">Drop a deck, paste a link, or import from the inbox.</p></div>` : "";
-  const cards = list.map((c) => `<div class="cardx ${tone(c)}" data-href="${target(c)}"><div class="row1"><div class="ico">${esc(initials(c.name))}</div>${badge(c)}</div><div><h3>${esc(c.name)}</h3></div><p class="desc">${esc(c.one_liner || "")}${c.ask ? ` · ${esc(c.ask)}` : ""}</p><div class="forms"><div class="micro">Sources</div><div class="chips">${c.sources.map((s) => `<span class="chip">${esc(s.key)} · ${s.passages}</span>`).join("")}</div></div><div class="foot"><span>${c.verification_summary ? `<b>${c.verification_summary.verified}/${c.verification_summary.statements}</b> verified · <b>${c.missing_count}</b> gaps${c.review?.reviewer ? ` · ${esc(c.review.reviewer)}` : ""}` : "Not drafted"}</span><span>${c.status === "sources" ? "Open sources" : "Open review"} →</span></div></div>`).join("");
+  const cards = list.map((c) => `<div class="cardx ${tone(c)}" data-href="${target(c)}"><div class="row1"><div class="ico">${esc(initials(c.name))}</div>${badge(c)}</div><div><h3>${esc(c.name)}</h3></div><p class="desc">${esc(c.one_liner || "")}${c.ask ? ` · ${esc(c.ask)}` : ""}</p><div class="forms"><div class="micro">Sources</div><div class="chips">${c.sources.map((s) => `<span class="chip">${esc(s.key)} · ${s.passages}</span>`).join("")}</div></div><div class="foot"><span>${c.verification_summary ? `<b>${c.verification_summary.verified}/${c.verification_summary.statements}</b> verified · <b>${c.missing_count}</b> gaps${c.review?.reviewer ? ` · ${esc(c.review.reviewer)}` : ""}` : "Not drafted"}</span><span>${c.status === "sources" ? "Open" : "Open assessment"} →</span></div></div>`).join("");
   const rows = list.map((c) => `<tr class="row" data-href="${target(c)}"><td><div class="nm">${esc(c.name)}</div><div class="ol">${esc(c.one_liner || "")}</div></td><td class="nw">${badge(c)}</td><td class="sec">${c.sources.map((s) => esc(s.key)).join(", ")}</td><td class="num">${c.verification_summary ? `${c.verification_summary.verified} / ${c.verification_summary.statements}` : ""}</td><td class="num">${c.missing_count ?? ""}</td><td class="sec nw">${esc(c.ask || "")}</td><td class="sec nw">${via(c)}</td><td class="sec nw">${c.review ? esc(c.review.reviewer || "") : ""}</td></tr>`).join("");
   const table = `<table class="list"><thead><tr><th>Company</th><th>Stage</th><th>Sources</th><th>Verified</th><th>Gaps</th><th>Round</th><th>Via</th><th>Reviewer</th></tr></thead><tbody>${rows}</tbody></table>`;
   $("#main").innerHTML = `<div class="page"><div class="inner"><div class="head"><h1>Seed assessments</h1><p class="sub">First-pass drafts for partner review. Every claim cites a passage from the deck, website, bios or call notes; nothing here scores or recommends.</p></div>
@@ -184,7 +184,7 @@ function pageNew(prefillSlug) {
     const fd = new FormData(e.target);
     try {
       const { slug } = await api("/companies", { method: "POST", body: JSON.stringify({ name: fd.get("name"), one_liner: fd.get("one_liner"), ask: fd.get("ask"), intake: { via: "manual" }, files: kept, sources: { deck: fd.get("deck"), website: fd.get("website"), founders: fd.get("founders"), "call-notes": fd.get("call-notes") } }) });
-      location.hash = `#/c/${slug}/draft?start=1`;
+      location.hash = `#/c/${slug}?start=1`;
     } catch (err) { $("#err").textContent = err.message; }
   });
 }
@@ -206,7 +206,7 @@ async function pageInbox() {
     try {
       const r = await api(`/inbox/${encodeURIComponent(b.dataset.import)}/import`, { method: "POST" });
       inboxCount = null;
-      location.hash = `#/c/${r.slug}/sources`;
+      location.hash = `#/c/${r.slug}`;
     } catch (err) { b.disabled = false; b.textContent = "Import failed: " + err.message; }
   });
 }
@@ -215,7 +215,7 @@ async function pageInbox() {
 async function pageSources(slug, openPid) {
   const c = await load(slug);
   topbar([{ label: c.name }]);
-  const body = stagehead("Sources", c.record ? `<a class="btn" href="#/c/${slug}/draft">Draft again</a>` : `<a class="btn primary" href="#/c/${slug}/draft?start=1">Draft assessment <span class="arr">→</span></a>`, "What the model reads. Click a passage to see where it came from.") +
+  const body = stagehead("Sources", c.record ? `<a class="btn" href="#/c/${slug}">Open assessment <span class="arr">→</span></a>` : `<a class="btn primary" href="#/c/${slug}?start=1">Draft assessment <span class="arr">→</span></a>`, "What the model reads. Click a passage to see where it came from.") +
     `<div class="split" id="split" style="--side-w:${sideWidth()}px"><div class="docwrap"><div class="pad narrow">${c.design_note ? `<div class="callout" style="grid-template-columns:1fr;margin-bottom:28px"><div><div class="micro">Why this example exists</div><p style="margin-top:6px">${esc(c.design_note)}</p></div></div>` : ""}${c.intake?.via === "inbox" ? `<div class="callout" style="grid-template-columns:1fr;margin-bottom:28px"><div><div class="micro">Imported from the inbox</div><p style="margin-top:6px">${esc(c.intake.from)} · ${esc(c.intake.subject)}. ${(c.intake.notes || []).map(esc).join(" · ")}</p></div></div>` : ""}${c.sourceDocs.map((s) => `<div class="srcblock"><div class="sbh"><h3>${esc(s.key)}</h3><span class="ti">${esc(s.title)} · ${s.passages.length} passages${c.files?.[s.key] ? ` · <a href="${fileUrl(c, s.key)}" target="_blank">${esc(c.files[s.key].name)}</a>` : ""}</span></div>${s.passages.map((p) => `<div class="psg clickable" data-pid="${esc(p.id)}"><span class="id">${esc(p.id)}</span><span class="tx">${esc(p.text)}</span></div>`).join("")}</div>`).join("")}</div></div>
     <div class="gutter" id="gutter" title="Drag to resize"></div><aside class="sources"><div class="h"><b id="sideTitle">Source</b><button id="closeSide" hidden>Close</button></div><div class="body" id="side"><p class="none">Click a passage and the page it came from opens here.</p></div></aside></div>`;
   workspace(c, "sources", body);
@@ -224,48 +224,6 @@ async function pageSources(slug, openPid) {
   $("#main").addEventListener("click", (e) => { const v = e.target.closest("[data-view]"); if (v) { show(v.dataset.view); return; } const p = e.target.closest(".psg[data-pid]"); if (p) show(p.dataset.pid); });
   $("#closeSide").addEventListener("click", () => { $("#split").classList.remove("show"); $("#closeSide").hidden = true; });
   if (openPid) { show(openPid); document.querySelector(`.psg[data-pid="${CSS.escape(openPid)}"]`)?.scrollIntoView({ block: "center" }); }
-}
-
-// ---------- draft ----------
-async function pageDraft(slug, autostart) {
-  const c = await load(slug);
-  topbar([{ label: c.name }]);
-  const rows = [["split", "Split"], ["draft", "Draft"], ["verify", "Verify"], ["repair", "Repair"], ["reverify", "Re-verify"], ["done", "Write"]];
-  const render = (log, running) => {
-    const by = Object.fromEntries(log.map((e) => [e.step, e]));
-    const last = log.length ? log[log.length - 1].step : null;
-    const list = rows.map(([k, label]) => {
-      const e = by[k], skip = (k === "repair" || k === "reverify") && by.done && !by.repair;
-      const cls = e ? (running && k === last && k !== "done" ? "on" : "done") : skip ? "skip" : "";
-      const f = e?.failures ? `<ul class="f">${e.failures.map((x) => `<li>${esc(x.where)}: “${esc(x.quote.slice(0, 90))}” ${esc(x.reason)}</li>`).join("")}</ul>` : "";
-      return `<div class="step ${cls}"><i></i><span class="k">${label}</span><span class="m">${skip ? "not needed" : esc(e?.message || "")}${f}</span></div>`;
-    }).join("");
-    const err = log.find((e) => e.step === "error"), done = by.done;
-    return `<div class="run">${list}${err ? `<div class="step err"><i></i><span class="k">Error</span><span class="m">${esc(err.message)}</span></div>` : ""}${done ? `<div class="result"><span><b>${done.summary.verified}</b> of ${done.summary.statements} verified</span><span><b>${done.summary.warning}</b> warnings</span><span><b>${done.summary.failed}</b> unverified</span><span>${done.seconds}s</span><a class="btn primary" href="#/c/${slug}/review" style="margin-left:auto">Open review <span class="arr">→</span></a></div>` : ""}</div>`;
-  };
-  const prev = c.record ? `<div class="run"><div class="result" style="margin:0 0 22px"><span>Last draft ${esc(c.record.generated_at)}</span><span><b>${c.record.verification_summary.verified}</b> of ${c.record.verification_summary.statements} verified</span>${c.record.repairs ? "<span>repair round ran</span>" : ""}<a class="btn" href="#/c/${slug}/review" style="margin-left:auto">Open review</a></div></div>` : "";
-  const body = stagehead("Draft", `<button class="btn ${c.record ? "" : "primary"}" id="run" ${c.running ? "disabled" : ""}>${c.record ? "Draft again" : "Start"}</button>`, c.record ? "Drafting again replaces the draft and clears the review." : "") +
-    `<div class="scroll"><div class="pad">${prev}<div id="out"></div></div></div>`;
-  workspace(c, "draft", body);
-  const start = async () => {
-    if (c.record && !autostart && !confirm("Draft again? This replaces the current draft and clears the review.")) return;
-    $("#run").disabled = true;
-    const log = []; $("#out").innerHTML = render(log, true);
-    const res = await fetch(`/api/companies/${slug}/draft`, { method: "POST" });
-    if (!res.ok) { $("#out").innerHTML = `<p class="err" style="color:var(--bad)">${esc((await res.json().catch(() => ({}))).error || res.statusText)}</p>`; $("#run").disabled = false; return; }
-    const rd = res.body.getReader(), dec = new TextDecoder(); let buf = "";
-    for (;;) {
-      const { value, done } = await rd.read(); if (done) break;
-      buf += dec.decode(value, { stream: true });
-      let i; while ((i = buf.indexOf("\n\n")) >= 0) { const line = buf.slice(0, i).replace(/^data: /, ""); buf = buf.slice(i + 2); if (line) { log.push(JSON.parse(line)); $("#out").innerHTML = render(log, true); } }
-    }
-    $("#out").innerHTML = render(log, false);
-    S.decisions = {}; S.note = "";
-    if (log.some((e) => e.step === "done")) setTimeout(() => (location.hash = `#/c/${slug}/review`), 900);
-    else $("#run").disabled = false;
-  };
-  $("#run").addEventListener("click", start);
-  if (autostart && !c.running) start();
 }
 
 // ---------- review / partner ----------
@@ -542,32 +500,80 @@ function queueSave() {
     const st = document.querySelector('.stage[href$="/review"] small'); if (st) st.textContent = stageState(S.company, "review");
   }, 700);
 }
-async function pageReview(slug, q = new URLSearchParams()) {
+// ---------- the assessment: one document, several states ----------
+const RUN_ROWS = [["split", "Split"], ["draft", "Draft"], ["verify", "Verify"], ["repair", "Repair"], ["reverify", "Re-verify"], ["done", "Write"]];
+function runHtml(log, running, slug) {
+  const by = Object.fromEntries(log.map((e) => [e.step, e]));
+  const last = log.length ? log[log.length - 1].step : null;
+  const list = RUN_ROWS.map(([k, label]) => {
+    const e = by[k], skip = (k === "repair" || k === "reverify") && by.done && !by.repair;
+    const cls = e ? (running && k === last && k !== "done" ? "on" : "done") : skip ? "skip" : "";
+    const f = e?.failures ? `<ul class="f">${e.failures.map((x) => `<li>${esc(x.where)}: “${esc(x.quote.slice(0, 90))}” ${esc(x.reason)}</li>`).join("")}</ul>` : "";
+    return `<div class="step ${cls}"><i></i><span class="k">${label}</span><span class="m">${skip ? "not needed" : esc(e?.message || "")}${f}</span></div>`;
+  }).join("");
+  const err = log.find((e) => e.step === "error"), done = by.done;
+  return `<div class="run">${list}${err ? `<div class="step err"><i></i><span class="k">Error</span><span class="m">${esc(err.message)}</span></div>` : ""}${done ? `<div class="result"><span><b>${done.summary.verified}</b> of ${done.summary.statements} verified</span><span><b>${done.summary.warning}</b> warnings</span><span><b>${done.summary.failed}</b> unverified</span><span>${done.seconds}s</span><span style="margin-left:auto">Opening the draft…</span></div>` : ""}</div>`;
+}
+async function startDraft(slug, c) {
+  const out = $("#assessbody"); const log = [];
+  out.innerHTML = `<div class="pad">${runHtml(log, true, slug)}</div>`;
+  document.querySelectorAll("#startDraft,#redraft").forEach((b) => (b.disabled = true));
+  const res = await fetch(`/api/companies/${slug}/draft`, { method: "POST" });
+  if (!res.ok) { out.innerHTML = `<div class="pad"><p style="color:var(--bad)">${esc((await res.json().catch(() => ({}))).error || res.statusText)}</p></div>`; return; }
+  const rd = res.body.getReader(), dec = new TextDecoder(); let buf = "";
+  for (;;) {
+    const { value, done } = await rd.read(); if (done) break;
+    buf += dec.decode(value, { stream: true });
+    let i; while ((i = buf.indexOf("\n\n")) >= 0) { const line = buf.slice(0, i).replace(/^data: /, ""); buf = buf.slice(i + 2); if (line) { log.push(JSON.parse(line)); out.innerHTML = `<div class="pad">${runHtml(log, true, slug)}</div>`; } }
+  }
+  out.innerHTML = `<div class="pad">${runHtml(log, false, slug)}</div>`;
+  S.decisions = {}; S.overrides = {}; S.note = ""; S.saved = ""; blocksCache = null;
+  if (log.some((e) => e.step === "done")) setTimeout(() => pageAssessment(slug, new URLSearchParams()), 900);
+  else document.querySelectorAll("#startDraft,#redraft").forEach((b) => (b.disabled = false));
+}
+async function pageAssessment(slug, q = new URLSearchParams()) {
   const c = await load(slug);
-  if (!c.record) return (location.hash = `#/c/${slug}/draft`);
+  const mode = q.get("mode") === "partner" ? "partner" : "review";
   if (q.get("s")) S.selected = q.get("s");
   topbar([{ label: c.name }]);
-  workspace(c, "review", stagehead("Review", `<span class="state" id="savestate">${S.saved ? "Saved " + S.saved.slice(11, 16) : "Edits save automatically"}</span><a class="btn primary" href="#/c/${slug}/partner">Partner page <span class="arr">→</span></a>`, "Click anywhere to edit. Click a statement to see its source.") + splitView(c, "review"));
-  wireSplit(c, "review");
+  const st = assessmentState(c);
+  const pill = `<span class="badge ${st.tone}">${st.label}</span>${st.detail ? `<span class="state">${esc(st.detail)}</span>` : ""}`;
+
+  if (!c.record) {
+    // Not drafted yet: what we have, and the one action.
+    const srcList = c.sourceDocs.map((s) => `<div class="srcrow"><span class="chip">${esc(s.key)}</span><span class="t">${esc(s.title)}</span><span class="n">${s.passages.length} passages${c.files?.[s.key] ? ` · <a href="${fileUrl(c, s.key)}" target="_blank">${esc(c.files[s.key].name)}</a>` : ""}</span></div>`).join("");
+    const body = stagehead("Assessment", `<button class="btn primary" id="startDraft" ${c.running ? "disabled" : ""}>Draft assessment <span class="arr">→</span></button>`, "") +
+      `<div class="scroll" id="assessbody"><div class="pad narrow"><div class="statusline">${pill}</div>
+      ${c.design_note ? `<div class="callout" style="grid-template-columns:1fr"><div><div class="micro">Why this example exists</div><p style="margin-top:6px">${esc(c.design_note)}</p></div></div>` : ""}
+      ${c.intake?.via === "inbox" ? `<div class="callout" style="grid-template-columns:1fr"><div><div class="micro">Imported from the inbox</div><p style="margin-top:6px">${esc(c.intake.from)} · ${esc(c.intake.subject)}. ${(c.intake.notes || []).map(esc).join(" · ")}</p></div></div>` : ""}
+      <div class="seclabel" style="margin:8px 0 10px">What the draft will be built from</div><div class="srclist">${srcList}</div><p class="hint" style="margin-top:14px">Every statement in the draft will cite one of these passages. <a href="#/c/${slug}/sources">Read them</a>, or draft now; about two minutes.</p></div></div>`;
+    workspace(c, "assessment", body);
+    $("#startDraft").addEventListener("click", () => startDraft(slug, c));
+    if (q.get("start") === "1" && !c.running) startDraft(slug, c);
+    return;
+  }
+
+  // Drafted: the document, in edit or partner mode.
+  const modeSwitch = `<div class="seg"><a href="#/c/${slug}" class="${mode === "review" ? "on" : ""}">Edit</a><a href="#/c/${slug}?mode=partner" class="${mode === "partner" ? "on" : ""}">Partner view</a></div>`;
+  const right = mode === "review"
+    ? `<span class="state" id="savestate">${S.saved ? "Saved " + S.saved.slice(11, 16) : "Edits save automatically"}</span>${modeSwitch}<button class="btn" id="redraft" title="Replace the draft and clear the review">Draft again</button>`
+    : `${modeSwitch}<button class="btn" onclick="window.print()">Print</button><a class="btn primary" href="#/c/${slug}/followup">Follow-up <span class="arr">→</span></a>`;
+  const body = `<div class="stagehead"><h2>Assessment</h2>${pill}<div class="r">${right}</div></div><div id="assessbody" style="display:contents">${splitView(c, mode)}</div>`;
+  workspace(c, mode === "partner" ? "partner" : "assessment", body);
+  wireSplit(c, mode);
+  $("#redraft")?.addEventListener("click", () => { if (confirm("Draft again? This replaces the current draft and clears the review.")) { $("#assessbody").style.display = "block"; startDraft(slug, c); } });
   const target = q.get("s") ? `.t-claim[data-id="${CSS.escape(q.get("s"))}"]` : q.get("g") ? `.blk[data-key="gap.${q.get("g")}"]` : q.get("k") ? `.blk[data-key="${CSS.escape(q.get("k"))}"]` : null;
   if (target) { const el = $("#doc").querySelector(target); if (el) { el.scrollIntoView({ block: "center" }); el.classList.add("flash"); if (q.get("s")) { renderSide(c, false); $("#split").classList.add("show"); } } }
-}
-async function pagePartner(slug) {
-  const c = await load(slug);
-  if (!c.record) return (location.hash = `#/c/${slug}/draft`);
-  topbar([{ label: c.name }]);
-  workspace(c, "partner", stagehead("Partner page", `<button class="btn" onclick="window.print()">Print</button><a class="btn primary" href="#/c/${slug}/followup">Follow-up <span class="arr">→</span></a>`, c.reviewDoc ? "What the partners receive." : "No review yet, so this is the unedited draft.") + splitView(c, "partner"));
-  wireSplit(c, "partner");
 }
 
 // ---------- follow-up ----------
 async function pageFollowup(slug) {
   const c = await load(slug);
-  if (!c.record) return (location.hash = `#/c/${slug}/draft`);
+  if (!c.record) return (location.hash = `#/c/${slug}`);
   topbar([{ label: c.name }]);
   const a = c.record.assessment;
   const items = a.missing, qs = a.dimensions.flatMap((d) => d.open_questions.map((q) => ({ dim: d.name, q })));
-  workspace(c, "followup", stagehead("Follow-up", `<button class="btn primary" id="copy">Copy email</button>`, "Sent to the founder before the partner meeting.") +
+  workspace(c, "followup", stagehead("Follow-up email", `<a class="btn" href="#/c/${slug}">Back to the assessment</a><button class="btn primary" id="copy">Copy email</button>`, "Sent to the founder before the partner meeting.") +
     `<div class="scroll"><div class="pad"><div class="fu"><div><h3>Missing</h3><ul>${items.map((m, i) => `<li><input type="checkbox" id="m${i}" checked><div><b>${esc(m.item)}</b><span>${esc(m.why_it_matters)}</span></div></li>`).join("")}</ul><h3>Open questions</h3><ul>${qs.map((x, i) => `<li><input type="checkbox" id="q${i}"><div>${esc(x.q)}<small>${esc(x.dim)}</small></div></li>`).join("")}</ul></div><div><div class="tools"><input class="input" id="from" placeholder="Your name" value="${esc(S.reviewer)}"></div><div class="email" id="email"></div></div></div></div></div>`);
   const build = () => {
     const picked = items.filter((_, i) => $(`#m${i}`).checked), q = qs.filter((_, i) => $(`#q${i}`).checked);
@@ -588,12 +594,14 @@ async function route() {
     if (p[0] === "new") return pageNew();
     if (p[0] === "inbox") return await pageInbox();
     if (p[0] === "c" && p[1]) {
-      const slug = p[1], stage = p[2] || "review";
+      const slug = p[1], stage = p[2] || "";
       if (stage === "sources") return await pageSources(slug, q.get("p"));
-      if (stage === "draft") return await pageDraft(slug, q.get("start") === "1");
-      if (stage === "review") return await pageReview(slug, q);
-      if (stage === "partner") return await pagePartner(slug);
       if (stage === "followup") return await pageFollowup(slug);
+      if (stage === "draft" || stage === "review" || stage === "partner" || stage === "") {
+        if (stage === "partner") q.set("mode", "partner");
+        if (stage !== "") { history.replaceState(null, "", `#/c/${slug}${q.toString() ? "?" + q.toString() : ""}`); }
+        return await pageAssessment(slug, q);
+      }
     }
     location.hash = "#/";
   } catch (err) { $("#main").innerHTML = `<div class="page"><div class="inner"><p style="color:var(--bad)">${esc(err.message)}</p></div></div>`; }
