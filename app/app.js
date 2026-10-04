@@ -367,8 +367,7 @@ function wireSplit(c, mode) {
     if (act && blk) { S.decisions[blk.dataset.id] = { action: act.dataset.act }; change(); rerender(); return; }
     const gact = e.target.closest("button[data-gapact]");
     if (gact && blk) { setPath(S.overrides, `missing.${blk.dataset.gap}.removed`, gact.dataset.gapact === "remove"); change(); rerender(); return; }
-    const h = e.target.closest("button[data-handle]");
-    if (h) { e.preventDefault(); openBlockMenu(h.dataset.handle, h.getBoundingClientRect()); return; }
+    if (e.target.closest("button[data-handle]")) { e.preventDefault(); return; }
     if (blk?.classList.contains("t-claim") && !e.target.closest("[contenteditable]")) showSource(blk.dataset.id);
   });
   doc.addEventListener("focusin", (e) => { const blk = e.target.closest(".t-claim"); if (blk && e.target.hasAttribute("contenteditable")) showSource(blk.dataset.id); });
@@ -394,7 +393,7 @@ function wireSplit(c, mode) {
   function placeAfter(key, anchorKey) {
     if (key === anchorKey || anchorKey === key) return;
     if (key.startsWith("ins.")) { const f = findInsert(key); if (!f) return; const item = f.item; deleteInsert(key); const ins = (S.overrides.inserts ??= {}); (ins[anchorKey] ??= []).unshift(item); if (ins[anchorKey].length > 1) { const rest = ins[anchorKey].splice(1); ins[key] = [...rest, ...(ins[key] || [])]; } }
-    else setPath(S.overrides, `moves.${key}`, anchorKey);
+    else (S.overrides.moves ??= {})[key] = anchorKey; // keys contain dots, so no setPath here
     change(); rerender();
   }
   function moveBlock(key, dir) {
@@ -406,28 +405,40 @@ function wireSplit(c, mode) {
     const el = doc.querySelector(`.blk[data-key="${CSS.escape(key)}"]`); el?.classList.add("flash"); el?.scrollIntoView({ block: "nearest" });
     const bc = el?.querySelector(".bc[contenteditable]"); if (bc) placeCaret(bc, "end");
   }
-  let dragKey = null, dropTarget = null, dropAfter = true;
+  // Drag with pointer events (works with mouse, trackpad and automation alike).
+  let drag = null;
   const clearDrop = () => { doc.querySelectorAll(".drop-before,.drop-after").forEach((e) => e.classList.remove("drop-before", "drop-after")); };
-  doc.addEventListener("dragstart", (e) => {
-    const h = e.target.closest("button[data-handle]"); if (!h) return;
-    dragKey = h.dataset.handle; e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("text/plain", dragKey);
-    const blk = h.closest(".blk"); blk.classList.add("dragging"); try { e.dataTransfer.setDragImage(blk, 20, 12); } catch {}
+  doc.addEventListener("pointerdown", (e) => {
+    const h = e.target.closest("button[data-handle]"); if (!h || e.button !== 0) return;
+    e.preventDefault();
+    const blk = h.closest(".blk");
+    drag = { key: h.dataset.handle, blk, startY: e.clientY, moved: false, target: null, after: true, ghost: null };
+    h.setPointerCapture?.(e.pointerId);
   });
-  doc.addEventListener("dragover", (e) => {
-    if (!dragKey) return; const blk = e.target.closest(".blk[data-key]"); if (!blk || blk.dataset.key === dragKey) return;
-    e.preventDefault(); e.dataTransfer.dropEffect = "move";
-    const r = blk.getBoundingClientRect(); dropAfter = e.clientY > r.top + r.height / 2; dropTarget = blk;
-    clearDrop(); blk.classList.add(dropAfter ? "drop-after" : "drop-before");
+  doc.addEventListener("pointermove", (e) => {
+    if (!drag) return;
+    if (!drag.moved) { if (Math.abs(e.clientY - drag.startY) < 4) return; drag.moved = true; drag.blk.classList.add("dragging"); document.body.classList.add("is-dragging"); closeMenus();
+      const g = drag.blk.cloneNode(true); g.className = "blk drag-ghost"; g.style.width = drag.blk.offsetWidth + "px"; document.body.appendChild(g); drag.ghost = g; }
+    drag.ghost.style.transform = `translate(${e.clientX + 12}px, ${e.clientY - 10}px)`;
+    const under = document.elementFromPoint(e.clientX, e.clientY)?.closest?.(".blk[data-key]");
+    clearDrop();
+    if (!under || under === drag.blk || under.closest(".drag-ghost")) { drag.target = null; return; }
+    const r = under.getBoundingClientRect(); drag.after = e.clientY > r.top + r.height / 2; drag.target = under;
+    under.classList.add(drag.after ? "drop-after" : "drop-before");
+    const wrap = doc.parentElement; if (e.clientY < 80) wrap.scrollTop -= 12; else if (e.clientY > window.innerHeight - 80) wrap.scrollTop += 12;
   });
-  doc.addEventListener("dragleave", (e) => { if (!doc.contains(e.relatedTarget)) clearDrop(); });
-  doc.addEventListener("drop", (e) => {
-    if (!dragKey || !dropTarget) return; e.preventDefault();
-    const els = [...doc.querySelectorAll(".blk[data-key]")]; const i = els.indexOf(dropTarget);
-    const anchor = dropAfter ? dropTarget : els[i - 1];
-    const key = dragKey; dragKey = null; clearDrop();
-    if (anchor && anchor.dataset.key !== key) placeAfter(key, anchor.dataset.key);
-  });
-  doc.addEventListener("dragend", () => { dragKey = null; dropTarget = null; clearDrop(); doc.querySelectorAll(".dragging").forEach((x) => x.classList.remove("dragging")); });
+  const endDrag = (e) => {
+    if (!drag) return;
+    const d = drag; drag = null;
+    d.ghost?.remove(); d.blk.classList.remove("dragging"); document.body.classList.remove("is-dragging"); clearDrop();
+    if (!d.moved) { if (e.type === "pointerup") openBlockMenu(d.key, d.blk.querySelector(".handle").getBoundingClientRect()); return; }
+    if (!d.target) return;
+    const els = [...doc.querySelectorAll(".blk[data-key]")]; const i = els.indexOf(d.target);
+    const anchor = d.after ? d.target : els[i - 1];
+    if (anchor && anchor.dataset.key !== d.key) { placeAfter(d.key, anchor.dataset.key); doc.querySelector(`.blk[data-key="${CSS.escape(d.key)}"]`)?.classList.add("flash"); }
+  };
+  doc.addEventListener("pointerup", endDrag);
+  doc.addEventListener("pointercancel", endDrag);
 
   function slashMenu(bc) {
     const key = keyOf(bc), rect = bc.getBoundingClientRect();
@@ -439,17 +450,18 @@ function wireSplit(c, mode) {
   doc.addEventListener("keydown", (e) => {
     const bc = e.target.closest(".bc[contenteditable]"); if (!bc) return;
     const key = keyOf(bc), b = currentBlocks(c).find((x) => x.key === key); if (!b) return;
+    const isEnter = e.key === "Enter" || e.key === "Return";
     const open = document.querySelector(".slash");
     if (open) {
       const btns = [...open.querySelectorAll("button")], i = btns.findIndex((x) => x.classList.contains("on"));
       if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); btns[i]?.classList.remove("on"); btns[(i + (e.key === "ArrowDown" ? 1 : btns.length - 1)) % btns.length].classList.add("on"); return; }
-      if (e.key === "Enter") { e.preventDefault(); btns[i]?.click(); return; }
+      if (isEnter) { e.preventDefault(); btns[i]?.click(); return; }
       if (e.key === "Escape" || e.key === "Backspace") { closeMenus(); if (e.key === "Escape") e.preventDefault(); return; }
     }
     if (e.key === "/" && b.insert && bc.innerText.trim() === "") { e.preventDefault(); slashMenu(bc); return; }
     if (e.key === "Escape") { bc.blur(); return; }
     if ((e.metaKey || e.ctrlKey) && b.rich && (e.key === "b" || e.key === "i")) { e.preventDefault(); document.execCommand(e.key === "b" ? "bold" : "italic"); readBlock(bc, c); change(); return; }
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (isEnter && !e.shiftKey) {
       e.preventDefault();
       if (b.type === "reviewer") { bc.blur(); return; }
       let html = "";

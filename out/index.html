@@ -298,6 +298,57 @@ table.list{width:100%;border-collapse:collapse;font-size:13.5px;background:#fff;
 .file .k{font-family:var(--mono);font-size:10px;font-weight:600;background:var(--muted-2);padding:1px 5px;color:var(--muted-foreground)}
 .file .sz{color:var(--subtle)}
 @media (max-width:900px){.callouts,.provs{grid-template-columns:1fr}.msg{grid-template-columns:1fr;grid-template-areas:"who" "subj" "body" "att" "act"}}
+
+/* source viewer */
+.psg.clickable{cursor:pointer}.psg.clickable:hover{background:var(--muted)}.psg.lit{background:var(--amber-bg)}
+.open-slide{margin-left:auto;font-size:11.5px;font-weight:500;color:var(--muted-foreground);border:1px solid var(--border-2);padding:1px 7px;background:#fff;white-space:nowrap}
+.open-slide:hover{color:var(--heading);background:var(--muted)}
+.viewer{display:flex;flex-direction:column;gap:10px}
+.viewer .vhead{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted-foreground)}
+.viewer .vhead .vt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.viewer .vnav{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted-foreground)}
+.viewer iframe.pdf{width:100%;aspect-ratio:16/9;min-height:230px;border:1px solid var(--border-2);background:#525659}
+.viewer .vtext{font-size:12.5px;line-height:1.6;color:var(--muted-foreground);white-space:pre-wrap;border-top:1px solid var(--border);padding-top:10px}
+.viewer .vtext .micro{margin-bottom:4px}
+.slidecard{aspect-ratio:16/9;border:1px solid var(--border-2);background:#fff;box-shadow:var(--shadow);padding:7% 8%;display:flex;flex-direction:column;gap:6%;overflow:hidden;position:relative;color:#15181f}
+.slidecard .sc-title{font-size:clamp(14px,2.4vw,20px);font-weight:600;letter-spacing:-.3px;line-height:1.2}
+.slidecard .sc-body{font-size:clamp(9px,1.3vw,12px);line-height:1.45;overflow:hidden;display:flex;flex-direction:column;gap:4px}
+.slidecard .sc-body p{margin:0}
+.slidecard .sc-foot{position:absolute;right:5%;bottom:5%;font-family:var(--mono);font-size:9px;color:var(--subtle)}
+
+/* drag and drop */
+.blk .handle{cursor:grab}
+.blk.dragging{opacity:.4}
+.blk.drop-before::before,.blk.drop-after::after{content:"";position:absolute;left:-8px;right:-8px;height:2px;background:var(--ring);border-radius:1px;z-index:2}
+.blk.drop-before::before{top:-2px}.blk.drop-after::after{bottom:-2px}
+.blk.flash{animation:flash 1s ease-out}
+@keyframes flash{0%{background:var(--amber-bg)}100%{background:transparent}}
+
+/* search box + palette */
+.top .searchbox{display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 10px 0 10px;border:1px solid var(--border-2);border-radius:6px;background:oklch(98.4% .003 247.858);box-shadow:var(--shadow);color:var(--subtle);font-size:13px;width:340px;margin-left:12px}
+.top .searchbox:hover{color:var(--muted-foreground);background:#fff}
+.top .searchbox .ico{font-size:15px;color:var(--muted-foreground)}
+.top .searchbox span:nth-child(2){flex:1;text-align:left}
+kbd{font-family:var(--font);font-size:10.5px;color:var(--subtle);border:1px solid var(--border-2);border-radius:4px;padding:1px 5px;background:#fff}
+#palette{position:fixed;inset:0;background:rgba(20,24,33,.28);z-index:100;display:flex;justify-content:center;align-items:flex-start;padding-top:12vh}
+.pal{width:min(680px,92vw);background:#fff;border:1px solid var(--border-2);box-shadow:0 20px 60px rgba(0,0,0,.22);display:flex;flex-direction:column;max-height:70vh}
+.pal-in{display:flex;align-items:center;gap:10px;padding:0 14px;height:52px;border-bottom:1px solid var(--border)}
+.pal-in .ico{font-size:18px;color:var(--muted-foreground)}
+.pal-in input{flex:1;border:0;outline:none;font-size:15px;background:transparent;color:var(--heading)}
+.pal-res{overflow:auto;padding:6px}
+.pal-grp{font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--subtle);padding:10px 10px 4px}
+.pal-item{display:grid;grid-template-columns:1fr auto;gap:2px 14px;width:100%;padding:8px 10px;border-radius:4px;text-align:left;align-items:baseline}
+.pal-item.on,.pal-item:hover{background:var(--muted-2)}
+.pal-item .pt{font-size:13.5px;color:var(--heading);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pal-item .ps{grid-column:1/3;font-size:12.5px;color:var(--muted-foreground);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pal-item .pm{font-size:11.5px;color:var(--subtle);white-space:nowrap;grid-row:1;grid-column:2}
+.pal-empty{padding:28px 16px;font-size:13px;color:var(--subtle);text-align:center;line-height:1.6}
+@media (max-width:900px){.top .searchbox{width:auto}.top .searchbox span:nth-child(2),.top .searchbox kbd{display:none}}
+
+body.is-dragging{user-select:none;cursor:grabbing}
+body.is-dragging *{cursor:grabbing!important}
+.drag-ghost{position:fixed;left:0;top:0;z-index:60;pointer-events:none;opacity:.85;background:#fff;box-shadow:0 10px 30px rgba(0,0,0,.18);border:1px solid var(--border-2);padding:6px 10px;max-height:80px;overflow:hidden;font-size:14px}
+.drag-ghost .handle,.drag-ghost .x{display:none}
 </style>
 </head><body>
 <header class="top"><span class="name">Assessments</span><div class="crumbs"><span>/</span><b>Static report</b></div><div class="right"><span class="ter" style="font-size:12.5px">Committed run. No scores, no recommendations.</span></div></header>
@@ -398,11 +449,17 @@ table.list{width:100%;border-collapse:collapse;font-size:13.5px;background:#fff;
     push({ key: "thesis", type: "thesis", text: ov(o, "thesis", a.bear_case.thesis), editable: review, field: "thesis" });
     claimBlocks(a.bear_case.points, "b");
     if (o.mode !== "partner" && c.eval) push({ key: "checks", type: "checks", eval: c.eval, fixed: true });
+    // Moves: overrides.moves[key] = anchorKey means "render this block right after anchorKey".
+    // Applied in two passes so a block can be dropped after an inserted block too.
+    const moves = Object.entries(o.overrides?.moves || {}).filter(([, a]) => typeof a === "string");
+    const applyMoves = (list, pending) => { const left = []; for (const [key, anchor] of pending) { const i = list.findIndex((b) => b.key === key); const j = list.findIndex((b) => b.key === anchor); if (i < 0 || j < 0 || key === anchor) { if (i >= 0 && j < 0) left.push([key, anchor]); continue; } const [b] = list.splice(i, 1); const j2 = list.findIndex((x) => x.key === anchor); list.splice(j2 + 1, 0, b); } return left; };
+    const later = applyMoves(B, moves);
     // Weave in the associate's inserted blocks after their anchors.
     const inserts = o.overrides?.inserts || {};
     const out = [];
     const addWithInserts = (b) => { out.push(b); for (const ins of inserts[b.key] || []) addWithInserts({ key: `ins.${ins.id}`, type: ins.type, html: ins.html || "", rich: ins.type !== "divider", editable: review && ins.type !== "divider", insert: true, id: ins.id }); };
     B.forEach(addWithInserts);
+    applyMoves(out, later);
     return out;
   }
 
@@ -411,7 +468,7 @@ table.list{width:100%;border-collapse:collapse;font-size:13.5px;background:#fff;
     const ce = b.editable ? (b.rich ? ' contenteditable="true"' : ' contenteditable="plaintext-only"') : "";
     const ph = b.placeholder ? ` data-placeholder="${esc(b.placeholder)}"` : b.insert ? ' data-placeholder="Type, or press / for a block type"' : "";
     const inner = b.rich ? sanitize(b.html) : esc(b.text ?? "");
-    const handle = review && !b.fixed ? `<button class="handle" data-handle="${esc(b.key)}" tabindex="-1" title="Block menu">⋮⋮</button>` : "";
+    const handle = review && !b.fixed ? `<button class="handle" data-handle="${esc(b.key)}" tabindex="-1" title="Drag to move, click for options">⋮⋮</button>` : "";
     const cls = `blk t-${b.type}${b.editable ? " editable" : ""}${b.insert ? " insert" : ""}${b.muted ? " muted" : ""}${b.removed ? " removed" : ""}`;
     switch (b.type) {
       case "label": return `<div class="${cls}">${esc(b.text)}</div>`;
