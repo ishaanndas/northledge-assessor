@@ -1,80 +1,74 @@
 # How it works
 
-A plain walkthrough of what the prototype does, in the order it does it. The code is small: about 2,000 lines of JavaScript, two dependencies (the Anthropic SDK and a PDF text reader), no build step.
+What the tool does, in the order it does it. Written for someone who will use it or decide about it, not someone who will maintain the code.
 
-## 1. The idea in one paragraph
+## In one paragraph
 
-An associate gives the tool what they have on a company: the deck, the website, founder bios, their call notes. The tool splits those into numbered passages, asks Claude to write a structured assessment where every sentence points at a passage and quotes it, then checks every quote mechanically against the source. Anything that fails gets one chance to be fixed. What is left is shown to the associate as an editable document with the source one click away. The tool never recommends and never scores.
+An associate gives the tool what they have on a company: the deck, the website, the founders' bios, their own notes from the first call. The tool breaks those into numbered passages and asks the AI to write an assessment where every sentence points at one passage and quotes it. A separate program then checks every quote against the source. Anything that fails gets one chance to be fixed; whatever still fails is shown as unverified rather than hidden. The associate edits the result in a document that opens the real slide behind any sentence. The tool never recommends and never scores.
 
-## 2. Getting a company in
+## Getting a company in
 
-Three ways, all ending in the same place: a folder of text files, one per source.
+Three ways, all ending in the same folder of text files, one per source.
 
-- **Files.** Drop a deck (PDF, PowerPoint or Word), or choose it, or paste a link to the file. The text is pulled out so that one passage equals one slide or page. The original file is kept, which is what lets the app show the real slide later.
-- **Links.** A website address is fetched and reduced to text. Hidden elements are kept and labelled, because that is where instructions aimed at machines tend to hide.
-- **Inbox.** Decks that arrive by email show up in an inbox. Importing a message creates the company with its attachments already read. In this prototype the inbox is a folder on disk shaped like a mailbox, with sample messages in it; connecting Gmail or Microsoft 365 is a matter of credentials and is shown as not connected until then.
+- **Drop in files.** The deck as PDF, PowerPoint or Word, or a link to one. The text is pulled out so that one passage is one slide. The original file is kept, which is what lets the app show the real slide later.
+- **Paste a link.** A website is fetched and turned into text. Hidden text on the page is kept and labelled, because that is where instructions aimed at AI tend to be planted.
+- **The inbox.** Decks that arrive by email appear in an inbox; one click turns a message into a company with its attachments already read. In this prototype the inbox is a folder with sample messages in it. Connecting a real mailbox is a matter of credentials, and the screen says so until then.
 
-Once a deck is read, the company name, one-liner, round, website and founder bios are filled in from it. The associate corrects anything wrong.
+Once a deck is read, the company name, one-line description, round, website and founder bios are filled in from it. The associate corrects whatever is wrong.
 
-## 3. Drafting
+## Drafting
 
-Each source is split at paragraph breaks into passages with ids like `deck:3` or `call-notes:7`. Slide titles travel with their slide. The model only ever sees text with these ids attached and is told it may cite nothing else.
+Each source is split at paragraph breaks into passages with short labels, such as `deck:3` for the third slide or `call-notes:7` for the seventh paragraph of the notes. Slide titles stay with their slide. The AI only ever sees text with these labels attached, and it is told it may point at nothing else.
 
-Claude Opus 5 then returns a fixed shape: a summary, six to eight assessment dimensions, where the sources disagree, what is missing, the case against, and integrity notes (anything in the inputs that tried to steer the reader). The shape is enforced by the API, and it has no field for a score or a verdict, so one cannot appear even by accident.
+It returns the assessment in a fixed shape every time: a summary a partner can read in two minutes, six to eight sections such as team, market and traction, where the sources disagree, what is missing, the strongest case against, and a list of anything in the inputs that tried to steer the reader. That shape has no slot for a score or a verdict, so neither can appear even by accident.
 
-Every claim carries a passage id and a verbatim quote of at most 30 words. Each claim also says whether it is stated in the source, derived from numbers in the source, or an argument about something the source does not contain.
+Every sentence carries the label of the passage it came from and a short quote from it, thirty words at most. Each sentence also says whether the source states it, whether the tool worked it out from numbers in the source, or whether it is a point about something the source does not contain.
 
-## 4. Checking the citations
+## Checking the quotes
 
-A verifier with no model in it reads every citation and asks four things: does the passage exist, does the quote appear in it word for word (after ignoring capitalisation, curly quotes and line breaks), is the quote under 30 words, and does every number in the claim appear somewhere in the cited passages.
+A small program, with no AI in it, reads every quote and asks: does this passage exist, do these exact words appear in it, is the quote short enough, and does every number in the sentence appear somewhere in the passages it points to.
 
-If anything hard fails, the model is shown the exact failures and asked once to fix the quote, cite the right passage, or drop the claim. There is no second round. Whatever still fails is kept in the draft and marked as unverified, so the associate sees what the model wanted to say and could not source.
+If anything fails, the AI is shown the exact failures and asked once to fix the quote, point at the right passage, or drop the sentence. There is no second chance. Whatever still fails stays in the draft, marked, so the associate can see what the tool wanted to say and could not back up.
 
-"Verified" therefore means one thing: the quote is real. Whether the sentence built on it is fair is a different question, which is what the evaluation's second model is for.
+"Verified" therefore means one specific thing: these words really are in that source. Whether the sentence built on them is fair is a separate question, answered by the second reader described in the Evaluation.
 
-## 5. The document
+## The document
 
-The assessment is one document in one place, and its state is derived rather than set: not drafted, drafting, draft, or reviewed the moment the associate changes anything.
+A company has one assessment, shown in whatever state it is in: not drafted, drafting, draft, or reviewed once the associate has changed anything.
 
-The editor works the way a Notion page does. Click anywhere and type. Enter makes a new block, "/" offers a heading, bullet, quote or divider, blocks drag by their handle. Claims can be edited or removed, but their citations stay attached, so a claim can be reworded without losing where it came from. Clicking a claim or a citation opens the actual deck page in a panel beside the document, with the quoted words highlighted. The panel resizes.
+The editor behaves like a Notion page. Click anywhere and type. Enter makes a new block, a slash offers a heading, bullet, quote or divider, and blocks drag by their handle. Sentences can be reworded or removed, but their quote and source stay attached. Clicking a sentence, or the small source label after it, opens the actual deck page in a panel beside the text with the quoted words highlighted. The panel resizes.
 
-The model's draft is never overwritten. Edits, removals, moves and added blocks are stored separately and applied on top, so the original can always be compared with what the associate changed.
+The AI's draft is never overwritten. The associate's edits sit on top of it, so the original and the edited version can always be compared.
 
-A switch flips between Edit and Preview; Preview is what the partners receive. Export gives Word, PDF, Markdown or copy to clipboard, all with the review applied. A follow-up email to the founder is composed from the missing list and open questions.
+A switch flips between Edit and Preview; Preview is what the partners receive. Export gives Word, PDF, Markdown or a clean copy, all with the edits applied. A follow-up email to the founder is composed from the missing list and the open questions. Search (Cmd+K) finds anything across every company: a phrase in a slide, a sentence in a draft, a missing item, an inbox message.
 
-Search (Cmd+K) covers company names, deck slides, website text, call notes, drafted claims, missing items and inbox messages, and opens the exact claim or passage.
-
-## 6. Evaluation
-
-A separate program re-checks every citation from scratch, asks a second model (Claude Sonnet 5) whether each claim is actually supported by its cited passages, scans the draft for recommendation or score language, and runs a short list of expectations written for each example before it was drafted (this contradiction must appear, this hidden instruction must be flagged, this inflated figure must not be asserted). A self-test plants four defects in a real draft and confirms the verifier catches them. Results and what they mean are in the Evaluation document.
-
-## 7. What it costs and how long it takes
+## Cost and time
 
 | Step | Per company |
 |---|---|
-| Drafting | about 2 to 3 minutes, roughly $0.30 to $0.50 |
-| Repair round, when needed | about 1 minute more |
-| Evaluation judge | about 1 minute, under $0.10 |
-| Filling the intake form from a deck | about 4 seconds, a few cents |
+| Drafting | 2 to 3 minutes, about 30 to 50 cents |
+| Fixing failed quotes, when needed | about a minute more |
+| The second reader, in the evaluation | about a minute, under 10 cents |
+| Filling the intake form from a deck | a few seconds, a few cents |
 
-At 150 companies a month the model spend is under $100.
+At 150 companies a month, the AI spend is under $100.
 
-## 8. Hosting
+## Where it runs
 
-The app runs on Railway at https://northledge-assessor-production.up.railway.app. Companies created there persist on a mounted disk. Reviews of the five built-in examples reset when the app is redeployed, which is fine for a demo. The documents you are reading are served by the same app under `/docs`.
+The app is hosted at https://northledge-assessor-production.up.railway.app. Companies created there are kept between updates. These documents are served by the same app under `/docs`. The code is at https://github.com/ishaanndas/northledge-assessor and runs locally with one command; see the README.
 
-## 9. What a production version would change
+## What a real version would add
 
-- **Ingestion.** Page-level ids for PDF decks (`deck p.4` reads better than `deck:4`), better website capture, call recordings transcribed into notes. The least glamorous and largest piece of work.
-- **Storage.** A proper database instead of folders: companies, sources, passages, drafts, claims, citations, the associate's edits, and the partners' decision.
-- **The second model in the pipeline.** Today it runs only in the evaluation. In production each claim would carry a second, clearly labelled status: quote verified, support partial.
-- **Access.** Sign-in, and partner pages that can be sent as links.
-- **An outcome log from day one.** Every draft joined to the partners' decision and, later, to what happened to the company. The year-later evaluation depends on this existing.
+- **Better intake.** Slide numbers that read as `deck p.4`, better website capture, call recordings turned into notes. The biggest and least glamorous piece of work.
+- **A database** in place of folders, holding companies, sources, drafts, edits and the partners' decisions.
+- **The second reader on every draft**, with its verdict shown next to each sentence alongside the quote check.
+- **Sign-in**, and partner pages that can be sent as links.
+- **A record of outcomes from day one**, so that after a year the tool can be judged on whether it helped the fund decide, not only on whether its quotes were real.
 
-## 10. Known limits
+## Limits worth knowing
 
-- Five examples, written by the same person who wrote the prompt. They test the failures that person thought of.
-- One run per example. Output varies between runs; the committed numbers are one sample.
-- The second model has not been checked against a human grader yet.
-- Long documents produce passages too big for a quote to pin precisely; pages or sentences would be needed.
+- The five example companies were written by the person who built the tool. They test the mistakes that person thought of.
+- Each example was run once; a second run would be worded differently.
+- The second reader has not yet been checked by a person.
+- Very long documents make passages too big for a quote to pin precisely.
 - The number check is literal: it misses numbers written as words and can be fooled by a coincidence.
