@@ -15,6 +15,9 @@ const APP_DIR = path.join(ROOT, "app");
 const TYPES = { ".html": "text/html; charset=utf-8", ".json": "application/json", ".md": "text/markdown; charset=utf-8", ".js": "text/javascript", ".css": "text/css", ".pdf": "application/pdf", ".pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation", ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document" };
 const SOURCE_ORDER = ["deck", "website", "founders", "call-notes", "email"];
 const running = new Map(); // slug -> true while a draft is in flight
+const UPLOADS = path.join(ROOT, "uploads"); // files kept between extract and create; gitignored
+const safeName = (n) => String(n).replace(/[^\w.\- ]+/g, "_").slice(0, 120) || "file";
+const FILE_KINDS = { ".pdf": "pdf", ".pptx": "pptx", ".docx": "docx", ".md": "text", ".txt": "text" };
 
 const readJson = (f) => (fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, "utf8")) : null);
 const send = (res, code, body, type = "application/json") => {
@@ -63,8 +66,27 @@ async function api(req, res, url) {
   if (parts[1] === "extract" && req.method === "POST") {
     const b = await body(req);
     try {
-      if (b.url) return send(res, 200, await extractUrl(String(b.url).trim()));
-      if (b.filename && b.data) return send(res, 200, await extractFile(b.filename, Buffer.from(b.data, "base64")));
+      if (b.url) {
+        const r = await extractUrl(String(b.url).trim());
+        if (r.buffer) {
+          fs.mkdirSync(UPLOADS, { recursive: true });
+          const token = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+          fs.writeFileSync(path.join(UPLOADS, `${token}__${safeName(r.meta.filename)}`), r.buffer);
+          r.file = { token, name: safeName(r.meta.filename), kind: FILE_KINDS[path.extname(r.meta.filename).toLowerCase()] || "file", pages: r.meta.pages || r.meta.slides || null };
+          delete r.buffer;
+        }
+        return send(res, 200, r);
+      }
+      if (b.filename && b.data) {
+        const buf = Buffer.from(b.data, "base64");
+        const r = await extractFile(b.filename, buf);
+        // Keep the original so the reader can open the page a passage came from.
+        fs.mkdirSync(UPLOADS, { recursive: true });
+        const token = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+        fs.writeFileSync(path.join(UPLOADS, `${token}__${safeName(b.filename)}`), buf);
+        r.file = { token, name: safeName(b.filename), kind: FILE_KINDS[path.extname(b.filename).toLowerCase()] || "file", pages: r.meta.pages || r.meta.slides || null };
+        return send(res, 200, r);
+      }
       return send(res, 400, { error: "send {url} or {filename, data}" });
     } catch (err) { return send(res, 422, { error: err.message }); }
   }
@@ -96,7 +118,17 @@ async function api(req, res, url) {
       const newSlug = slugify(b.name);
       const dir = path.join(COMPANIES_DIR, newSlug);
       fs.mkdirSync(path.join(dir, "sources"), { recursive: true });
-      fs.writeFileSync(path.join(dir, "company.json"), JSON.stringify({ slug: newSlug, name: b.name.trim(), one_liner: (b.one_liner || "").trim(), ask: (b.ask || "").trim(), created_at: new Date().toISOString(), intake: b.intake || {} }, null, 2));
+      const files = {};
+      for (const [key, f] of Object.entries(b.files || {})) {
+        if (!f?.token) continue;
+        const src = fs.readdirSync(UPLOADS).find((n) => n.startsWith(f.token + "__"));
+        if (!src) continue;
+        fs.mkdirSync(path.join(dir, "files"), { recursive: true });
+        const name = src.split("__").slice(1).join("__");
+        fs.renameSync(path.join(UPLOADS, src), path.join(dir, "files", name));
+        files[key] = { name, kind: f.kind, pages: f.pages };
+      }
+      fs.writeFileSync(path.join(dir, "company.json"), JSON.stringify({ slug: newSlug, name: b.name.trim(), one_liner: (b.one_liner || "").trim(), ask: (b.ask || "").trim(), created_at: new Date().toISOString(), intake: b.intake || {}, files }, null, 2));
       sources
         .sort(([a], [b2]) => (SOURCE_ORDER.indexOf(a) + 100) % 100 - (SOURCE_ORDER.indexOf(b2) + 100) % 100)
         .forEach(([key, text], i) => {

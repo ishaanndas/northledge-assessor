@@ -293,3 +293,20 @@ table.list{width:100%;border-collapse:collapse;font-size:13.5px;background:#fff;
 .file .k{font-family:var(--mono);font-size:10px;font-weight:600;background:var(--muted-2);padding:1px 5px;color:var(--muted-foreground)}
 .file .sz{color:var(--subtle)}
 @media (max-width:900px){.callouts,.provs{grid-template-columns:1fr}.msg{grid-template-columns:1fr;grid-template-areas:"who" "subj" "body" "att" "act"}}
+
+/* source viewer */
+.psg.clickable{cursor:pointer}.psg.clickable:hover{background:var(--muted)}.psg.lit{background:var(--amber-bg)}
+.open-slide{margin-left:auto;font-size:11.5px;font-weight:500;color:var(--muted-foreground);border:1px solid var(--border-2);padding:1px 7px;background:#fff;white-space:nowrap}
+.open-slide:hover{color:var(--heading);background:var(--muted)}
+.viewer{display:flex;flex-direction:column;gap:10px}
+.viewer .vhead{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted-foreground)}
+.viewer .vhead .vt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.viewer .vnav{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted-foreground)}
+.viewer iframe.pdf{width:100%;aspect-ratio:16/9;min-height:230px;border:1px solid var(--border-2);background:#525659}
+.viewer .vtext{font-size:12.5px;line-height:1.6;color:var(--muted-foreground);white-space:pre-wrap;border-top:1px solid var(--border);padding-top:10px}
+.viewer .vtext .micro{margin-bottom:4px}
+.slidecard{aspect-ratio:16/9;border:1px solid var(--border-2);background:#fff;box-shadow:var(--shadow);padding:7% 8%;display:flex;flex-direction:column;gap:6%;overflow:hidden;position:relative;color:#15181f}
+.slidecard .sc-title{font-size:clamp(14px,2.4vw,20px);font-weight:600;letter-spacing:-.3px;line-height:1.2}
+.slidecard .sc-body{font-size:clamp(9px,1.3vw,12px);line-height:1.45;overflow:hidden;display:flex;flex-direction:column;gap:4px}
+.slidecard .sc-body p{margin:0}
+.slidecard .sc-foot{position:absolute;right:5%;bottom:5%;font-family:var(--mono);font-size:9px;color:var(--subtle)}

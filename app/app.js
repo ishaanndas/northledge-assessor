@@ -82,13 +82,14 @@ function pageNew(prefillSlug) {
   const ta = (key) => $(`textarea[name="${key}"]`);
   const status = (key, text, cls = "") => { const el = $(`#st-${key}`); el.textContent = text; el.className = "st " + cls; };
   const toB64 = (file) => new Promise((ok, no) => { const r = new FileReader(); r.onload = () => ok(r.result.split(",")[1]); r.onerror = no; r.readAsDataURL(file); });
+  const kept = {}; // source key -> {token, kind, pages} for files the server kept
   const describe = (m) => m.pages ? `${m.pages} pages` : m.slides ? `${m.slides} slides` : m.paragraphs ? `${m.paragraphs} paragraphs` : "read";
   const shortUrl = (u) => u.replace(/^https?:\/\//, "").replace(/\/$/, "");
   async function ingestFile(key, file) {
     status(key, `Reading ${file.name}…`);
     try {
       const r = await api("/extract", { method: "POST", body: JSON.stringify({ filename: file.name, data: await toB64(file) }) });
-      ta(key).value = r.text;
+      ta(key).value = r.text; if (r.file) kept[key] = r.file;
       status(key, `${file.name}: ${describe(r.meta)}`, "ok");
       if (key === "deck") autofill(r.text);
     } catch (err) { status(key, err.message, "bad"); }
@@ -98,7 +99,7 @@ function pageNew(prefillSlug) {
     status(key, `Fetching ${shortUrl(url)}…`);
     try {
       const r = await api("/extract", { method: "POST", body: JSON.stringify({ url }) });
-      ta(key).value = r.text;
+      ta(key).value = r.text; if (r.file) kept[key] = r.file;
       status(key, `${r.meta.filename || r.meta.title || shortUrl(url)}: ${describe(r.meta)}`, "ok");
       if (key === "deck") autofill(r.text);
     } catch (err) { status(key, /fetch failed/i.test(err.message) ? `Could not reach ${shortUrl(url)}. Paste the page text instead.` : err.message, "bad"); }
@@ -130,7 +131,7 @@ function pageNew(prefillSlug) {
     e.preventDefault();
     const fd = new FormData(e.target);
     try {
-      const { slug } = await api("/companies", { method: "POST", body: JSON.stringify({ name: fd.get("name"), one_liner: fd.get("one_liner"), ask: fd.get("ask"), intake: { via: "manual" }, sources: { deck: fd.get("deck"), website: fd.get("website"), founders: fd.get("founders"), "call-notes": fd.get("call-notes") } }) });
+      const { slug } = await api("/companies", { method: "POST", body: JSON.stringify({ name: fd.get("name"), one_liner: fd.get("one_liner"), ask: fd.get("ask"), intake: { via: "manual" }, files: kept, sources: { deck: fd.get("deck"), website: fd.get("website"), founders: fd.get("founders"), "call-notes": fd.get("call-notes") } }) });
       location.hash = `#/c/${slug}/draft?start=1`;
     } catch (err) { $("#err").textContent = err.message; }
   });
@@ -162,9 +163,13 @@ async function pageInbox() {
 async function pageSources(slug) {
   const c = await load(slug);
   topbar([{ label: c.name }]);
-  const body = stagehead("Sources", c.record ? `<a class="btn" href="#/c/${slug}/draft">Draft again</a>` : `<a class="btn primary" href="#/c/${slug}/draft?start=1">Draft assessment <span class="arr">→</span></a>`, "What the model reads. A claim can cite nothing else.") +
-    `<div class="scroll"><div class="pad narrow">${c.design_note ? `<div class="callout" style="grid-template-columns:1fr;margin-bottom:28px"><div><div class="micro">Why this example exists</div><p style="margin-top:6px">${esc(c.design_note)}</p></div></div>` : ""}${c.intake?.via === "inbox" ? `<div class="callout" style="grid-template-columns:1fr;margin-bottom:28px"><div><div class="micro">Imported from the inbox</div><p style="margin-top:6px">${esc(c.intake.from)} · ${esc(c.intake.subject)}. ${(c.intake.notes || []).map(esc).join(" · ")}</p></div></div>` : ""}${c.sourceDocs.map((s) => `<div class="srcblock"><div class="sbh"><h3>${esc(s.key)}</h3><span class="ti">${esc(s.title)} · ${s.passages.length} passages</span></div>${s.passages.map((p) => `<div class="psg"><span class="id">${esc(p.id)}</span><span class="tx">${esc(p.text)}</span></div>`).join("")}</div>`).join("")}</div></div>`;
+  const body = stagehead("Sources", c.record ? `<a class="btn" href="#/c/${slug}/draft">Draft again</a>` : `<a class="btn primary" href="#/c/${slug}/draft?start=1">Draft assessment <span class="arr">→</span></a>`, "What the model reads. Click a passage to see where it came from.") +
+    `<div class="split" id="split"><div class="docwrap"><div class="pad narrow">${c.design_note ? `<div class="callout" style="grid-template-columns:1fr;margin-bottom:28px"><div><div class="micro">Why this example exists</div><p style="margin-top:6px">${esc(c.design_note)}</p></div></div>` : ""}${c.intake?.via === "inbox" ? `<div class="callout" style="grid-template-columns:1fr;margin-bottom:28px"><div><div class="micro">Imported from the inbox</div><p style="margin-top:6px">${esc(c.intake.from)} · ${esc(c.intake.subject)}. ${(c.intake.notes || []).map(esc).join(" · ")}</p></div></div>` : ""}${c.sourceDocs.map((s) => `<div class="srcblock"><div class="sbh"><h3>${esc(s.key)}</h3><span class="ti">${esc(s.title)} · ${s.passages.length} passages${c.files?.[s.key] ? ` · <a href="${fileUrl(c, s.key)}" target="_blank">${esc(c.files[s.key].name)}</a>` : ""}</span></div>${s.passages.map((p) => `<div class="psg clickable" data-pid="${esc(p.id)}"><span class="id">${esc(p.id)}</span><span class="tx">${esc(p.text)}</span></div>`).join("")}</div>`).join("")}</div></div>
+    <aside class="sources"><div class="h"><b id="sideTitle">Source</b><button id="closeSide" hidden>Close</button></div><div class="body" id="side"><p class="none">Click a passage. PDF decks open at that page; other sources show the passage as a slide.</p></div></aside></div>`;
   workspace(c, "sources", body);
+  const show = (pid) => { $("#side").innerHTML = viewerHtml(c, pid); $("#split").classList.add("show"); $("#closeSide").hidden = false; document.querySelectorAll(".psg.lit").forEach((x) => x.classList.remove("lit")); document.querySelector(`.psg[data-pid="${CSS.escape(pid)}"]`)?.classList.add("lit"); };
+  $("#main").addEventListener("click", (e) => { const v = e.target.closest("[data-view]"); if (v) { show(v.dataset.view); return; } const p = e.target.closest(".psg[data-pid]"); if (p) show(p.dataset.pid); });
+  $("#closeSide").addEventListener("click", () => { $("#split").classList.remove("show"); $("#closeSide").hidden = true; });
 }
 
 // ---------- draft ----------
@@ -211,7 +216,8 @@ async function pageDraft(slug, autostart) {
 
 // ---------- review / partner ----------
 function docOpts(mode) { return { mode, decisions: S.decisions, overrides: S.overrides, selected: S.selected, reviewer: S.reviewer, note: S.note }; }
-function renderSide(c, browse) { $("#sideTitle").textContent = browse ? "All passages" : "Source"; $("#side").innerHTML = browse ? Doc.browse(c) : Doc.provenance(c, S.selected); }
+function renderSide(c, browse) { $("#sideTitle").textContent = browse ? "All passages" : "Source"; $("#side").innerHTML = browse ? Doc.browse(c) : Doc.provenance(c, S.selected); $("#side").querySelectorAll(".src .sh .chip").forEach((ch) => { const pid = ch.textContent.trim(); if (/^[\w-]+:\d+$/.test(pid)) { const b = document.createElement("button"); b.className = "open-slide"; b.dataset.view = pid; b.textContent = c.files?.[pid.split(":")[0]]?.kind === "pdf" ? "Open page" : "View as slide"; ch.parentElement.appendChild(b); } }); }
+function showViewer(c, pid) { $("#sideTitle").textContent = "Source"; $("#side").innerHTML = `<button class="btn sm quiet" id="backToSource" style="margin-bottom:10px">← Back to the passage</button>` + viewerHtml(c, pid); $("#split").classList.add("show"); $("#closeSide").hidden = false; }
 function splitView(c, mode) {
   return `<div class="split" id="split"><div class="docwrap"><article class="doc" id="doc">${Doc.document(c, docOpts(mode))}</article></div><aside class="sources"><div class="h"><b id="sideTitle">Source</b><button id="browse">All passages</button><button id="closeSide" hidden>Close</button></div><div class="body" id="side">${Doc.provenance(c, S.selected)}</div></aside></div>`;
 }
@@ -220,6 +226,31 @@ function setPath(obj, path, value) {
   for (const k of keys.slice(0, -1)) o = o[k] ??= {};
   o[keys[keys.length - 1]] = value;
 }
+
+// ---------- source viewer: the real page behind a passage ----------
+// PDF decks open at the page in the browser's viewer; everything else renders
+// the passage as a slide-shaped card so the reader still sees it "as a slide".
+const fileUrl = (c, key) => c.files?.[key] ? `/${c.origin === "example" ? "examples" : "companies"}/${c.slug}/files/${encodeURIComponent(c.files[key].name)}` : null;
+function slideCard(passageText, pid) {
+  const lines = passageText.split("\n");
+  const m = lines[0].match(/^Slide (\d+):?\s*(.*)$/);
+  const title = m ? m[2] || `Slide ${m[1]}` : lines[0];
+  const body = (m ? lines.slice(1) : lines.slice(1)).filter(Boolean);
+  return `<div class="slidecard"><div class="sc-title">${esc(title)}</div><div class="sc-body">${body.map((l) => `<p>${esc(l)}</p>`).join("")}</div><div class="sc-foot">${esc(pid)}</div></div>`;
+}
+function viewerHtml(c, pid) {
+  const [key, n] = pid.split(":");
+  const file = c.files?.[key];
+  const text = c.record?.passages?.[pid]?.text ?? c.sourceDocs?.find((s) => s.key === key)?.passages.find((p) => p.id === pid)?.text ?? "";
+  const url = fileUrl(c, key);
+  const title = c.sourceDocs?.find((s) => s.key === key)?.title || c.record?.sources?.find((s) => s.key === key)?.title || key;
+  let body;
+  if (file?.kind === "pdf" && url) body = `<iframe class="pdf" src="${url}#page=${Number(n)}&toolbar=0&navpanes=0&view=Fit" title="${esc(file.name)} page ${n}"></iframe>`;
+  else body = slideCard(text, pid);
+  const nav = (() => { const total = file?.pages || c.sourceDocs?.find((s) => s.key === key)?.passages.length || c.record?.sources?.find((s) => s.key === key)?.passages || 0; const i = Number(n); return `<div class="vnav"><button class="btn sm" data-view="${key}:${i - 1}" ${i <= 1 ? "disabled" : ""}>←</button><span>${file?.kind === "pdf" ? "Page" : "Slide"} ${i}${total ? ` of ${total}` : ""}</span><button class="btn sm" data-view="${key}:${i + 1}" ${total && i >= total ? "disabled" : ""}>→</button>${url ? `<a class="btn sm" href="${url}" target="_blank" style="margin-left:auto">Open file</a>` : ""}</div>`; })();
+  return `<div class="viewer"><div class="vhead"><span class="chip">${esc(pid)}</span><span class="vt">${esc(title)}${file ? ` · ${esc(file.name)}` : ""}</span></div>${nav}${body}<div class="vtext"><div class="micro">Passage text</div>${esc(text)}</div></div>`;
+}
+
 // ---------- editor ----------
 // Caret helpers for contenteditable blocks.
 const sel = () => window.getSelection();
@@ -349,6 +380,7 @@ function wireSplit(c, mode) {
   document.addEventListener("click", (e) => { if (!e.target.closest(".menu,.slash,button[data-handle]")) closeMenus(); }, { capture: true });
   $("#browse").addEventListener("click", () => { renderSide(c, true); $("#split").classList.add("show"); $("#closeSide").hidden = false; });
   $("#closeSide").addEventListener("click", () => { $("#split").classList.remove("show"); $("#closeSide").hidden = true; });
+  $("#side").addEventListener("click", (e) => { const v = e.target.closest("[data-view]"); if (v) { showViewer(c, v.dataset.view); return; } if (e.target.closest("#backToSource")) renderSide(c, false); });
 }
 function queueSave() {
   clearTimeout(S.saveTimer);
