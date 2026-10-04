@@ -71,6 +71,8 @@ Implemented in the prototype as five screens (sources, draft, review, partner vi
 
 **Inputs**
 
+- The main path is the fund's inbox: decks that arrive by email are picked up, read and filled in without anyone uploading them. A read-only mailbox connection (Gmail or Microsoft 365, one label or folder) or a forwarding address feeds the inbox; with automation on, each arriving message becomes a company, and a draft, on its own. The connector is set up per client, because each mail provider needs the fund's own credentials and each fund routes deal flow differently. Files and links are the fallback.
+
 - Accept one to four text sources per company, each labelled by type (deck, website, founders, call notes). Additional labelled sources (for example a data room memo) are accepted and cited by their label.
 - Split each source into numbered passages at paragraph granularity. Each passage has a stable id of the form `source:n`. Slide and section headings are folded into the passage that follows them so a title travels with its content.
 - Present the sources to the AI only in this numbered form. The AI can cite nothing that does not have an id.
@@ -192,6 +194,6 @@ Instrumentation and targets for the first 60 days (about 300 companies). Expande
 
 ## 15. Roadmap after v1
 
-- **v1.1.** Claim-level accept, edit and reject in the reader, with the edit log kept. Follow-up email generated from the missing list. Fund-specific missing-list checklist.
+- **v1.1.** The first client's mailbox connector, so the inbox fills itself. Fund-specific missing-list checklist. An edit log behind the editor.
 - **v2.** Ingestion: PDF decks with page-level passage labels, website capture, call recording transcripts. Second reader in the drafting process as a second, labelled status. Hosted reader with access control. Run history and the audit dashboard for the operations lead.
 - **v3.** Outcome log joined to drafts. The comparison view from the decision record, evaluated against human-rated similarity before release.

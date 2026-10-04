@@ -8,13 +8,19 @@ An associate gives the tool what they have on a company: the deck, the website, 
 
 ## Getting a company in
 
-Three ways, all ending in the same folder of text files, one per source.
+The aim is that nobody uploads anything. Decks arrive by email; the tool reads them as they land; by the time an associate opens the app the company exists with its deck read, its name, round and founders filled in, and, if the fund wants it, a draft already waiting.
 
-- **Drop in files.** The deck as PDF, PowerPoint or Word, or a link to one. The text is pulled out so that one passage is one slide. The original file is kept, which is what lets the app show the real slide later.
-- **Paste a link.** A website is fetched and turned into text. Hidden text on the page is kept and labelled, because that is where instructions aimed at AI tend to be planted.
-- **The inbox.** Decks that arrive by email appear in an inbox; one click turns a message into a company with its attachments already read. In this prototype the inbox is a folder with sample messages in it. Connecting a real mailbox is a matter of credentials, and the screen says so until then.
+**The inbox** is where that happens. It can be fed three ways:
 
-Once a deck is read, the company name, one-line description, round, website and founder bios are filled in from it. The associate corrects whatever is wrong.
+- **A connected mailbox.** Gmail or Microsoft 365, read-only, watching one label or folder the fund chooses. Messages in that label with a deck attached or a deck link are picked up; nothing else is read, and nothing is ever sent, moved or deleted.
+- **A forwarding address.** The fund adds it as a forwarding rule, or gives it to the people who receive decks. No mailbox access needed.
+- **A drop folder.** In this prototype a folder on disk stands in for a mailbox, holding sample emails, so the whole flow can be tried end to end today.
+
+Two switches on the Inbox page decide how far it goes on its own: **import on arrival** turns each message into a company with its attachments read and its fields filled; **draft on arrival** drafts it too.
+
+The connectors are set up per client rather than shipped as a universal button. Google and Microsoft each require the fund's own credentials for a read-only connection, and every fund routes deal flow differently: a shared deals@ address, a label, a forwarding rule, sometimes a Slack channel. The connection flow in the app explains what gets connected and what the fund has to provide, and keeps the settings so the connection goes live when the credentials exist.
+
+Two fallbacks remain for anything that did not come by email: drop in files (PDF, PowerPoint, Word, or a link to one) or paste a website link. Once a deck is read, by any route, the company's name, one-line description, round, website and founder bios are filled in from it, and the associate corrects whatever is wrong.
 
 ## Drafting
 
@@ -59,7 +65,7 @@ The app is hosted at https://northledge-assessor-production.up.railway.app. Comp
 
 ## What a real version would add
 
-- **Better intake.** Slide numbers that read as `deck p.4`, better website capture, call recordings turned into notes. The biggest and least glamorous piece of work.
+- **The first mailbox connector**, built for the first client's mail provider and routing, so the inbox is fed without anyone touching it. Then slide numbers that read as `deck p.4`, better website capture, and call recordings turned into notes.
 - **A database** in place of folders, holding companies, sources, drafts, edits and the partners' decisions.
 - **The second reader on every draft**, with its verdict shown next to each sentence alongside the quote check.
 - **Sign-in**, and partner pages that can be sent as links.

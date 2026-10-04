@@ -8,7 +8,7 @@ import { OUT_DIR, COMPANIES_DIR, listCompanies, loadCompany, findCompanyDir, out
 import { draftCompany } from "./lib/pipeline.mjs";
 import { extractFile, extractUrl } from "./lib/extract.mjs";
 import { prefillFromDeck } from "./lib/prefill.mjs";
-import { listInbox, importInboxMessage, INBOX_DIR } from "./lib/inbox.mjs";
+import { listInbox, importInboxMessage, INBOX_DIR, readSettings, writeSettings, startWatcher } from "./lib/inbox.mjs";
 import { search } from "./lib/search.mjs";
 import { toMarkdownApplied, toPlainText, toDocx } from "./lib/export.mjs";
 import { markdownToHtml } from "./lib/markdown-html.mjs";
@@ -103,6 +103,18 @@ async function api(req, res, url) {
   // The inbox: messages waiting in the drop folder (and, when configured, a mailbox).
   if (parts[1] === "inbox") {
     if (req.method === "GET" && !parts[2]) return send(res, 200, listInbox());
+    // Connection setup. Credentials are never typed here; the client's own OAuth app
+    // supplies them as environment variables, and the connection goes live when they exist.
+    if (req.method === "PUT" && parts[2] === "settings") {
+      const b = await body(req); const patch = {};
+      if (b.provider && ["gmail", "m365"].includes(b.provider)) { const st = readSettings(); patch.providers = { ...st.providers, [b.provider]: { account: String(b.account || "").trim(), watch: String(b.watch || "").trim() || (b.provider === "gmail" ? "label Deal flow" : "folder Deal flow"), setAt: new Date().toISOString() } }; }
+      if (b.disconnect) { const st = readSettings(); const p2 = { ...st.providers }; delete p2[b.disconnect]; patch.providers = p2; if (b.disconnect === "forward") patch.forwarding = null; }
+      if (b.forwarding) patch.forwarding = { address: `deals-${Math.random().toString(36).slice(2, 8)}@inbound.assessments.example`, setAt: new Date().toISOString() };
+      if (typeof b.autoImport === "boolean") patch.autoImport = b.autoImport;
+      if (typeof b.autoDraft === "boolean") patch.autoDraft = b.autoDraft;
+      writeSettings(patch);
+      return send(res, 200, listInbox().status);
+    }
     if (req.method === "POST" && parts[2] && parts[3] === "import") {
       try { return send(res, 201, await importInboxMessage(parts[2], { companiesDir: COMPANIES_DIR, slugify })); } catch (err) { return send(res, 422, { error: err.message }); }
     }
@@ -273,4 +285,4 @@ http
     if (err.code === "EADDRINUSE") { console.error(`Port ${PORT} is already in use. Another copy of the app is probably running; open http://localhost:${PORT} or stop it first (lsof -ti:${PORT} | xargs kill).`); process.exit(1); }
     throw err;
   })
-  .listen(PORT, () => console.log(`app at http://localhost:${PORT}`));
+  .listen(PORT, () => { console.log(`app at http://localhost:${PORT}`); startWatcher({ companiesDir: COMPANIES_DIR, slugify, draft: (slug) => draftCompany(slug) }); });

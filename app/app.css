@@ -394,3 +394,19 @@ aside.sources .body{padding:14px 16px 40px}
 
 .cardx .tc{font-size:11px;font-weight:500;color:var(--amber);margin-top:3px}
 .cardx .foot .evl{display:block;font-size:11px;color:var(--subtle);margin-top:3px}
+
+/* inbox connections */
+.provs{grid-template-columns:1fr}
+.prov{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center}
+.prov .pb{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+.prov .pb b{font-weight:500;color:var(--heading)}.prov .pb span{flex-basis:100%;color:var(--muted-foreground);font-size:12.5px}
+.prov .addr{font-family:var(--mono);font-size:12px;background:var(--muted-2);padding:2px 6px}
+.auto{border:1px solid var(--border-2);background:#fff;padding:14px 16px;display:grid;gap:10px;font-size:13.5px}
+.auto label{display:flex;gap:10px;align-items:flex-start;line-height:1.5;color:var(--muted-foreground)}
+.auto label b{font-weight:500;color:var(--heading)}.auto input{margin-top:4px;accent-color:var(--primary)}
+.auto .hint{margin:0;padding-top:6px;border-top:1px solid var(--border)}
+.pal.connect{max-height:none}
+.connect .ch{display:flex;align-items:center;gap:12px;padding:0 18px;height:52px;border-bottom:1px solid var(--border)}
+.connect .ch b{font-weight:600;flex:1}.connect .ch span{font-size:12px;color:var(--subtle)}.connect .ch .x{font-size:18px;color:var(--subtle);opacity:1;padding:0 4px}
+.connect .cb{padding:22px 18px}.connect .cb h3{font-size:16px;font-weight:600;margin:0 0 10px}.connect .cb p{font-size:14px;line-height:1.6;color:var(--muted-foreground);margin:0 0 12px}
+.connect .cf{display:flex;gap:8px;padding:12px 18px;border-top:1px solid var(--border);background:var(--muted)}

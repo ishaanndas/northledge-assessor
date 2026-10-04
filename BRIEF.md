@@ -8,11 +8,11 @@ The secondary reader is the partner, who scans the one-pager before the Monday m
 
 ## What v1 does
 
-It takes the four inputs as text, splits each into numbered passages, and drafts the assessment in a fixed shape: a two-minute summary, six to eight dimensions, where the sources disagree, what is missing, the strongest case against, and integrity notes. Every claim carries the passage it came from and a verbatim quote. A verifier checks every quote mechanically, gives the model one round to fix or drop what failed, and marks anything still unverified rather than hiding it. The draft ships as a document and as a reader where clicking a claim shows the passage with the quote highlighted.
+It takes the four inputs, ideally straight from the fund's inbox so that a deck that arrives by email is already read, filled in and drafted before anyone opens the app, splits each into numbered passages, and drafts the assessment in a fixed shape: a two-minute summary, six to eight dimensions, where the sources disagree, what is missing, the strongest case against, and integrity notes. Every claim carries the passage it came from and the exact words quoted. A program with no AI in it checks every quote, gives the AI one round to fix or drop what failed, and marks anything still unverified rather than hiding it. The draft ships as a document and as a reader where clicking a claim shows the passage with the quote highlighted.
 
 ## What v1 deliberately does not do
 
-It does not score, rank or recommend. It reads nothing the associate did not give it: no web, no databases, no LinkedIn. That is a constraint, not a gap: a draft is only fully traceable if its universe of evidence is closed and visible. It does not remember previous companies, judge thesis fit, or parse slides as images. It drafts, the associate edits, the partners decide.
+It does not score, rank or recommend. It reads nothing the fund did not give it: no web, no databases, no LinkedIn. The mailbox connection is read-only and limited to one label; the connector for each mail provider is set up per client, since each needs the fund's own credentials and each fund routes deal flow differently. That is a constraint, not a gap: a draft is only fully traceable if its universe of evidence is closed and visible. It does not remember previous companies, judge thesis fit, or parse slides as images. It drafts, the associate edits, the partners decide.
 
 ## What a good assessment contains
 
@@ -41,11 +41,11 @@ Sixty days is about 300 companies: enough to measure the process, nowhere near e
 
 ## The three biggest risks
 
-**A claim that reads as sourced but is not.** This is the failure that destroys partner trust and the model's most natural one. A citation is a passage id plus a verbatim quote; the quote is checked mechanically; every number in a claim must appear in the cited passage; the model gets one repair round; what still fails is marked, not deleted. The eval adds a second model as judge, reading each claim against the full passage, because a quote can match and still not support the sentence built on it. "Verified" means the quote is real, not that the claim is true, and the label says so.
+**A claim that reads as sourced but is not.** This is the failure that destroys partner trust and the AI's most natural one. A citation is a passage plus the exact words; the words are checked by a program; every number in a claim must appear in the cited passage; the AI gets one repair round; what still fails is marked, not deleted. The evaluation adds a second AI as a second reader, checking each claim against the full passage, because a quote can be real and still not support the sentence built on it. "Verified" means the quote is real, not that the claim is true, and the label says so.
 
 **Laundered marketing and manipulated inputs.** Decks overstate, and once founders know an AI reads their materials, some will write for it. One test company has an instruction to AI reviewers hidden in its website and a third-party "probability of success" planted in its deck. The design ranks call notes above the deck and the deck above the website, requires a contradictions section, treats input text as data rather than instruction, and reports steering attempts in integrity notes where the partner can see them.
 
-**The tool becomes the decision.** Not through a score but through anchoring: a fluent summary is persuasive, and a partner who reads it first has half-decided. The schema has no field for a verdict, the eval scans every draft for recommendation and probability language, the bear case is mandatory and sits at the same level as the assessment, and the associate's name goes on the document, not the model's.
+**The tool becomes the decision.** Not through a score but through anchoring: a fluent summary is persuasive, and a partner who reads it first has half-decided. The draft's fixed shape has no slot for a verdict, the evaluation scans every draft for recommendation and probability language, the bear case is mandatory and sits at the same level as the assessment, and the associate's name goes on the document, not the AI's.
 
 ## Should v1 show a probability of success? No.
 
