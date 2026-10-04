@@ -59,7 +59,7 @@ function openPalette() {
   const input = $("#palq"), res = $("#palres");
   let items = [], active = 0;
   const render = () => {
-    if (!items.length) { res.innerHTML = `<div class="pal-empty">${input.value.trim() ? "Nothing matches." : "Type to search everything: company names, deck slides, website text, call notes, drafted claims, missing items and inbox messages."}</div>`; return; }
+    if (!items.length) { res.innerHTML = `<div class="pal-empty">${input.value.trim() ? "Nothing matches." : "Type to search everything: company names, deck slides, website text, call notes, drafted claims, missing items and inbox emails."}</div>`; return; }
     let lastType = null, h = "";
     items.forEach((it, i) => {
       if (it.type !== lastType) { h += `<div class="pal-grp">${TYPE_LABEL[it.type] || it.type}</div>`; lastType = it.type; }
@@ -115,7 +115,7 @@ async function pageCompanies() {
   const table = `<table class="list"><thead><tr><th>Company</th><th>Stage</th><th>Sources</th><th>Verified</th><th>Gaps</th><th>Round</th><th>Source</th><th>Reviewer</th></tr></thead><tbody>${rows}</tbody></table>`;
   $("#main").innerHTML = `<div class="page"><div class="inner"><div class="head"><h1>Seed assessments</h1><p class="sub">First-pass drafts for partner review. Every claim cites a passage from the deck, website, bios or call notes; nothing here scores or recommends.</p></div>
   <div class="callouts"><div class="callout"><div class="ico">+</div><div><div class="micro">Start here</div><h3>Add a company</h3><p>Drop a deck (PDF, PPTX, DOCX), paste a website link, or paste text. The fields fill themselves from the deck.</p></div><a class="btn primary" href="#/new">New company <span class="arr">→</span></a></div>
-  <div class="callout ${waiting.length ? "live" : ""}"><div class="ico">✉</div><div><div class="micro">Inbox</div><h3>${waiting.length ? `${waiting.length} message${waiting.length === 1 ? "" : "s"} with decks waiting` : "Nothing waiting"}</h3><p>Decks that arrive by email land here. Import one to create the company with its attachments already read.</p></div><a class="btn" href="#/inbox">Open inbox <span class="arr">→</span></a></div></div>
+  <div class="callout ${waiting.length ? "live" : ""}"><div class="ico">✉</div><div><div class="micro">Inbox</div><h3>${waiting.length ? `${waiting.length} email${waiting.length === 1 ? "" : "s"} with decks waiting` : "Nothing waiting"}</h3><p>Decks that arrive by email land here. Import one to create the company with its attachments already read.</p></div><a class="btn" href="#/inbox">Open inbox <span class="arr">→</span></a></div></div>
   <div class="gridhead"><span class="seclabel">Companies · ${list.length}</span><div class="seg" role="tablist"><button data-view="grid" class="${view === "grid" ? "on" : ""}">Cards</button><button data-view="list" class="${view === "list" ? "on" : ""}">List</button></div></div>
   ${list.length ? (view === "list" ? table : `<div class="cards">${cards}${filler}</div>`) : `<div class="empty">No companies yet.</div>`}</div></div>`;
   $("#main").addEventListener("click", (e) => {
@@ -125,67 +125,97 @@ async function pageCompanies() {
 }
 
 // ---------- new company ----------
-function pageNew(prefillSlug) {
+function pageNew() {
   topbar([{ label: "New company" }]);
   const src = (key, label, hint, allowUrl) => `<div class="src" data-key="${key}"><div class="lab"><b>${label}</b><span>${hint}</span><span class="st" id="st-${key}"></span><label class="pick">Choose file<input type="file" accept=".pdf,.pptx,.docx,.md,.txt" data-into="${key}"></label></div>
-    ${allowUrl ? `<div class="urlrow"><input class="input" placeholder="${key === "website" ? "https://company.com" : "Link to the deck (DocSend links need the file downloaded first)"}" data-url="${key}"><button class="btn sm" data-fetch="${key}">Fetch</button></div>` : ""}
+    ${allowUrl ? `<div class="urlrow"><input class="input" placeholder="https://company.com" data-url="${key}"><button class="btn sm" data-fetch="${key}">Fetch</button></div>` : ""}
     <div class="drop" data-drop="${key}"><textarea class="textarea" name="${key}" placeholder="Paste text, or drop a file here"></textarea></div></div>`;
-  $("#main").innerHTML = `<div class="page"><div class="inner" style="max-width:820px"><div class="head"><h1>New company</h1><p class="sub">Drop the deck first. The company name, one-liner, round, website and founder bios fill from it; correct anything that is wrong and add what the deck does not have.</p></div>
-  <form class="form" id="f"><div class="three"><label class="field">Company<input class="input" name="name" required></label><label class="field">One-liner<input class="input" name="one_liner"></label><label class="field">Round<input class="input" name="ask" placeholder="$2M seed"></label></div>
-  <div class="fill" id="fill" hidden></div>
-  ${src("deck", "Deck", "PDF, PPTX or DOCX; one passage per slide", true)}${src("website", "Website", "fetched as text, hidden elements included", true)}${src("founders", "Founder bios", "from the deck's team slide or pasted", false)}${src("call-notes", "Call notes", "your notes from the first call; PDF, DOCX or text", false)}
-  <div class="foot"><button class="btn primary" type="submit">Create and draft <span class="arr">→</span></button><span class="hint">Drafting takes about two minutes.</span><span class="err" id="err"></span></div></form></div></div>`;
+  $("#main").innerHTML = `<div class="page" id="newpage"><div class="inner" style="max-width:820px"><div class="head"><h1>New company</h1><p class="sub">Start with the deck. The company name, one-liner, round, website and founder bios fill in from it; correct anything that is wrong.</p></div>
+  <form class="form" id="f">
+    <div class="deckzone" id="deckzone" data-drop="deck">
+      <div class="dz-empty" id="dzEmpty"><div class="dz-icon">↓</div><b>Drop the deck here</b><span>PDF, PowerPoint or Word. Or <label class="dz-pick">choose a file<input type="file" accept=".pdf,.pptx,.docx,.md,.txt" data-into="deck"></label>, or paste a link below.</span>
+        <div class="urlrow dz-url"><input class="input" placeholder="Link to the deck: a PDF, a Google Slides link or a Drive link" data-url="deck"><button class="btn sm" data-fetch="deck">Fetch</button></div></div>
+      <div class="dz-busy" id="dzBusy" hidden><div class="spin"></div><b id="dzBusyText">Reading the deck…</b></div>
+      <div class="dz-done" id="dzDone" hidden><div class="dz-file"><span class="k" id="dzKind">PDF</span><div><b id="dzName"></b><span id="dzMeta"></span></div><button class="btn sm quiet" type="button" id="dzReplace">Replace</button></div>
+        <details class="dz-text"><summary>See the text that was read from it</summary><textarea class="textarea" name="deck" placeholder="Deck text"></textarea></details></div>
+      <p class="dz-err" id="dzErr" hidden></p>
+    </div>
+    <div class="fill" id="fill" hidden></div>
+    <div class="three"><label class="field">Company<input class="input" name="name" required></label><label class="field">One-liner<input class="input" name="one_liner"></label><label class="field">Round<input class="input" name="ask" placeholder="$2M seed"></label></div>
+    <div class="seclabel" style="margin-top:6px">Other sources, if you have them</div>
+    ${src("website", "Website", "the company's site, read as text", true)}${src("founders", "Founder bios", "filled from the deck's team slide, or paste your own", false)}${src("call-notes", "Call notes", "your notes from the first call", false)}
+    <div class="foot"><button class="btn primary" type="submit">Create and draft <span class="arr">→</span></button><span class="hint">Drafting takes about two minutes.</span><span class="err" id="err"></span></div>
+  </form></div></div>`;
   const ta = (key) => $(`textarea[name="${key}"]`);
-  const status = (key, text, cls = "") => { const el = $(`#st-${key}`); el.textContent = text; el.className = "st " + cls; };
+  const status = (key, text, cls = "") => { const el = $(`#st-${key}`); if (el) { el.textContent = text; el.className = "st " + cls; } };
   const toB64 = (file) => new Promise((ok, no) => { const r = new FileReader(); r.onload = () => ok(r.result.split(",")[1]); r.onerror = no; r.readAsDataURL(file); });
   const kept = {}; // source key -> {token, kind, pages} for files the server kept
   const describe = (m) => m.pages ? `${m.pages} pages` : m.slides ? `${m.slides} slides` : m.paragraphs ? `${m.paragraphs} paragraphs` : "read";
   const shortUrl = (u) => u.replace(/^https?:\/\//, "").replace(/\/$/, "");
+  // The deck area has three looks: empty (drop here), busy, and done (file card).
+  const deckState = (state, info = {}) => {
+    $("#dzEmpty").hidden = state !== "empty"; $("#dzBusy").hidden = state !== "busy"; $("#dzDone").hidden = state !== "done";
+    $("#deckzone").classList.toggle("has-deck", state === "done");
+    if (state === "busy") $("#dzBusyText").textContent = info.text || "Reading the deck…";
+    if (state === "done") { $("#dzName").textContent = info.name; $("#dzMeta").textContent = info.meta; $("#dzKind").textContent = info.kind; }
+    $("#dzErr").hidden = !info.error; if (info.error) $("#dzErr").textContent = info.error;
+  };
   async function ingestFile(key, file) {
-    status(key, `Reading ${file.name}…`);
+    if (key === "deck") deckState("busy", { text: `Reading ${file.name}…` }); else status(key, `Reading ${file.name}…`);
     try {
       const r = await api("/extract", { method: "POST", body: JSON.stringify({ filename: file.name, data: await toB64(file) }) });
       ta(key).value = r.text; if (r.file) kept[key] = r.file;
-      status(key, `${file.name}: ${describe(r.meta)}`, "ok");
-      if (key === "deck") autofill(r.text);
-    } catch (err) { status(key, err.message, "bad"); }
+      if (key === "deck") { deckState("done", { name: file.name, meta: describe(r.meta), kind: (file.name.split(".").pop() || "").toUpperCase().slice(0, 4) }); autofill(r.text); }
+      else status(key, `${file.name}: ${describe(r.meta)}`, "ok");
+    } catch (err) { if (key === "deck") deckState("empty", { error: err.message }); else status(key, err.message, "bad"); }
   }
   async function ingestUrl(key, url) {
     if (!url.trim()) return;
-    status(key, `Fetching ${shortUrl(url)}…`);
+    if (key === "deck") deckState("busy", { text: `Fetching ${shortUrl(url).slice(0, 60)}…` }); else status(key, `Fetching ${shortUrl(url)}…`);
     try {
       const r = await api("/extract", { method: "POST", body: JSON.stringify({ url }) });
       ta(key).value = r.text; if (r.file) kept[key] = r.file;
-      status(key, `${r.meta.filename || r.meta.title || shortUrl(url)}: ${describe(r.meta)}`, "ok");
-      if (key === "deck") autofill(r.text);
-    } catch (err) { status(key, /fetch failed/i.test(err.message) ? `Could not reach ${shortUrl(url)}. Paste the page text instead.` : err.message, "bad"); }
+      if (key === "deck") { deckState("done", { name: r.meta.filename || r.meta.title || shortUrl(url), meta: describe(r.meta) + " · from a link", kind: (r.meta.method || "LINK").toUpperCase().slice(0, 4) }); autofill(r.text); }
+      else status(key, `${r.meta.filename || r.meta.title || shortUrl(url)}: ${describe(r.meta)}`, "ok");
+    } catch (err) { if (key === "deck") deckState("empty", { error: err.message }); else status(key, err.message, "bad"); }
   }
   async function autofill(deckText) {
-    const box = $("#fill"); box.hidden = false; box.className = "fill"; box.textContent = "Reading the deck to fill the fields…";
+    const box = $("#fill"); box.hidden = false; box.className = "fill"; box.textContent = "Reading the deck to fill in the fields…";
     try {
       const p = await api("/prefill", { method: "POST", body: JSON.stringify({ deck: deckText }) });
       const filled = [];
       const set = (name, val) => { const el = $(`[name="${name}"]`); if (val && !el.value.trim()) { el.value = val; el.classList.add("auto"); filled.push({ name: "company", one_liner: "one-liner", ask: "round" }[name] || name); } };
       set("name", p.company_name); set("one_liner", p.one_liner); set("ask", p.round);
-      if (p.founder_bios && !ta("founders").value.trim()) { ta("founders").value = p.founder_bios; status("founders", "from the deck's team slide", "ok"); filled.push("founder bios"); }
-      if (p.website_url && !ta("website").value.trim()) { $('[data-url="website"]').value = p.website_url; filled.push("website link"); ingestUrl("website", p.website_url); }
+      if (p.founder_bios && !ta("founders").value.trim()) { ta("founders").value = p.founder_bios; status("founders", "filled from the deck's team slide", "ok"); filled.push("founder bios"); }
+      if (p.website_url && !ta("website").value.trim()) { $('[data-url="website"]').value = p.website_url; status("website", "address from the deck; click Fetch if it is the right site", ""); filled.push("website address"); }
       box.className = "fill ok";
-      box.innerHTML = filled.length ? `Filled from the deck: ${filled.join(", ")}. Confidence ${p.confidence}. Check them; the deck's words, not ours.` : `The deck did not state the company fields clearly. Fill them in by hand.`;
-    } catch (err) { box.className = "fill bad"; box.textContent = `Could not read the deck for fields: ${err.message}`; }
+      box.textContent = filled.length ? `Filled in from the deck: ${filled.join(", ")}. Check them; anything green came from the deck.` : "The deck did not state the company details clearly. Fill them in by hand.";
+    } catch (err) { box.className = "fill bad"; box.textContent = `Could not read the company details from the deck: ${err.message}`; }
   }
   const f = $("#f");
   f.addEventListener("change", (e) => { const inp = e.target.closest("input[type=file]"); if (inp?.files[0]) ingestFile(inp.dataset.into, inp.files[0]); });
   f.addEventListener("click", (e) => { const b = e.target.closest("button[data-fetch]"); if (b) { e.preventDefault(); ingestUrl(b.dataset.fetch, $(`[data-url="${b.dataset.fetch}"]`).value); } });
   f.addEventListener("keydown", (e) => { if (e.key === "Enter" && e.target.matches("[data-url]")) { e.preventDefault(); ingestUrl(e.target.dataset.url, e.target.value); } });
   f.addEventListener("input", (e) => { if (e.target.matches("input,textarea")) e.target.classList.remove("auto"); });
-  for (const z of f.querySelectorAll("[data-drop]")) {
-    z.addEventListener("dragover", (e) => { e.preventDefault(); z.classList.add("over"); });
-    z.addEventListener("dragleave", () => z.classList.remove("over"));
-    z.addEventListener("drop", (e) => { e.preventDefault(); z.classList.remove("over"); const file = e.dataTransfer.files[0]; if (file) ingestFile(z.dataset.drop, file); else { const url = e.dataTransfer.getData("text/uri-list") || e.dataTransfer.getData("text"); if (/^https?:/.test(url)) ingestUrl(z.dataset.drop, url); } });
-  }
+  $("#dzReplace").addEventListener("click", () => { ta("deck").value = ""; delete kept.deck; deckState("empty"); });
+  // Drag and drop: onto a source box puts the file there; anywhere else on the
+  // page counts as the deck while there isn't one yet.
+  const page = $("#newpage"); let depth = 0;
+  const fileFrom = (e) => e.dataTransfer?.files?.[0];
+  const urlFrom = (e) => { const u = e.dataTransfer?.getData("text/uri-list") || e.dataTransfer?.getData("text"); return /^https?:/.test(u || "") ? u : null; };
+  page.addEventListener("dragenter", (e) => { e.preventDefault(); depth++; page.classList.add("dragging-file"); });
+  page.addEventListener("dragleave", () => { if (--depth <= 0) { depth = 0; page.classList.remove("dragging-file"); f.querySelectorAll(".over").forEach((x) => x.classList.remove("over")); } });
+  page.addEventListener("dragover", (e) => { e.preventDefault(); const z = e.target.closest("[data-drop]"); f.querySelectorAll(".over").forEach((x) => x !== z && x.classList.remove("over")); (z || $("#deckzone")).classList.add("over"); });
+  page.addEventListener("drop", (e) => {
+    e.preventDefault(); depth = 0; page.classList.remove("dragging-file"); f.querySelectorAll(".over").forEach((x) => x.classList.remove("over"));
+    const z = e.target.closest("[data-drop]"); const key = z ? z.dataset.drop : "deck";
+    const file = fileFrom(e), url = urlFrom(e);
+    if (file) ingestFile(key, file); else if (url) ingestUrl(key, url);
+  });
   f.addEventListener("submit", async (e) => {
     e.preventDefault();
     const fd = new FormData(e.target);
+    if (!String(fd.get("deck") || "").trim() && !["website", "founders", "call-notes"].some((k) => String(fd.get(k) || "").trim())) { $("#err").textContent = "Add the deck, or at least one other source."; return; }
     try {
       const { slug } = await api("/companies", { method: "POST", body: JSON.stringify({ name: fd.get("name"), one_liner: fd.get("one_liner"), ask: fd.get("ask"), intake: { via: "manual" }, files: kept, sources: { deck: fd.get("deck"), website: fd.get("website"), founders: fd.get("founders"), "call-notes": fd.get("call-notes") } }) });
       location.hash = `#/c/${slug}?start=1`;
@@ -198,26 +228,39 @@ async function pageInbox() {
   topbar([{ label: "Inbox" }]);
   const { status, messages } = await api("/inbox");
   const kindIcon = (k) => ({ pdf: "PDF", pptx: "PPT", docx: "DOC", md: "MD", txt: "TXT" }[k] || k.toUpperCase());
-  const stateBadge = (p) => p.state === "connected" ? `<span class="badge green">Connected</span>` : p.state === "pending" ? `<span class="badge amber">Set up · waiting for credentials</span>` : `<span class="badge">Not connected</span>`;
-  const action = (p) => p.id === "folder" ? "" : p.state === "off" ? `<button class="btn sm" data-connect="${p.id}">${p.id === "forward" ? "Set up" : "Connect"}</button>` : `<button class="btn sm quiet" data-disconnect="${p.id}">Remove</button>`;
-  const prov = status.providers.map((p) => `<div class="prov ${p.state !== "off" ? "on" : ""}"><span class="dot"></span><div class="pb"><b>${esc(p.name)}</b>${stateBadge(p)}<span>${esc(p.detail)}</span>${p.id === "forward" && p.config ? `<code class="addr">${esc(p.config.address)}</code>` : ""}</div><div class="pa">${action(p)}</div></div>`).join("");
-  const auto = `<div class="auto"><label><input type="checkbox" id="autoImport" ${status.automation.autoImport ? "checked" : ""}> <b>Import on arrival.</b> Every message with a deck becomes a company, with its attachments read and its fields filled, without anyone clicking.</label><label><input type="checkbox" id="autoDraft" ${status.automation.autoDraft ? "checked" : ""} ${status.automation.autoImport ? "" : "disabled"}> <b>Draft on arrival.</b> Each imported company is drafted straight away, so it is waiting for review by the time an associate opens the app.</label><p class="hint">Rule: messages with a ${status.rule.attachments.join(", ")} attachment or a deck link, from any sender. Everything else is left in the mailbox.</p></div>`;
-  const rows = messages.map((m) => `<div class="msg ${m.imported ? "done" : ""}" data-id="${m.id}"><div class="who"><b>${esc(m.from)}</b><span>${esc(m.date)}</span></div><div class="subj">${esc(m.subject)}</div><div class="body">${esc(m.body.split("\n").filter(Boolean)[0] || "")}</div><div class="att">${m.attachments.map((a) => `<a class="file" href="/inbox/${encodeURIComponent(m.id)}/${encodeURIComponent(a.name)}" target="_blank"><span class="k">${kindIcon(a.kind)}</span>${esc(a.name)}<span class="sz">${(a.bytes / 1024).toFixed(0)} KB</span></a>`).join("")}${m.links.map((l) => `<span class="file"><span class="k">URL</span>${esc(l.replace(/^https?:\/\//, ""))}</span>`).join("")}</div><div class="act">${m.imported ? `<span class="badge green">Imported</span><a class="btn sm" href="#/c/${m.imported.slug}">Open</a>` : `<button class="btn primary sm" data-import="${m.id}">Import as company <span class="arr">→</span></button>`}</div></div>`).join("");
-  $("#main").innerHTML = `<div class="page"><div class="inner" style="max-width:960px"><div class="head"><h1>Inbox</h1><p class="sub">${esc(status.goal)}</p></div>
-  <div class="seclabel" style="margin-bottom:10px">Connections</div><div class="provs">${prov}</div>
-  <div class="seclabel" style="margin:26px 0 10px">Automation</div>${auto}
-  <div class="gridhead" style="margin-top:28px"><span class="seclabel">Messages · ${messages.length}</span><span class="hint">In this prototype, the drop folder stands in for a mailbox: a folder with a message file and its attachments is one email.</span></div>
-  <div class="msgs">${rows || `<div class="empty">Nothing waiting.</div>`}</div></div></div>`;
-  const save = async (patch) => { await api("/inbox/settings", { method: "PUT", body: JSON.stringify(patch) }); inboxCount = null; pageInbox(); };
-  $("#autoImport").addEventListener("change", (e) => save({ autoImport: e.target.checked, ...(e.target.checked ? {} : { autoDraft: false }) }));
-  $("#autoDraft").addEventListener("change", (e) => save({ autoDraft: e.target.checked }));
+  const live = status.providers.filter((p) => p.state !== "off");
+  const strip = `<div class="instrip"><span>${live.map((p) => `<span class="dot ${p.state === "connected" ? "on" : "wait"}"></span>${esc(p.id === "folder" ? "Sample emails" : p.name)}${p.state === "pending" ? " (waiting for credentials)" : ""}`).join('<span class="sep">·</span>')}</span><span class="sep">·</span><span>${status.automation.autoImport ? (status.automation.autoDraft ? "New emails are imported and drafted on arrival" : "New emails are imported on arrival") : "New emails wait here for you to import"}</span><a class="btn sm" href="#/settings">Inbox settings</a></div>`;
+  const waiting = messages.filter((m) => !m.imported).length;
+  const rows = messages.map((m) => `<div class="msg ${m.imported ? "done" : ""}" data-id="${m.id}"><div class="who"><b>${esc(m.from)}</b><span>${esc(m.date)}</span></div><div class="subj">${esc(m.subject)}</div><div class="body">${esc(m.body.split("\n").map((l) => l.trim()).filter((l) => l && !/^(hi|hello|hey|dear)\b[^.!?]{0,30}[,!]?$/i.test(l))[0] || "")}</div><div class="att">${m.attachments.map((a) => `<a class="file" href="/inbox/${encodeURIComponent(m.id)}/${encodeURIComponent(a.name)}" target="_blank"><span class="k">${kindIcon(a.kind)}</span>${esc(a.name)}<span class="sz">${(a.bytes / 1024).toFixed(0)} KB</span></a>`).join("")}${m.links.map((l) => `<span class="file"><span class="k">URL</span>${esc(l.replace(/^https?:\/\//, ""))}</span>`).join("")}</div><div class="act">${m.imported ? `<span class="badge green">Imported</span><a class="btn sm" href="#/c/${m.imported.slug}">Open</a>` : `<button class="btn primary sm" data-import="${m.id}">Import as company <span class="arr">→</span></button>`}</div></div>`).join("");
+  $("#main").innerHTML = `<div class="page"><div class="inner" style="max-width:960px"><div class="head"><h1>Inbox</h1><p class="sub">Emails with a deck attached, ready to turn into a company. ${waiting ? `${waiting} waiting.` : "Nothing waiting."}</p></div>
+  ${strip}
+  <div class="msgs">${rows || `<div class="empty">No emails with decks yet.</div>`}</div></div></div>`;
   $("#main").addEventListener("click", async (e) => {
-    const c = e.target.closest("button[data-connect]"); if (c) { connectFlow(c.dataset.connect, save); return; }
-    const d = e.target.closest("button[data-disconnect]"); if (d) { if (confirm("Remove this connection?")) save({ disconnect: d.dataset.disconnect }); return; }
     const b = e.target.closest("button[data-import]"); if (!b) return;
     b.disabled = true; b.textContent = "Reading attachments…";
     try { const r = await api(`/inbox/${encodeURIComponent(b.dataset.import)}/import`, { method: "POST" }); inboxCount = null; location.hash = `#/c/${r.slug}`; }
     catch (err) { b.disabled = false; b.textContent = "Import failed: " + err.message; }
+  });
+}
+
+async function pageSettings() {
+  topbar([{ href: "#/inbox", label: "Inbox" }, { label: "Settings" }]);
+  const { status } = await api("/inbox");
+  const stateBadge = (p) => p.state === "connected" ? `<span class="badge green">Connected</span>` : p.state === "pending" ? `<span class="badge amber">Set up, waiting for credentials</span>` : `<span class="badge">Not connected</span>`;
+  const action = (p) => p.id === "folder" ? "" : p.state === "off" ? `<button class="btn sm" data-connect="${p.id}">${p.id === "forward" ? "Set up" : "Connect"}</button>` : `<button class="btn sm quiet" data-disconnect="${p.id}">Remove</button>`;
+  const prov = status.providers.map((p) => `<div class="prov ${p.state !== "off" ? "on" : ""}"><span class="dot"></span><div class="pb"><b>${esc(p.name)}</b>${stateBadge(p)}<span>${esc(p.detail)}</span>${p.id === "forward" && p.config ? `<code class="addr">${esc(p.config.address)}</code>` : ""}</div><div class="pa">${action(p)}</div></div>`).join("");
+  const auto = `<div class="auto"><label><input type="checkbox" id="autoImport" ${status.automation.autoImport ? "checked" : ""}> <b>Import on arrival.</b> Every email with a deck becomes a company, with its attachments read and its details filled in, without anyone clicking.</label><label><input type="checkbox" id="autoDraft" ${status.automation.autoDraft ? "checked" : ""} ${status.automation.autoImport ? "" : "disabled"}> <b>Draft on arrival.</b> Each imported company is drafted straight away, so it is waiting for review by the time someone opens the app.</label><p class="hint">Picked up: emails with a ${status.rule.attachments.join(", ")} attachment or a link to a deck. Everything else stays in the mailbox.</p></div>`;
+  $("#main").innerHTML = `<div class="page"><div class="inner" style="max-width:860px"><div class="head"><h1>Inbox settings</h1><p class="sub">${esc(status.goal)}</p></div>
+  <div class="seclabel" style="margin-bottom:10px">Where emails come from</div><div class="provs">${prov}</div>
+  <p class="hint" style="margin:10px 0 0">Mailbox connections are set up with each fund, because Google and Microsoft require the fund's own credentials and every fund routes deal flow a little differently.</p>
+  <div class="seclabel" style="margin:28px 0 10px">What happens when an email arrives</div>${auto}
+  <div class="actions"><a class="btn" href="#/inbox">Back to the inbox</a></div></div></div>`;
+  const save = async (patch) => { await api("/inbox/settings", { method: "PUT", body: JSON.stringify(patch) }); inboxCount = null; pageSettings(); };
+  $("#autoImport").addEventListener("change", (e) => save({ autoImport: e.target.checked, ...(e.target.checked ? {} : { autoDraft: false }) }));
+  $("#autoDraft").addEventListener("change", (e) => save({ autoDraft: e.target.checked }));
+  $("#main").addEventListener("click", (e) => {
+    const c = e.target.closest("button[data-connect]"); if (c) { connectFlow(c.dataset.connect, save); return; }
+    const d = e.target.closest("button[data-disconnect]"); if (d && confirm("Remove this connection?")) save({ disconnect: d.dataset.disconnect });
   });
 }
 
@@ -231,9 +274,9 @@ function connectFlow(provider, save) {
   const name = isGmail ? "Gmail / Google Workspace" : isMs ? "Microsoft 365 / Outlook" : "Forwarding address";
   const steps = isGmail || isMs
     ? [
-      { t: "What gets connected", b: `A read-only connection to one mailbox, limited to the label or folder you choose. The app reads messages in that label, pulls deck attachments and links, and never sends, moves or deletes mail.` },
+      { t: "What gets connected", b: `A read-only connection to one mailbox, limited to the label or folder you choose. The app reads emails in that label, pulls out deck attachments and links, and never sends, moves or deletes anything.` },
       { t: "Which mailbox and label", form: true },
-      { t: "What happens next", b: `${isGmail ? "Google" : "Microsoft"} requires the fund's own ${isGmail ? "OAuth client" : "app registration"} for a connection like this, and that is created by the fund's IT or by us on their behalf during setup. Save these settings now; the moment the credentials are in place, the connection goes live and messages start arriving here on their own.` },
+      { t: "What happens next", b: `${isGmail ? "Google" : "Microsoft"} requires the fund's own ${isGmail ? "OAuth client" : "app registration"} for a connection like this, and that is created by the fund's IT or by us on their behalf during setup. Save these settings now; the moment the credentials are in place, the connection goes live and emails start arriving here on their own.` },
     ]
     : [
       { t: "How it works", b: `We give you an address. Add it as a forwarding rule in your mail client, or hand it to the people who receive decks, and anything sent to it lands in this inbox with its attachments. No access to your mailbox is needed.` },
@@ -242,7 +285,7 @@ function connectFlow(provider, save) {
   let i = 0; const data = { account: "", watch: isGmail ? "Deal flow" : "Deal flow" };
   const render = () => {
     const st = steps[i];
-    el.innerHTML = `<div class="pal connect"><div class="ch"><b>Connect ${esc(name)}</b><span>Step ${i + 1} of ${steps.length}</span><button class="x" id="cx">×</button></div><div class="cb"><h3>${esc(st.t)}</h3>${st.b ? `<p>${esc(st.b)}</p>` : ""}${st.form ? `<label class="field">Mailbox<input class="input" id="acct" placeholder="deals@yourfund.com" value="${esc(data.account)}"></label><label class="field" style="margin-top:12px">${isGmail ? "Gmail label to watch" : "Outlook folder to watch"}<input class="input" id="watch" value="${esc(data.watch)}"></label><p class="hint" style="margin-top:10px">Only messages in this ${isGmail ? "label" : "folder"} are read. A filter in ${isGmail ? "Gmail" : "Outlook"} can route deck emails into it automatically.</p>` : ""}${st.forward ? `<p>Generate the address, then add it as a forwarding rule or share it with founders and introducers.</p>` : ""}</div><div class="cf">${i > 0 ? `<button class="btn" id="back">Back</button>` : ""}<span style="flex:1"></span>${i < steps.length - 1 ? `<button class="btn primary" id="next">Continue</button>` : `<button class="btn primary" id="done">${st.forward ? "Generate address" : "Save connection"}</button>`}</div></div>`;
+    el.innerHTML = `<div class="pal connect"><div class="ch"><b>Connect ${esc(name)}</b><span>Step ${i + 1} of ${steps.length}</span><button class="x" id="cx">×</button></div><div class="cb"><h3>${esc(st.t)}</h3>${st.b ? `<p>${esc(st.b)}</p>` : ""}${st.form ? `<label class="field">Mailbox<input class="input" id="acct" placeholder="deals@yourfund.com" value="${esc(data.account)}"></label><label class="field" style="margin-top:12px">${isGmail ? "Gmail label to watch" : "Outlook folder to watch"}<input class="input" id="watch" value="${esc(data.watch)}"></label><p class="hint" style="margin-top:10px">Only emails in this ${isGmail ? "label" : "folder"} are read. A filter in ${isGmail ? "Gmail" : "Outlook"} can route deck emails into it automatically.</p>` : ""}${st.forward ? `<p>Generate the address, then add it as a forwarding rule or share it with founders and introducers.</p>` : ""}</div><div class="cf">${i > 0 ? `<button class="btn" id="back">Back</button>` : ""}<span style="flex:1"></span>${i < steps.length - 1 ? `<button class="btn primary" id="next">Continue</button>` : `<button class="btn primary" id="done">${st.forward ? "Generate address" : "Save connection"}</button>`}</div></div>`;
     el.querySelector("#cx").onclick = () => el.remove();
     el.querySelector("#back")?.addEventListener("click", () => { i--; render(); });
     el.querySelector("#next")?.addEventListener("click", () => { if (st.form) { data.account = el.querySelector("#acct").value.trim(); data.watch = el.querySelector("#watch").value.trim(); if (!data.account) { el.querySelector("#acct").focus(); return; } } i++; render(); });
@@ -664,6 +707,7 @@ async function route() {
     if (!p.length) return await pageCompanies();
     if (p[0] === "new") return pageNew();
     if (p[0] === "inbox") return await pageInbox();
+    if (p[0] === "settings") return await pageSettings();
     if (p[0] === "c" && p[1]) {
       const slug = p[1], stage = p[2] || "";
       if (stage === "sources") return await pageSources(slug, q.get("p"));

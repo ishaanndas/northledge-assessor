@@ -13,6 +13,7 @@ A tool that drafts the one-page company assessment a seed fund's associate write
 | 2. Working prototype with 3 to 4 example inputs and outputs | The app and the command line below. Five example companies in `examples/`, outputs in `out/`. The dashboard lists them under "Test cases from the assignment". |
 | 3. Evaluation, honest report, year-later plan | `eval.mjs` and `selftest.mjs`; findings and the plan in `docs/EVALUATION.md`; raw run in `out/eval-report.md`. |
 | 4. README | This file. |
+| Next steps and open questions | `docs/NEXT-STEPS.md`, also at `/docs/next-steps`. |
 
 ## Run it
 
@@ -76,7 +77,17 @@ Reading PDFs and slides as images; a database (folders instead); the second mode
 
 ## What comes next
 
-Mailbox connectors for the first client, so decks never need uploading. The second model's verdict shown beside every claim. Page-level citations for decks. An outcome log from day one so the year-later evaluation has data. Then the comparison view described in the brief, and only once it has been checked against human judgement.
+This is a working prototype, not a finished product. Getting it ready for real deal flow means, in order of importance:
+
+1. **Testing it against real assessments with a fund.** Run it on 50 to 100 companies the fund has already assessed by hand, have partners and associates grade the drafts against their own write-ups, agree what good enough means, and adjust until it gets there. Quality only reaches a fund's standard through real examples and feedback.
+2. **A seasoned engineer reviewing and cleaning up the code** for production: tests, a proper database, monitoring.
+3. **Sign-in and permissions**, using the fund's Google or Microsoft accounts.
+4. **Security and privacy**: an agreement with the AI provider on data use, encryption, backups, deletion on request.
+5. **Connecting the fund's inbox**, set up with their IT.
+6. **Fitting it to the fund**: their sections, their checklist, their house style.
+7. **Recording outcomes from day one**, then a gradual rollout.
+
+The full list, with the open questions to settle with a fund, is in `docs/NEXT-STEPS.md` (also at `/docs/next-steps`).
 
 ## How AI tools were used
 

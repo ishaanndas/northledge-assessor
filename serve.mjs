@@ -257,6 +257,7 @@ const DOCS = [
   { id: "brief", file: "BRIEF.md", title: "Product brief", blurb: "Two pages: who it is for, what v1 does and does not do, how success is measured, the three biggest risks, and why there is no probability score." },
   { id: "how-it-works", file: "docs/TECHNICAL.md", title: "How it works", blurb: "The pipeline, the verifier, the editor, the app, and what a production version would change." },
   { id: "evaluation", file: "docs/EVALUATION.md", title: "Evaluation", blurb: "What the automated checks are, what they found on the committed run, what they cannot see, and how to evaluate after a year of real decisions." },
+  { id: "next-steps", file: "docs/NEXT-STEPS.md", title: "Next steps", blurb: "What it would take to make this ready for real use: testing against real assessments with a fund, an engineering review, sign-in, security, the inbox connection, and the open questions." },
   { id: "prd", file: "docs/PRD.md", title: "Product requirements", blurb: "The longer version of the brief: requirements, metrics, risks, rollout, roadmap." },
   { id: "eval-report", file: "out/eval-report.md", title: "Eval run", blurb: "The raw output of the last evaluation run: every flagged statement with the judge's reason." },
   { id: "test-decks", file: "samples/README.md", title: "Test decks", blurb: "The sample decks for testing intake, and everything planted in the trap deck." },

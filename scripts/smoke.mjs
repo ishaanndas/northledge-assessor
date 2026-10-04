@@ -82,7 +82,7 @@ try {
   ok("GET /api/inbox", inbox.status === 200 && Array.isArray(inbox.body?.messages), `${inbox.body?.messages?.length ?? 0} messages`);
   const ev = await getJson("/eval.json");
   ok("GET /eval.json", ev.status === 200 && Array.isArray(ev.body));
-  for (const d of ["", "/readme", "/brief", "/how-it-works", "/evaluation", "/prd", "/eval-report", "/test-decks"]) {
+  for (const d of ["", "/readme", "/brief", "/how-it-works", "/evaluation", "/next-steps", "/prd", "/eval-report", "/test-decks"]) {
     const r = await fetch(base + "/docs" + d); ok(`GET /docs${d}`, r.status === 200);
   }
   for (const c of list) {
@@ -93,7 +93,7 @@ try {
 
   const drafted = list.find((c) => c.origin === "example" && c.status !== "sources") || list.find((c) => c.status !== "sources");
   const notDrafted = list.find((c) => c.status === "sources");
-  const pages = [["home", "#/", "Companies"], ["new company", "#/new", "New company"], ["inbox", "#/inbox", "Connections"], ["docs", "", "Documents", "/docs"]];
+  const pages = [["home", "#/", "Companies"], ["new company", "#/new", "New company"], ["inbox", "#/inbox", "Inbox settings"], ["inbox settings", "#/settings", "Where emails come from"], ["docs", "", "Documents", "/docs"]];
   if (drafted) pages.push(["assessment (edit)", `#/c/${drafted.slug}`, "Note to partners"], ["assessment (preview)", `#/c/${drafted.slug}?mode=partner`, "Summary"], ["sources", `#/c/${drafted.slug}/sources`, "What the model reads"], ["follow-up", `#/c/${drafted.slug}/followup`, "Email founder"]);
   if (notDrafted) pages.push(["assessment (not drafted)", `#/c/${notDrafted.slug}`, "What the draft will be built from"]);
   for (const [name, hash, expect, pathname = "/"] of pages) {

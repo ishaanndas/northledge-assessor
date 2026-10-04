@@ -79,6 +79,8 @@ The app is hosted at https://northledge-assessor-production.up.railway.app. Comp
 
 ## What a real version would add
 
+The full plan, in order, with the questions to settle with a fund, is in the Next steps document. In short:
+
 - **The first mailbox connector**, built for the first client's mail provider and routing, so the inbox is fed without anyone touching it. Then slide numbers that read as `deck p.4`, better website capture, and call recordings turned into notes.
 - **A database** in place of folders, holding companies, sources, drafts, edits and the partners' decisions.
 - **The second reader on every draft**, with its verdict shown next to each sentence alongside the quote check.
