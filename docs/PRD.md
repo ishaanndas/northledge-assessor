@@ -176,14 +176,7 @@ Instrumentation and targets for the first 60 days (about 300 companies). Expande
 
 **Request.** Partners asked for a single probability of success on every company.
 
-**Options considered.**
-
-1. A model-generated probability. Rejected: no calibration data exists and none will for years; the number has no citation; it anchors the meeting and converts the evidence into supporting material for a figure.
-2. A rubric score (sum of dimension ratings). Rejected: the same anchoring, and the weights would be the tool's opinion dressed as arithmetic.
-3. Evidence-coverage indicators per dimension (how much is sourced, how much is missing, how many contradictions). Adopted: traceable, descriptive, and tells the partner how much to trust the picture rather than what to conclude.
-4. Outcome-informed comparison ("resembles these past companies"), shown after the partner records their own view. Deferred to v3, conditional on a year of logged decisions and a validated similarity method.
-
-**Decision.** Option 3 for v1. Revisit option 4 after twelve months of logged decisions. Options 1 and 2 are not planned.
+**Decision.** Not in v1. The tool drafts the assessment; it does not evaluate the investment, so it does not score it. Deciding stays with the partners. A score would also be the only claim on the page with no source behind it. Instead, each section shows how much is backed by a source, what is missing and where the sources disagree.
 
 ## 14. Open questions
 
@@ -196,4 +189,4 @@ Instrumentation and targets for the first 60 days (about 300 companies). Expande
 
 - **v1.1.** The first client's mailbox connector, so the inbox fills itself. Fund-specific missing-list checklist. An edit log behind the editor.
 - **v2.** Ingestion: PDF decks with page-level passage labels, website capture, call recording transcripts. Second reader in the drafting process as a second, labelled status. Hosted reader with access control. Run history and the audit dashboard for the operations lead.
-- **v3.** Outcome log joined to drafts. The comparison view from the decision record, evaluated against human-rated similarity before release.
+- **v3.** Outcome log joined to drafts, so the fund can see which kinds of sentences turned out wrong.

@@ -67,8 +67,6 @@ With that saved, we would ask:
 - **Did associates keep the drafts?** The share of sentences they leave in place should rise over time and should not depend on which associate it was.
 - **Did the missing list speed things up?** Time from first call to decision, and how many rounds of questions went to founders, before and after.
 
-One thing we would not do is use a year of outcomes to produce a probability of success. Twenty investments and a handful of results is not enough to learn from, and a number on the page would quietly become the decision.
-
 ## Running the checks
 
 ```bash

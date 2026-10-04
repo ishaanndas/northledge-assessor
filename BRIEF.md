@@ -47,12 +47,8 @@ Sixty days is about 300 companies: enough to measure the process, nowhere near e
 
 **The tool becomes the decision.** Not through a score but through anchoring: a fluent summary is persuasive, and a partner who reads it first has half-decided. The draft's fixed shape has no slot for a verdict, the evaluation scans every draft for recommendation and probability language, the bear case is mandatory and sits at the same level as the assessment, and the associate's name goes on the document, not the AI's.
 
-## Should v1 show a probability of success? No.
+## Probability of success score
 
-A probability needs calibration, and calibration needs outcomes. This fund will know whether its 2026 decisions were right somewhere between 2031 and 2036. Until then any number on the page is the model's impression formatted as precision, and the partners are better calibrated than the model on the thing it would be guessing at.
+Not in v1. The tool drafts the assessment; it does not evaluate the investment, so it does not score it. Deciding is the partners' job. A score would also be the only line on the page with no source behind it.
 
-It also breaks the two principles the partners put first. A score has no citation; it is the one claim on the page that cannot be traced. And a score is a decision. Once it is on the page the evidence becomes supporting material for a number, the bear case becomes a footnote, and the meeting becomes an argument about the number rather than the company.
-
-What v1 shows instead is traceable: how much of each dimension is sourced versus missing, how often the sources disagree, and the bear case at full weight. Those tell a partner how much to trust the picture, which is the useful part of what a probability would have said.
-
-The thing to revisit after a year of logged decisions is not a probability but a comparison: "the evidence profile resembles these three companies we passed on and this one we backed," with the cases linked, shown after the partner records their own view so it informs rather than anchors. That needs a real evaluation behind it and belongs in v3, not v1.
+What helps a partner judge the draft is already on the page: what is backed by a source, what is missing, and where the sources disagree. The output has no place for a score, and the evaluation checks that the tool never slips into that kind of language.
