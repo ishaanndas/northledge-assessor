@@ -1,259 +1,80 @@
-# Technical writeup
+# How it works
 
-How the prototype is built, why it is built that way, what it measured, and what a production version would change. Read `README.md` first for how to run it; this document assumes you have.
+A plain walkthrough of what the prototype does, in the order it does it. The code is small: about 2,000 lines of JavaScript, two dependencies (the Anthropic SDK and a PDF text reader), no build step.
 
-## 1. System overview
+## 1. The idea in one paragraph
 
-```
-examples/<slug>/
-  company.json              name, one-liner, round, design note
-  expectations.json         known-answer checks for the eval
-  sources/01-deck.md ...    the inputs, as text
+An associate gives the tool what they have on a company: the deck, the website, founder bios, their call notes. The tool splits those into numbered passages, asks Claude to write a structured assessment where every sentence points at a passage and quotes it, then checks every quote mechanically against the source. Anything that fails gets one chance to be fixed. What is left is shown to the associate as an editable document with the source one click away. The tool never recommends and never scores.
 
-        │ lib/sources.mjs          split into passages: deck:1 ... call-notes:9
-        ▼
-assess.mjs ──► Claude Opus 5 (structured output, effort high, streaming)
-        │  lib/prompts.mjs system prompt · lib/schema.mjs JSON schema
-        ▼
-lib/verify.mjs               deterministic: passage exists · quote verbatim · ≤30 words · numbers present
-        │  hard failures? ──► one repair turn with the failures listed ──► re-verify
-        ▼
-out/<slug>/assessment.json   record: company, model, usage, passages, assessment (annotated), verification results
-out/<slug>/assessment.md     the document an associate would edit
+## 2. Getting a company in
 
-eval.mjs ──► re-verify from the record · Claude Sonnet 5 judge · leakage scan · expectations ──► out/eval.json, out/eval-report.md
-report.mjs ──► out/index.html   static reader with embedded data and click-through provenance
-selftest.mjs                    plants four defects in a real record, confirms the verifier catches them
-serve.mjs + app/                the app: JSON API over the same pipeline, five screens, port 4950
-```
+Three ways, all ending in the same place: a folder of text files, one per source.
 
-About 1,700 lines of JavaScript. Two dependencies: the Anthropic SDK and pdf-parse (PPTX and DOCX are read with a 40-line zip reader of our own). Node 20 or later, ES modules, no build step.
+- **Files.** Drop a deck (PDF, PowerPoint or Word), or choose it, or paste a link to the file. The text is pulled out so that one passage equals one slide or page. The original file is kept, which is what lets the app show the real slide later.
+- **Links.** A website address is fetched and reduced to text. Hidden elements are kept and labelled, because that is where instructions aimed at machines tend to hide.
+- **Inbox.** Decks that arrive by email show up in an inbox. Importing a message creates the company with its attachments already read. In this prototype the inbox is a folder on disk shaped like a mailbox, with sample messages in it; connecting Gmail or Microsoft 365 is a matter of credentials and is shown as not connected until then.
 
-## 2. Repository layout
+Once a deck is read, the company name, one-liner, round, website and founder bios are filled in from it. The associate corrects anything wrong.
 
-| Path | Role |
+## 3. Drafting
+
+Each source is split at paragraph breaks into passages with ids like `deck:3` or `call-notes:7`. Slide titles travel with their slide. The model only ever sees text with these ids attached and is told it may cite nothing else.
+
+Claude Opus 5 then returns a fixed shape: a summary, six to eight assessment dimensions, where the sources disagree, what is missing, the case against, and integrity notes (anything in the inputs that tried to steer the reader). The shape is enforced by the API, and it has no field for a score or a verdict, so one cannot appear even by accident.
+
+Every claim carries a passage id and a verbatim quote of at most 30 words. Each claim also says whether it is stated in the source, derived from numbers in the source, or an argument about something the source does not contain.
+
+## 4. Checking the citations
+
+A verifier with no model in it reads every citation and asks four things: does the passage exist, does the quote appear in it word for word (after ignoring capitalisation, curly quotes and line breaks), is the quote under 30 words, and does every number in the claim appear somewhere in the cited passages.
+
+If anything hard fails, the model is shown the exact failures and asked once to fix the quote, cite the right passage, or drop the claim. There is no second round. Whatever still fails is kept in the draft and marked as unverified, so the associate sees what the model wanted to say and could not source.
+
+"Verified" therefore means one thing: the quote is real. Whether the sentence built on it is fair is a different question, which is what the evaluation's second model is for.
+
+## 5. The document
+
+The assessment is one document in one place, and its state is derived rather than set: not drafted, drafting, draft, or reviewed the moment the associate changes anything.
+
+The editor works the way a Notion page does. Click anywhere and type. Enter makes a new block, "/" offers a heading, bullet, quote or divider, blocks drag by their handle. Claims can be edited or removed, but their citations stay attached, so a claim can be reworded without losing where it came from. Clicking a claim or a citation opens the actual deck page in a panel beside the document, with the quoted words highlighted. The panel resizes.
+
+The model's draft is never overwritten. Edits, removals, moves and added blocks are stored separately and applied on top, so the original can always be compared with what the associate changed.
+
+A switch flips between Edit and Preview; Preview is what the partners receive. Export gives Word, PDF, Markdown or copy to clipboard, all with the review applied. A follow-up email to the founder is composed from the missing list and open questions.
+
+Search (Cmd+K) covers company names, deck slides, website text, call notes, drafted claims, missing items and inbox messages, and opens the exact claim or passage.
+
+## 6. Evaluation
+
+A separate program re-checks every citation from scratch, asks a second model (Claude Sonnet 5) whether each claim is actually supported by its cited passages, scans the draft for recommendation or score language, and runs a short list of expectations written for each example before it was drafted (this contradiction must appear, this hidden instruction must be flagged, this inflated figure must not be asserted). A self-test plants four defects in a real draft and confirms the verifier catches them. Results and what they mean are in the Evaluation document.
+
+## 7. What it costs and how long it takes
+
+| Step | Per company |
 |---|---|
-| `assess.mjs` | CLI over the pipeline. One company per iteration; prints progress. |
-| `eval.mjs` | Evaluation. Reads records, never the pipeline's in-memory state. |
-| `report.mjs` | Builds the reader. Pure function of `out/`. |
-| `selftest.mjs` | Mutation test for the verifier. |
-| `serve.mjs` | App server: JSON API, server-sent drafting progress, review storage, static files. |
-| `app/` | The client: `app.html`, `app.css`, `app.js`, and `doc.js` (the document renderer, also inlined into the static report). |
-| `lib/pipeline.mjs` | `draftCompany(slug, onProgress)`: the pipeline as a function, used by the CLI and the server. |
-| `lib/extract.mjs` | Files and URLs to source text: PDF (pdf-parse, one passage per page), PPTX and DOCX (zip + XML), Markdown, text; URLs fetched and stripped with hidden elements kept and marked; links to files parsed as files. |
-| `lib/zip.mjs` | Minimal zip reader (stored and deflate) for Office files. |
-| `lib/prefill.mjs` | Reads a deck and proposes company name, one-liner, round, website and founder bios. Sonnet 5, structured output, copies rather than interprets. |
-| `lib/inbox.mjs` | The inbox: a watched drop folder shaped like a mailbox (`inbox/<id>/message.json` plus attachments); import creates a company from a message. Connector status for Gmail and Microsoft 365. |
-| `samples/`, `inbox/` | `build_decks.py` generates four test decks as PPTX (python-pptx) and PDF (headless Chrome) from one content table: three ordinary, one trap (Lumina Health). Plus the earlier Northwind, Kestrel and Parcelbee mocks and a DOCX of call notes. Each deck is also a sample inbox message. `samples/README.md` lists what is planted. |
-| `lib/env.mjs` | `.env` loader, project root, model ids (`DRAFTER_MODEL`, `JUDGE_MODEL` env overrides). |
-| `lib/sources.mjs` | Example loading, passage splitting, rendering for the model. |
-| `lib/schema.mjs` | The assessment JSON schema. |
-| `lib/prompts.mjs` | Drafter system prompt, repair message, judge prompt and schema. |
-| `lib/verify.mjs` | Normalization, number extraction, verification, annotation, failure formatting. |
-| `lib/markdown.mjs` | Record to markdown. |
-| `examples/` | Four companies, each with sources and expectations. |
-| `out/` | Committed outputs of the 3 October 2026 run. |
-| `BRIEF.md`, `docs/` | Product brief, PRD, this document, evaluation. |
+| Drafting | about 2 to 3 minutes, roughly $0.30 to $0.50 |
+| Repair round, when needed | about 1 minute more |
+| Evaluation judge | about 1 minute, under $0.10 |
+| Filling the intake form from a deck | about 4 seconds, a few cents |
 
-## 3. Data model
+At 150 companies a month the model spend is under $100.
 
-**Source.** A markdown file. The filename's numeric prefix orders it; the remainder is the citation key (`01-deck.md` becomes `deck`). The first `# ` heading is the source title, which is shown to the model in the source header and counted as evidence for the number check (dates and durations tend to live there).
+## 8. Hosting
 
-**Passage.** A blank-line separated block within a source, after dropping the title line. A heading-only block (`## Slide 3: Traction`) is folded into the block that follows it. Passages are numbered from 1 within each source; the id is `key:n`. Paragraph granularity was chosen over sentence granularity because a sentence-level id makes the model's citing job fussier without making the verification stronger: the verbatim quote already pins the span inside the passage.
+The app runs on Railway at https://northledge-assessor-production.up.railway.app. Companies created there persist on a mounted disk. Reviews of the five built-in examples reset when the app is redeployed, which is fine for a demo. The documents you are reading are served by the same app under `/docs`.
 
-**Rendered input.** What the model reads:
+## 9. What a production version would change
 
-```
-=== SOURCE "deck" (Mesa Pay — Seed Deck (August 2026)) ===
-[deck:1] Slide 1: Small exporters are locked out of modern payments There are 1.2 million ...
+- **Ingestion.** Page-level ids for PDF decks (`deck p.4` reads better than `deck:4`), better website capture, call recordings transcribed into notes. The least glamorous and largest piece of work.
+- **Storage.** A proper database instead of folders: companies, sources, passages, drafts, claims, citations, the associate's edits, and the partners' decision.
+- **The second model in the pipeline.** Today it runs only in the evaluation. In production each claim would carry a second, clearly labelled status: quote verified, support partial.
+- **Access.** Sign-in, and partner pages that can be sent as links.
+- **An outcome log from day one.** Every draft joined to the partners' decision and, later, to what happened to the company. The year-later evaluation depends on this existing.
 
-[deck:2] Slide 2: Product A multi-currency receiving account ...
-```
+## 10. Known limits
 
-**Assessment.** The object in `lib/schema.mjs`. The shape is described in the PRD section 8. Two design points worth noting in the schema itself: `additionalProperties: false` everywhere so the model cannot add a `score` field even if it wanted to, and the `basis` enum (`stated`, `derived`, `absence`) so the reader can tell a quotation from an inference from an argument about a gap.
-
-**Record** (`out/<slug>/assessment.json`). Everything the eval and the reader need without re-reading the examples: company metadata, timestamp, model, repair count, first-pass and final verification summaries, the first-pass failures, the source list, every passage keyed by id, the annotated assessment, and the per-statement verification results. The eval deliberately reads only this file so it can be run on records produced elsewhere.
-
-**Verification result.** Per statement: id (`d2.c1` for dimension 2 claim 1, `x3` for contradiction 3, `b0` for bear point 0), location, text, basis, per-citation status, overall status (`verified`, `warning`, `failed`) and an issues list with codes.
-
-## 4. The drafting call
-
-```js
-client.messages.stream({
-  model: "claude-opus-5",
-  max_tokens: 32000,
-  system: DRAFTER_SYSTEM,
-  messages,
-  output_config: { effort: "high", format: { type: "json_schema", schema: ASSESSMENT_SCHEMA } },
-});
-const msg = await stream.finalMessage();
-```
-
-Choices and reasons:
-
-- **Opus 5** as the drafter. The task is judgment-heavy (what is the real objection, what is the primary source) and runs 150 times a month, so the cost difference against a smaller model is a rounding error next to associate time. The drafter and the judge are deliberately different models (section 7).
-- **Structured output** with a raw JSON schema rather than a tool call or free text with a parser. The schema is the contract between the model, the verifier, the eval and the reader, and the API guarantees conformance. No Zod dependency; the schema object is plain JSON.
-- **Effort high, thinking left at the model's default (adaptive).** The task benefits from reasoning about source conflicts. Thinking display is omitted; the reasoning is not shown and not stored.
-- **Streaming** with `finalMessage()` because the output is long (8k to 14k tokens) and a non-streaming request risks the HTTP timeout. Nothing is rendered incrementally.
-- **No tools, no web access.** The evidence universe is closed by construction. This is a product principle (PRD P1) implemented as the absence of a feature.
-- **Stop reasons are checked.** `refusal` and `max_tokens` both throw rather than silently producing a partial draft.
-
-## 5. Verification
-
-`lib/verify.mjs` is pure string processing. The important functions:
-
-**`normalize(s)`**: lowercase; curly quotes to straight; en, em and minus dashes to hyphen; strip `* _ \` # >` (markdown marks); collapse whitespace; trim. Both the quote and the passage go through it, so a quote that differs only in typographic quotes or line wrapping still matches. A quote that paraphrases does not.
-
-**`extractNumbers(text)`**: finds numeric tokens with optional thousands separators, decimals and a `k`, `M`, `B`, `million`, `billion` suffix, and returns both the scaled value and the bare figure. So `$38k` in a claim matches `$38,000` in a passage, and `118%` matches `118%`. Years, counts and percentages are all just numbers to this function.
-
-**`verifyAssessment(assessment, passageIndex)`** walks every cited statement and records issues:
-
-| Code | Hard? | Meaning |
-|---|---|---|
-| `no_citation` | yes | The statement has no citations at all. |
-| `missing_passage` | yes | The cited id does not exist. |
-| `quote_not_found` | yes | The normalized quote is not a substring of the normalized passage. |
-| `quote_too_long` | no | Over 30 words. Still matched, but the model is over-quoting. |
-| `number_not_in_evidence` | no | A number in the claim text appears in none of the cited passages or their source titles. Skipped for `derived` statements, which are allowed to compute. |
-
-A statement with any hard issue is `failed`; with only soft issues `warning`; otherwise `verified`. The summary counts are what the reader shows.
-
-**Why verbatim and not fuzzy.** A fuzzy match (token overlap, edit distance) would let a paraphrase pass, and a paraphrase is exactly where meaning drifts. The cost of strictness is that a correct claim with a slightly wrong quote fails verification; the repair round exists for that case and the failure is visible if it persists. On the run described in `docs/EVALUATION.md`, strictness produced no false failures that survived repair.
-
-**Why numbers get a soft check.** Numbers are where misattribution does the most damage, but the check cannot distinguish "the model invented 24%" from "the model wrote 24% that it correctly computed from 110,000 over 38,000 times twelve". The `derived` basis is the model's declaration that it computed; the check trusts the declaration and the judge verifies the arithmetic.
-
-## 6. The repair round
-
-If verification produces any hard failure, `assess.mjs` appends the model's full previous turn (including its thinking blocks, unchanged, as the API requires) and a user message listing each failure with the statement, the cited id, the quote and the reason. The model must return a complete assessment again and is told to fix the quote, re-cite a passage that actually contains the support, or remove the claim, and not to make claims vaguer to pass.
-
-Exactly one round. A loop until clean would optimize for passing the string check, which is a worse objective than being precise. After the round, whatever still fails is marked and shipped.
-
-On the 3 October run the round fired on one draft of five (the second Harbor Health draft): three quotes that paraphrased instead of copying. All three were fixed. The failures are stored in the record (`first_pass_failures`) from this run forward.
-
-## 7. Evaluation architecture
-
-The eval is a separate program with its own entry point and no shared in-memory state with the pipeline. Design rules:
-
-- **Re-verify from the record.** The eval rebuilds the passage index from `assessment.json` and runs the verifier again rather than trusting the statuses the pipeline wrote. If the pipeline had a bug that marked everything verified, the eval would still catch it.
-- **A different model as judge.** Sonnet 5 reads every statement with the full text of its cited passages (not just the quote) and returns `supported`, `partial` or `unsupported` with a one-line reason. One call per company, all statements batched, structured output. The judge is instructed to be strict about numbers and about words that carry more than the source does ("led", "partnered", "customers"), to check arithmetic on `derived` statements, and to treat `absence` statements as supported when the cited passage is the closest the sources come and does not contain the thing. The judge is also a language model and can be wrong; its verdicts are reported with reasons so a human can disagree.
-- **The interesting cell is "quote verified, judge unsupported or partial".** That is the failure a string check cannot see, and the eval reports it as its own list.
-- **Decision-language scan.** Regular expressions over the summary, dimension findings, claims and bear thesis for recommendation, verdict, probability and superlative language. Integrity notes and contradictions are excluded because they legitimately quote the inputs (the planted "85% probability of success" lives there).
-- **Known-answer expectations.** A small JSON per example written when the trap was designed: minimum counts (contradictions, missing items, integrity notes, bear points), regexes that must appear in contradictions, integrity notes, the bear case or the missing list, and regexes that must not appear in dimension claims. The forbidden-claim regexes are attribution-aware: "The deck states Marsh led perception at Tesla" is correct behaviour and must not be penalized, so the pattern excludes statements that attribute ("deck", "states", "claims", "presents" and so on).
-- **Self-test.** `selftest.mjs` copies a real record, plants a fabricated quote, a nonexistent passage id, an altered number and a stripped citation, and confirms the verifier reports each. It is the test that the test works.
-
-Full method, results and limitations are in `docs/EVALUATION.md`.
-
-## 8. The reader
-
-`report.mjs` writes one static HTML file with the records and the eval results embedded as JSON. No server-side rendering, no framework, no network calls apart from web fonts. The client script renders the navigation, the document and the provenance pane from the embedded data.
-
-The provenance highlight mirrors the server's normalizer: it builds the normalized passage character by character while recording a map from each normalized index back to the raw index, finds the normalized quote, and marks the raw span. The first version walked the two strings in parallel and drifted by the number of collapsed whitespace characters; the fix was the explicit index map. A check over all 246 citations in the committed run finds every quote.
-
-Layout is three columns (companies, document, sources) above 1100px, two columns with a slide-in sources pane below, and a single column on phones. Design tokens (paper background, serif headings, gold accent for provenance) were borrowed from an earlier legal-drafting prototype that solved the same reader problem for contract clauses.
-
-The page is labelled "Draft for partner review · not a recommendation" on every company. The automated-checks strip at the bottom of each draft shows the eval's counts and the judge's flagged statements with reasons.
-
-## 8a. The app
-
-`serve.mjs` serves `app/` and a small JSON API. The client (`app/app.js`) is hash-routed with no framework; `app/doc.js` is the document renderer, shared with the static report so the committed artifact and the app look the same. One stylesheet, one typeface, one accent colour; the document gets the room and the chrome stays out of the way.
-
-| Route | View | What it does |
-|---|---|---|
-| `#/` | Companies | Cards or a list: company, sources, state (not drafted, drafting, draft, reviewed), verified count, gaps, reviewer. |
-| `#/new` | New company | Deck as file or link, website link, bios, call notes; fields fill from the deck; "Create and draft" starts drafting. |
-| `#/inbox` | Inbox | Decks that arrived by email; import creates the company. |
-| `#/c/:slug` | Assessment | One document, one place. Not drafted: the sources it will be built from and a Draft button; drafting: live progress; drafted: the block editor with the source panel. The header carries the state, an Edit / Preview switch (`?mode=partner` is Preview: what the partners receive, edits applied), an Export menu (Word, PDF via print, Markdown, copy as text or Markdown, all with the review applied), Email founder, and Draft again. `?s=`, `?g=`, `?k=` deep-link to a claim, a missing item or a section. Old `/draft`, `/review` and `/partner` paths redirect here. |
-| `#/c/:slug/sources` | Sources | Evidence, not a step: the numbered passages; click one and the page it came from opens beside it. `?p=` opens a passage. |
-| `#/c/:slug/followup` | Email founder | Missing items and open questions composed into the email to the founder. Reached from the assessment header, not the sidebar. |
-
-The sidebar holds two things: Assessment (with its state) and Sources (with the passage count). Everything else is an action in the header.
-
-State is derived, never set by hand: a company is *not drafted* until a record exists, *draft* once it does, and *reviewed* as soon as the associate changes anything (a note, an edit, a removal, an inserted block).
-
-API: `GET /api/companies`, `POST /api/companies`, `GET /api/companies/:slug`, `POST /api/companies/:slug/draft` (event stream), `PUT /api/companies/:slug/review`, `GET /api/companies/:slug/export?format=md|txt|docx` (the review applied; `lib/export.mjs` runs the same block renderer as the app in a sandbox so the file matches the screen, and writes the docx by hand), `GET /api/search?q=` (companies, files, source passages, claims, missing items, integrity notes, summaries, bear theses and inbox messages, scored by phrase then by all-terms match; the palette on ⌘K opens results at the exact claim or passage). Drafting again deletes the previous review, since its decisions refer to statement ids that no longer exist.
-
-Storage: example companies write to `out/<slug>/`; companies created in the app keep everything, outputs included, under `companies/<slug>/` so nothing user-created lands in the committed outputs. A review is a set of decisions keyed by statement id (`keep`, `edit` with text, `remove`), overrides for the prose fields (summary, findings, open questions, gaps, bear thesis), the note and reviewer, the associate's inserted blocks stored as `inserts[anchorKey] = [{id, type, html}]` so each sits after the block it was created under, and `moves[blockKey] = anchorKey` for model blocks the associate dragged elsewhere. The renderer (`app/doc.js`) builds an ordered block list from draft plus review and renders it in review, partner or static mode; the model's draft is never mutated. The server allows one in-flight draft per company. Nothing is authenticated; this is a single-associate prototype.
-
-## 8b. Getting a company in
-
-Three paths, all ending in the same `companies/<slug>/sources/*.md` layout the pipeline reads.
-
-- **Files.** The intake form accepts PDF, PPTX, DOCX, Markdown and text for any source, by drop, picker or a link straight to the file. Files travel as base64 JSON to `POST /api/extract`, which returns the text shaped for the splitter: one passage per slide or page for decks (empty pages included, so passage N is page N), one per paragraph for prose. The associate sees the extracted text in the textarea before anything is drafted, so what the model will read is never hidden. The original file is kept (`uploads/` until the company is created, then `companies/<slug>/files/`) and recorded in `company.json` under `files`, so the reader can open the page a passage came from.
-- **Links.** A website URL is fetched server-side and reduced to text. Links to files parse as files; Google Slides and Docs links fetch the exported PDF or DOCX, and Drive file links fetch the file, all of which need the link to be shared with anyone who has it. Elements marked hidden (`hidden`, `display:none`, `aria-hidden`) are kept and prefixed with "[hidden element]" because that is where instructions aimed at machines tend to live; the Mesa Pay example shows why.
-- **Inbox.** `GET /api/inbox` lists messages in `inbox/`, each a folder with `message.json` and attachments. `POST /api/inbox/:id/import` reads every attachment, classifies it (deck, call notes, founders, or by filename), fetches a website link from the body if there is one, keeps the email body as an `email` source, and creates the company. The design keeps the connector swappable: a Gmail or Microsoft 365 adapter would write the same folders from a watched label. Both show as not connected until credentials exist, and the UI says so rather than pretending.
-
-**Auto-fill.** When a deck is read, `POST /api/prefill` asks Sonnet 5 for the company name, one-liner, round, website and founder bios as a structured object, with instructions to copy the deck's words and leave fields empty rather than guess. The form fills only fields that are still empty, marks them, and the associate overwrites freely; the inbox import does the same server-side. Measured at about four seconds and a few cents per deck.
-
-## 9. Measured performance (3 October 2026 run)
-
-| Stage | Per company | Notes |
-|---|---|---|
-| Drafting latency | 90 to 125 seconds | Opus 5, effort high, 8k to 14k output tokens |
-| Drafting tokens | 4k to 6k in, 8k to 12k out | Input is small because the evidence universe is closed |
-| Repair round, when it fires | about 60 seconds, 10k in, 5k out | Replays the first turn |
-| Judge latency | 50 to 70 seconds | Sonnet 5, one batched call |
-| Judge tokens | about 9k in, 5k out | |
-| Cost per company | roughly $0.30 to $0.45 draft, about $0.07 judge | Opus 5 at $5 / $25 per million; Sonnet 5 at $2 / $10 |
-| Full `npm start` | about 10 to 12 minutes, about $1.60 | Four companies, sequential |
-
-At 150 companies a month, model spend is on the order of $60 to $80 a month. Companies could be drafted in parallel or through the Batch API overnight; neither was worth the complexity for the prototype.
-
-## 10. Failure modes observed and what was done
-
-| Observed | Where | Response |
-|---|---|---|
-| Quotes that paraphrase rather than copy | Harbor Health second draft, 3 of 33 statements | Repair round fixed all three. Kept as evidence that the round is needed. |
-| Interpretation on top of a true quote ("the only differentiator", "can lapse without notice") | 8 of 182 statements across all four, half in bear cases | Not caught by the verifier, caught by the judge. Judge moves into the pipeline in v2 as a second status. |
-| Number check flagged dates and call durations | Harbor Health first draft, 2 statements | Source titles counted as evidence. |
-| Eval regex penalized correctly attributed claims | Quill Robotics expectations | Attribution-aware patterns. |
-| Reader highlight offset | All citations | Index-map rewrite; verified over all 246 citations. |
-| Em dash in model prose | One Mesa Pay bear point | Not a correctness issue; a style instruction would remove it. Left as is to keep the committed run honest. |
-
-Not observed on this run, but designed for: fabricated quotes, citations to nonexistent passages, numbers absent from evidence, claims without citations (all exercised by the self-test); instruction-following from inputs; recommendation or probability language.
-
-## 11. Security and trust posture
-
-- **Prompt injection.** Inputs are rendered as data under a system prompt that says so and tells the model to report steering attempts. The model has no tools, so an injection cannot cause an action, only a biased draft, and the adversarial example tests for that. This is defence by design plus testing, not a guarantee; new inputs should be red-teamed periodically.
-- **No external calls from the model.** No web search, no fetch, no MCP. The only network traffic is the Messages API.
-- **Secrets.** The API key is read from `.env`, which is gitignored. Nothing else is secret.
-- **Data handling.** Inputs are sent to the model provider; retention is governed by the fund's API agreement. Outputs are written to the local filesystem only. A production version would store records in the fund's own database with access control.
-- **Auditability.** Every record carries the model id, token usage, the verification results and the first-pass failures. The eval report is reproducible from records alone.
-
-## 12. Extending the prototype
-
-- **Add a company.** Create `examples/<slug>/company.json` and `sources/NN-key.md` files. Optionally `expectations.json`. Run `node assess.mjs <slug>`.
-- **Add a source type.** Any markdown file in `sources/` works; the citation key is the filename after the number. Nothing else needs to change.
-- **Change models.** `DRAFTER_MODEL` and `JUDGE_MODEL` environment variables. Keep them different.
-- **Add a dimension or change the shape.** Edit `lib/schema.mjs` and the dimension list in `lib/prompts.mjs`. The verifier, markdown and reader walk the schema generically; only the reader's section headings are hard-coded.
-- **Add a verification rule.** Add an issue code in `verifyAssessment`, mark it hard or soft. Hard codes trigger repair and need a reason string in `hardFailures`.
-- **Add an eval check.** Expectations support count minimums and regex presence or absence per section; new field types go in `expectationChecks` in `eval.mjs`.
-
-## 12b. Hosting
-
-The app runs on Railway at https://northledge-assessor-production.up.railway.app. `Procfile` starts `node serve.mjs` (so `npm start`, the assignment's pipeline command, is not what the host runs); `railway.json` carries the same start command and a restart policy. `ANTHROPIC_API_KEY` is a service variable. A volume is mounted at `/app/companies`, so companies created through the app, with their files, drafts and reviews, survive redeploys; reviews of the five committed examples live in `out/` inside the image and reset on each deploy, which is acceptable for a demo and would move to the database in production. Chrome and python-pptx are build-time tools for the sample decks only; the runtime needs Node and the two npm dependencies.
-
-## 13. Path to production
-
-What changes when this becomes a service rather than a script.
-
-- **Ingestion.** PDF decks through text extraction with page-level ids (`deck p.4` reads better to a partner than `deck:7`), website capture with hidden-element text preserved (the adversarial example shows why), transcript import for call recordings. This is the largest piece of work and the least interesting.
-- **Storage.** Postgres tables for companies, sources, passages, drafts, statements, citations, verification results, associate edits and partner decisions. The record format in `out/` maps onto this directly.
-- **Judge in the pipeline.** Run the judge after verification and store its verdict as a second status per statement, labelled distinctly ("quote verified; support: partial"). Do not let it delete statements; the associate decides.
-- **Reader as a hosted app.** Same static reader behind the fund's SSO, reading from the database. Claim-level accept, edit and reject with an edit log.
-- **Operations.** A run log and a dashboard for the weekly audit: accuracy by source type, repair frequency, judge partials, decision-language hits, per-associate draft survival.
-- **Cost and throughput.** Parallel drafting; Batch API for overnight runs of the week's pipeline at half price; prompt caching is irrelevant because the per-company input is small and unique.
-- **Outcome log.** From day one, join every draft to the partners' decision and, later, to the company's outcome. The year-later evaluation in `docs/EVALUATION.md` depends on this existing.
-
-## 14. Known limitations
-
-- Four author-written examples. The examples were written by the same person who wrote the prompt, in one session. They exercise the designed failure modes and nothing else.
-- One run. Model output varies between runs; the committed numbers are one sample, not a distribution.
-- The judge is a language model. Its partials are plausible on reading, but it has not been audited against a human.
-- Paragraph passages are coarse for long documents. A ten-page memo would produce passages that are too big for a quote to pin meaningfully; sentence or page sub-ids would be needed.
-- The number check is lexical. It will miss a number written as a word and will match a coincidental equal number.
-- Reviews are JSON files with no history; one reviewer per company, no authentication.
-- Em dashes appear in model prose occasionally. A style rule in the prompt would remove them; it was not added so the committed outputs match the committed prompt.
-
-## 15. Testing
-
-What exists: the mutation self-test for the verifier, the eval as an end-to-end check, and the known-answer expectations as regression tests for the four examples. What a production version needs and this prototype lacks: unit tests for the splitter and normalizer edge cases (Windows line endings, nested headings, markdown tables), snapshot tests of the rendered input, a regression set that grows with every incident from the weekly audit, and a variance run (the same company drafted five times) to measure how stable the claims, contradictions and bear case are.
+- Five examples, written by the same person who wrote the prompt. They test the failures that person thought of.
+- One run per example. Output varies between runs; the committed numbers are one sample.
+- The second model has not been checked against a human grader yet.
+- Long documents produce passages too big for a quote to pin precisely; pages or sentences would be needed.
+- The number check is literal: it misses numbers written as words and can be fooled by a coincidence.

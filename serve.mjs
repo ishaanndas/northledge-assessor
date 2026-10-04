@@ -11,6 +11,7 @@ import { prefillFromDeck } from "./lib/prefill.mjs";
 import { listInbox, importInboxMessage, INBOX_DIR } from "./lib/inbox.mjs";
 import { search } from "./lib/search.mjs";
 import { toMarkdownApplied, toPlainText, toDocx } from "./lib/export.mjs";
+import { markdownToHtml } from "./lib/markdown-html.mjs";
 
 const PORT = Number(process.env.PORT || 4950);
 const APP_DIR = path.join(ROOT, "app");
@@ -203,11 +204,56 @@ async function api(req, res, url) {
   return send(res, 404, { error: "not found" });
 }
 
+
+// ---- Documents, rendered from the markdown in the repo so the link stays clean ----
+const DOCS = [
+  { id: "readme", file: "README.md", title: "README", blurb: "How to run it, key decisions, what was cut, what comes next, how AI tools were used." },
+  { id: "brief", file: "BRIEF.md", title: "Product brief", blurb: "Two pages: who it is for, what v1 does and does not do, how success is measured, the three biggest risks, and why there is no probability score." },
+  { id: "how-it-works", file: "docs/TECHNICAL.md", title: "How it works", blurb: "The pipeline, the verifier, the editor, the app, and what a production version would change." },
+  { id: "evaluation", file: "docs/EVALUATION.md", title: "Evaluation", blurb: "What the automated checks are, what they found on the committed run, what they cannot see, and how to evaluate after a year of real decisions." },
+  { id: "prd", file: "docs/PRD.md", title: "Product requirements", blurb: "The longer version of the brief: requirements, metrics, risks, rollout, roadmap." },
+  { id: "eval-report", file: "out/eval-report.md", title: "Eval run", blurb: "The raw output of the last evaluation run: every flagged statement with the judge's reason." },
+  { id: "test-decks", file: "samples/README.md", title: "Test decks", blurb: "The sample decks for testing intake, and everything planted in the trap deck." },
+];
+function docPage(title, bodyHtml, current) {
+  const nav = DOCS.map((d) => `<a href="/docs/${d.id}" class="${d.id === current ? "on" : ""}">${d.title}</a>`).join("");
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title} · Seed assessments</title><link rel="stylesheet" href="/app.css"><style>
+  .docs{display:grid;grid-template-columns:240px minmax(0,1fr);min-height:calc(100vh - 56px)}
+  .docs nav{border-right:1px solid var(--border);background:oklch(99% 0 0);padding:20px 12px;position:sticky;top:56px;align-self:start;height:calc(100vh - 56px);overflow:auto}
+  .docs nav a{display:block;padding:8px 12px 8px 16px;border-radius:6px;font-size:13px;color:oklch(44.6% .043 257.281);position:relative}
+  .docs nav a:hover{background:var(--muted);color:var(--heading)}.docs nav a.on{background:var(--muted-2);color:var(--heading);font-weight:500}
+  .docs nav a.on::before{content:"";position:absolute;left:0;top:9px;bottom:9px;width:2px;background:var(--primary)}
+  .docs nav .seclabel{padding:0 8px 8px}
+  .prose{max-width:760px;padding:40px 48px 120px;font-size:15px;line-height:1.65;color:var(--foreground)}
+  .prose h1{font-size:32px;font-weight:600;letter-spacing:-.7px;margin:0 0 18px}.prose h2{font-size:20px;font-weight:600;letter-spacing:-.3px;margin:36px 0 10px}.prose h3{font-size:16px;font-weight:600;margin:24px 0 6px}
+  .prose p{margin:0 0 14px}.prose ul,.prose ol{margin:0 0 14px;padding-left:24px}.prose li{margin:4px 0}
+  .prose code{font-family:var(--mono);font-size:12.5px;background:var(--muted-2);padding:1px 5px}.prose pre{background:var(--muted);border:1px solid var(--border-2);padding:12px 14px;overflow:auto;font-size:12.5px;line-height:1.5}.prose pre code{background:none;padding:0}
+  .prose .tbl{overflow-x:auto;margin:0 0 16px}.prose table{border-collapse:collapse;width:100%;font-size:13.5px}.prose th{text-align:left;font-size:11px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;color:var(--subtle);padding:8px 10px;border-bottom:1px solid var(--border-2);background:var(--muted)}.prose td{padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+  .prose blockquote{border-left:2px solid var(--border-2);margin:0 0 14px;padding:4px 16px;color:var(--muted-foreground)}.prose hr{border:0;border-top:1px solid var(--border-2);margin:28px 0}
+  .prose a{color:var(--blue);text-decoration:underline}
+  .doclist{display:grid;gap:1px;background:var(--border-2);border:1px solid var(--border-2)}.doclist a{display:block;background:#fff;padding:16px 18px;text-decoration:none}.doclist a:hover{background:var(--muted)}.doclist b{display:block;font-weight:600;color:var(--heading);font-size:15px;margin-bottom:3px}.doclist span{font-size:13.5px;color:var(--muted-foreground)}
+  @media (max-width:820px){.docs{grid-template-columns:1fr}.docs nav{position:static;height:auto;border-right:0;border-bottom:1px solid var(--border)}.prose{padding:24px 20px 80px}}
+  </style></head><body>
+  <header class="top"><a class="name" href="/"><span class="mark">SA</span>Seed assessments</a><div class="crumbs"><span>/</span><a href="/docs">Docs</a>${current ? `<span>/</span><b>${title}</b>` : ""}</div><div class="right"><a class="navlink" href="/">Open the app</a><a class="navlink" href="https://github.com/ishaanndas/northledge-assessor">GitHub</a></div></header>
+  <div class="docs"><nav><div class="seclabel">Documents</div>${nav}</nav><main class="prose">${bodyHtml}</main></div></body></html>`;
+}
+function docsIndex() {
+  const list = DOCS.map((d) => `<a href="/docs/${d.id}"><b>${d.title}</b><span>${d.blurb}</span></a>`).join("");
+  return docPage("Docs", `<h1>Documents</h1><p>Everything that goes with the prototype. The app itself is at <a href="/">/</a>; the source is on <a href="https://github.com/ishaanndas/northledge-assessor">GitHub</a>.</p><div class="doclist">${list}</div>`, null);
+}
+
 http
   .createServer(async (req, res) => {
     const url = new URL(req.url, `http://localhost:${PORT}`);
     try {
       if (url.pathname.startsWith("/api/")) return await api(req, res, url);
+      if (url.pathname === "/docs" || url.pathname === "/docs/") return send(res, 200, docsIndex(), "text/html; charset=utf-8");
+      const dm = url.pathname.match(/^\/docs\/([a-z-]+)$/);
+      if (dm) {
+        const d = DOCS.find((x) => x.id === dm[1]); if (!d) return send(res, 404, "Not found", "text/plain");
+        const f = path.join(ROOT, d.file); if (!fs.existsSync(f)) return send(res, 404, "Not found", "text/plain");
+        return send(res, 200, docPage(d.title, markdownToHtml(fs.readFileSync(f, "utf8")), d.id), "text/html; charset=utf-8");
+      }
       // Static: app/ first, then out/ (the committed report and markdown).
       let p = decodeURIComponent(url.pathname);
       if (p === "/" || p === "/index.html") p = "/app.html";

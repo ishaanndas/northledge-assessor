@@ -1,6 +1,6 @@
 # Product requirements: first-pass assessment drafter
 
-Version 1.0, 3 October 2026. Companion to the two-page brief (`BRIEF.md`), which is the summary; this document is the full specification. Technical detail is in `docs/TECHNICAL.md`, evaluation method and results in `docs/EVALUATION.md`.
+The longer version of the two-page brief. The brief is the summary; this is the list of what v1 has to do, how it is measured, what could go wrong and what comes after. How it is built is in How it works; what the checks found is in Evaluation.
 
 ## 1. Summary
 
