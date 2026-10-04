@@ -27,7 +27,7 @@ selftest.mjs                    plants four defects in a real record, confirms t
 serve.mjs + app/                the app: JSON API over the same pipeline, five screens, port 4950
 ```
 
-About 930 lines of JavaScript across nine files. One dependency, the Anthropic SDK. Node 20 or later, ES modules, no build step.
+About 1,700 lines of JavaScript. Two dependencies: the Anthropic SDK and pdf-parse (PPTX and DOCX are read with a 40-line zip reader of our own). Node 20 or later, ES modules, no build step.
 
 ## 2. Repository layout
 
@@ -40,6 +40,11 @@ About 930 lines of JavaScript across nine files. One dependency, the Anthropic S
 | `serve.mjs` | App server: JSON API, server-sent drafting progress, review storage, static files. |
 | `app/` | The client: `app.html`, `app.css`, `app.js`, and `doc.js` (the document renderer, also inlined into the static report). |
 | `lib/pipeline.mjs` | `draftCompany(slug, onProgress)`: the pipeline as a function, used by the CLI and the server. |
+| `lib/extract.mjs` | Files and URLs to source text: PDF (pdf-parse, one passage per page), PPTX and DOCX (zip + XML), Markdown, text; URLs fetched and stripped with hidden elements kept and marked; links to files parsed as files. |
+| `lib/zip.mjs` | Minimal zip reader (stored and deflate) for Office files. |
+| `lib/prefill.mjs` | Reads a deck and proposes company name, one-liner, round, website and founder bios. Sonnet 5, structured output, copies rather than interprets. |
+| `lib/inbox.mjs` | The inbox: a watched drop folder shaped like a mailbox (`inbox/<id>/message.json` plus attachments); import creates a company from a message. Connector status for Gmail and Microsoft 365. |
+| `samples/`, `inbox/` | Mock decks (two Chrome-rendered PDFs, one hand-built PPTX, one DOCX) and three sample inbox messages. |
 | `lib/env.mjs` | `.env` loader, project root, model ids (`DRAFTER_MODEL`, `JUDGE_MODEL` env overrides). |
 | `lib/sources.mjs` | Example loading, passage splitting, rendering for the model. |
 | `lib/schema.mjs` | The assessment JSON schema. |
@@ -165,6 +170,16 @@ The page is labelled "Draft for partner review · not a recommendation" on every
 API: `GET /api/companies`, `POST /api/companies`, `GET /api/companies/:slug`, `POST /api/companies/:slug/draft` (event stream), `PUT /api/companies/:slug/review`. Drafting again deletes the previous review, since its decisions refer to statement ids that no longer exist.
 
 Storage: example companies write to `out/<slug>/`; companies created in the app keep everything, outputs included, under `companies/<slug>/` so nothing user-created lands in the committed outputs. A review is a set of decisions keyed by statement id (`keep`, `edit` with text, `remove`) plus overrides for the prose fields (summary, findings, open questions, gaps, bear thesis) and the note and reviewer; the model's draft is never mutated and the partner page is a projection of draft plus review. The server allows one in-flight draft per company. Nothing is authenticated; this is a single-associate prototype.
+
+## 8b. Getting a company in
+
+Three paths, all ending in the same `companies/<slug>/sources/*.md` layout the pipeline reads.
+
+- **Files.** The intake form accepts PDF, PPTX, DOCX, Markdown and text for any source, by drop, picker or a link straight to the file. Files travel as base64 JSON to `POST /api/extract`, which returns the text shaped for the splitter: one passage per slide or page for decks, one per paragraph for prose. The associate sees the extracted text in the textarea before anything is drafted, so what the model will read is never hidden.
+- **Links.** A website URL is fetched server-side and reduced to text. Elements marked hidden (`hidden`, `display:none`, `aria-hidden`) are kept and prefixed with "[hidden element]" because that is where instructions aimed at machines tend to live; the Mesa Pay example shows why.
+- **Inbox.** `GET /api/inbox` lists messages in `inbox/`, each a folder with `message.json` and attachments. `POST /api/inbox/:id/import` reads every attachment, classifies it (deck, call notes, founders, or by filename), fetches a website link from the body if there is one, keeps the email body as an `email` source, and creates the company. The design keeps the connector swappable: a Gmail or Microsoft 365 adapter would write the same folders from a watched label. Both show as not connected until credentials exist, and the UI says so rather than pretending.
+
+**Auto-fill.** When a deck is read, `POST /api/prefill` asks Sonnet 5 for the company name, one-liner, round, website and founder bios as a structured object, with instructions to copy the deck's words and leave fields empty rather than guess. The form fills only fields that are still empty, marks them, and the associate overwrites freely; the inbox import does the same server-side. Measured at about four seconds and a few cents per deck.
 
 ## 9. Measured performance (3 October 2026 run)
 

@@ -13,7 +13,7 @@ The deliverables, mapped to the assignment:
 
 ## Run it
 
-Requires Node 20 or later and an Anthropic API key.
+Requires Node 20 or later and an Anthropic API key. Two dependencies: the Anthropic SDK and pdf-parse.
 
 ```bash
 npm install
@@ -21,7 +21,9 @@ echo "ANTHROPIC_API_KEY=sk-ant-..." > .env
 npm run serve        # the app, at http://localhost:4950
 ```
 
-The app is one workspace per company with five stages in a left rail. **Sources** shows the numbered passages the model will read. **Draft** runs the pipeline with live progress and opens the review when it finishes. **Review** is the document as an editor, in the way a Notion page is: click anywhere and type, with the source panel beside it showing the passage behind whichever claim you are on; citations stay attached to their claims, removed claims strike through and can be restored, and everything saves as you go. **Partner page** is what the partners receive, with edits applied, printable. **Follow-up** turns the missing list into the email to the founder. "New company" takes the four inputs as pasted text or files and starts drafting in one step. The four example companies are preloaded; companies you add live under `companies/`, which is gitignored.
+The app is one workspace per company with five stages in a left rail. **Sources** shows the numbered passages the model will read. **Draft** runs the pipeline with live progress and opens the review when it finishes. **Review** is the document as an editor, in the way a Notion page is: click anywhere and type, with the source panel beside it showing the passage behind whichever claim you are on; citations stay attached to their claims, removed claims strike through and can be restored, and everything saves as you go. **Partner page** is what the partners receive, with edits applied, printable. **Follow-up** turns the missing list into the email to the founder.
+
+Getting a company in: **New company** takes a deck as a PDF, PPTX or DOCX (drop it, choose it, or paste a link to the file), a website link that is fetched as text with hidden elements kept and marked, and pasted text or files for bios and call notes. Once the deck is read, the company name, one-liner, round, website and founder bios fill from it; you correct what is wrong and add what the deck lacks. **Inbox** shows decks that arrive by email; importing one creates the company with its attachments already read and its fields filled. In this build the inbox is a watched drop folder (`inbox/`) shaped like a mailbox, with three sample messages; the Gmail and Microsoft 365 connectors show as not connected until OAuth credentials exist. Mock decks to try are in `samples/` (two PDFs, one PPTX, one DOCX of call notes). The four example companies are preloaded; companies you add live under `companies/`, which is gitignored. The companies page has card and list views.
 
 The same pipeline runs from the command line:
 

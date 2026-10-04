@@ -82,32 +82,33 @@ function pageNew(prefillSlug) {
   const ta = (key) => $(`textarea[name="${key}"]`);
   const status = (key, text, cls = "") => { const el = $(`#st-${key}`); el.textContent = text; el.className = "st " + cls; };
   const toB64 = (file) => new Promise((ok, no) => { const r = new FileReader(); r.onload = () => ok(r.result.split(",")[1]); r.onerror = no; r.readAsDataURL(file); });
+  const describe = (m) => m.pages ? `${m.pages} pages` : m.slides ? `${m.slides} slides` : m.paragraphs ? `${m.paragraphs} paragraphs` : "read";
+  const shortUrl = (u) => u.replace(/^https?:\/\//, "").replace(/\/$/, "");
   async function ingestFile(key, file) {
     status(key, `Reading ${file.name}…`);
     try {
       const r = await api("/extract", { method: "POST", body: JSON.stringify({ filename: file.name, data: await toB64(file) }) });
       ta(key).value = r.text;
-      const m = r.meta;
-      status(key, `${file.name}: ${m.pages ? m.pages + " pages" : m.slides ? m.slides + " slides" : m.paragraphs ? m.paragraphs + " paragraphs" : "read"}`, "ok");
+      status(key, `${file.name}: ${describe(r.meta)}`, "ok");
       if (key === "deck") autofill(r.text);
     } catch (err) { status(key, err.message, "bad"); }
   }
   async function ingestUrl(key, url) {
     if (!url.trim()) return;
-    status(key, `Fetching ${url}…`);
+    status(key, `Fetching ${shortUrl(url)}…`);
     try {
       const r = await api("/extract", { method: "POST", body: JSON.stringify({ url }) });
       ta(key).value = r.text;
-      status(key, `${r.meta.title || url}: ${r.meta.paragraphs} paragraphs`, "ok");
+      status(key, `${r.meta.filename || r.meta.title || shortUrl(url)}: ${describe(r.meta)}`, "ok");
       if (key === "deck") autofill(r.text);
-    } catch (err) { status(key, err.message, "bad"); }
+    } catch (err) { status(key, /fetch failed/i.test(err.message) ? `Could not reach ${shortUrl(url)}. Paste the page text instead.` : err.message, "bad"); }
   }
   async function autofill(deckText) {
     const box = $("#fill"); box.hidden = false; box.className = "fill"; box.textContent = "Reading the deck to fill the fields…";
     try {
       const p = await api("/prefill", { method: "POST", body: JSON.stringify({ deck: deckText }) });
       const filled = [];
-      const set = (name, val) => { const el = $(`[name="${name}"]`); if (val && !el.value.trim()) { el.value = val; el.classList.add("auto"); filled.push(name.replace("_", " ")); } };
+      const set = (name, val) => { const el = $(`[name="${name}"]`); if (val && !el.value.trim()) { el.value = val; el.classList.add("auto"); filled.push({ name: "company", one_liner: "one-liner", ask: "round" }[name] || name); } };
       set("name", p.company_name); set("one_liner", p.one_liner); set("ask", p.round);
       if (p.founder_bios && !ta("founders").value.trim()) { ta("founders").value = p.founder_bios; status("founders", "from the deck's team slide", "ok"); filled.push("founder bios"); }
       if (p.website_url && !ta("website").value.trim()) { $('[data-url="website"]').value = p.website_url; filled.push("website link"); ingestUrl("website", p.website_url); }
