@@ -37,7 +37,7 @@ async function load(slug) {
   const c = await api(`/companies/${slug}`);
   if (S.slug !== slug) { S.selected = null; S.note = ""; S.decisions = {}; S.overrides = {}; S.saved = ""; }
   if (c.reviewDoc) { S.decisions = c.reviewDoc.decisions || {}; S.overrides = c.reviewDoc.overrides || {}; S.note = c.reviewDoc.note || ""; if (c.reviewDoc.reviewer) S.reviewer = c.reviewDoc.reviewer; S.saved = c.reviewDoc.updated; }
-  S.slug = slug; S.company = c;
+  S.slug = slug; S.company = c; blocksCache = null;
   return c;
 }
 
@@ -211,7 +211,6 @@ async function pageDraft(slug, autostart) {
 
 // ---------- review / partner ----------
 function docOpts(mode) { return { mode, decisions: S.decisions, overrides: S.overrides, selected: S.selected, reviewer: S.reviewer, note: S.note }; }
-function renderDoc(c, mode) { const el = $("#doc"); const y = el.parentElement.scrollTop; el.innerHTML = Doc.document(c, docOpts(mode)); el.parentElement.scrollTop = y; }
 function renderSide(c, browse) { $("#sideTitle").textContent = browse ? "All passages" : "Source"; $("#side").innerHTML = browse ? Doc.browse(c) : Doc.provenance(c, S.selected); }
 function splitView(c, mode) {
   return `<div class="split" id="split"><div class="docwrap"><article class="doc" id="doc">${Doc.document(c, docOpts(mode))}</article></div><aside class="sources"><div class="h"><b id="sideTitle">Source</b><button id="browse">All passages</button><button id="closeSide" hidden>Close</button></div><div class="body" id="side">${Doc.provenance(c, S.selected)}</div></aside></div>`;
@@ -221,35 +220,133 @@ function setPath(obj, path, value) {
   for (const k of keys.slice(0, -1)) o = o[k] ??= {};
   o[keys[keys.length - 1]] = value;
 }
+// ---------- editor ----------
+// Caret helpers for contenteditable blocks.
+const sel = () => window.getSelection();
+function caretAtStart(el) { const s = sel(); if (!s.rangeCount) return false; const r = s.getRangeAt(0).cloneRange(); r.selectNodeContents(el); r.setEnd(s.getRangeAt(0).startContainer, s.getRangeAt(0).startOffset); return r.toString().length === 0; }
+function caretAtEnd(el) { const s = sel(); if (!s.rangeCount) return false; const r = s.getRangeAt(0).cloneRange(); r.selectNodeContents(el); r.setStart(s.getRangeAt(0).endContainer, s.getRangeAt(0).endOffset); return r.toString().trim().length === 0; }
+function placeCaret(el, where = "end") { if (!el) return; el.focus(); const r = document.createRange(); r.selectNodeContents(el); r.collapse(where === "start"); const s = sel(); s.removeAllRanges(); s.addRange(r); }
+function splitAtCaret(el) { const s = sel(); const r = s.getRangeAt(0); const tail = document.createRange(); tail.setStart(r.endContainer, r.endOffset); tail.setEndAfter(el.lastChild || el); const frag = tail.extractContents(); const d = document.createElement("div"); d.appendChild(frag); return d.innerHTML; }
+const uid = () => Math.random().toString(36).slice(2, 9);
+const editableBlocks = () => [...$("#doc").querySelectorAll(".bc[contenteditable]")];
+const blockEl = (bc) => bc.closest(".blk");
+const keyOf = (bc) => bc.dataset.key;
+
+// Inserts live in S.overrides.inserts[anchorKey] = [{id,type,html}].
+function insertAfter(anchorKey, type = "p", html = "") {
+  const ins = (S.overrides.inserts ??= {});
+  const id = uid();
+  (ins[anchorKey] ??= []).unshift({ id, type, html });
+  // Blocks that were anchored to the anchor now follow the new block, so order is preserved.
+  if (ins[anchorKey].length > 1) { const rest = ins[anchorKey].splice(1); ins[`ins.${id}`] = [...rest, ...(ins[`ins.${id}`] || [])]; }
+  return `ins.${id}`;
+}
+function findInsert(key) { const id = key.replace(/^ins\./, ""); for (const [anchor, arr] of Object.entries(S.overrides.inserts || {})) { const i = arr.findIndex((x) => x.id === id); if (i >= 0) return { anchor, arr, i, item: arr[i] }; } return null; }
+function deleteInsert(key) {
+  const f = findInsert(key); if (!f) return;
+  const children = (S.overrides.inserts[key] || []); delete S.overrides.inserts[key];
+  f.arr.splice(f.i, 1, ...children);
+  if (!f.arr.length) delete S.overrides.inserts[f.anchor];
+}
+function readBlock(bc, c) {
+  const key = keyOf(bc), b = currentBlocks(c).find((x) => x.key === key); if (!b) return;
+  if (b.type === "claim") { const text = bc.innerText.replace(/ /g, " ").trim(); const orig = b.stmt.text; S.decisions[b.id] = text && text !== orig ? { action: "edit", text } : { action: "keep" }; }
+  else if (b.insert) { const f = findInsert(key); if (f) f.item.html = Doc.sanitize(bc.innerHTML); }
+  else if (b.field === "note") S.note = Doc.sanitize(bc.innerHTML);
+  else if (b.field === "reviewer") { S.reviewer = bc.innerText.trim(); localStorage.setItem("reviewer", S.reviewer); }
+  else if (b.field) setPath(S.overrides, b.field, bc.innerText.replace(/ /g, " ").trim());
+}
+let blocksCache = null;
+function currentBlocks(c) { return (blocksCache ??= Doc.buildBlocks(c, docOpts("review"))); }
+function renderDoc(c, mode) { blocksCache = null; const el = $("#doc"); const y = el.parentElement.scrollTop; el.innerHTML = Doc.document(c, docOpts(mode)); el.parentElement.scrollTop = y; }
+function focusKey(key, where = "end") { const bc = $("#doc").querySelector(`.bc[data-key="${CSS.escape(key)}"]`); placeCaret(bc, where); return bc; }
+function closeMenus() { document.querySelectorAll(".menu,.slash").forEach((m) => m.remove()); }
+function showMenu(items, x, y, cls = "menu") {
+  closeMenus();
+  const m = document.createElement("div"); m.className = cls; m.style.left = x + "px"; m.style.top = y + "px";
+  m.innerHTML = items.map((it, i) => it.sep ? `<div class="sep"></div>` : `<button data-i="${i}" class="${i === 0 ? "on" : ""}${it.danger ? " danger" : ""}"><span>${esc(it.label)}</span>${it.hint ? `<small>${esc(it.hint)}</small>` : ""}</button>`).join("");
+  document.body.appendChild(m);
+  m.addEventListener("mousedown", (e) => e.preventDefault());
+  m.addEventListener("click", (e) => { const b = e.target.closest("button[data-i]"); if (!b) return; closeMenus(); items[b.dataset.i].run(); });
+  return m;
+}
+
 function wireSplit(c, mode) {
   const doc = $("#doc");
-  const showSource = (id) => { S.selected = id; doc.querySelectorAll(".claim.lit").forEach((x) => x.classList.remove("lit")); doc.querySelector(`.claim[data-id="${id}"]`)?.classList.add("lit"); renderSide(c, false); $("#split").classList.add("show"); $("#closeSide").hidden = false; };
+  const showSource = (id) => { S.selected = id; doc.querySelectorAll(".t-claim.lit").forEach((x) => x.classList.remove("lit")); doc.querySelector(`.t-claim[data-id="${id}"]`)?.classList.add("lit"); renderSide(c, false); $("#split").classList.add("show"); $("#closeSide").hidden = false; };
+  const change = () => { blocksCache = null; queueSave(); };
+  const rerender = () => { renderDoc(c, mode); };
+
   doc.addEventListener("click", (e) => {
-    const li = e.target.closest(".claim");
+    const blk = e.target.closest(".blk");
     const act = e.target.closest("button[data-act]");
-    if (act && li) { S.decisions[li.dataset.id] = { action: act.dataset.act }; renderDoc(c, mode); queueSave(); return; }
+    if (act && blk) { S.decisions[blk.dataset.id] = { action: act.dataset.act }; change(); rerender(); return; }
     const gact = e.target.closest("button[data-gapact]");
-    if (gact) { const i = gact.closest("[data-gap]").dataset.gap; setPath(S.overrides, `missing.${i}.removed`, gact.dataset.gapact === "remove"); renderDoc(c, mode); queueSave(); return; }
-    if (li && !e.target.closest("[contenteditable]")) showSource(li.dataset.id);
+    if (gact && blk) { setPath(S.overrides, `missing.${blk.dataset.gap}.removed`, gact.dataset.gapact === "remove"); change(); rerender(); return; }
+    const h = e.target.closest("button[data-handle]");
+    if (h) { e.preventDefault(); openBlockMenu(h.dataset.handle, h.getBoundingClientRect()); return; }
+    if (blk?.classList.contains("t-claim") && !e.target.closest("[contenteditable]")) showSource(blk.dataset.id);
   });
-  doc.addEventListener("focusin", (e) => { const li = e.target.closest(".claim"); if (li && e.target.hasAttribute("contenteditable")) showSource(li.dataset.id); });
+  doc.addEventListener("focusin", (e) => { const blk = e.target.closest(".t-claim"); if (blk && e.target.hasAttribute("contenteditable")) showSource(blk.dataset.id); });
+
+  function openBlockMenu(key, rect) {
+    const b = currentBlocks(c).find((x) => x.key === key); if (!b) return;
+    const items = [];
+    if (b.type === "claim") items.push(b.decision.action === "remove" ? { label: "Restore claim", run: () => { S.decisions[b.id] = { action: "keep" }; change(); rerender(); } } : { label: "Remove claim", hint: "strikes through, keeps the citation", danger: true, run: () => { S.decisions[b.id] = { action: "remove" }; change(); rerender(); } });
+    if (b.type === "claim" && b.decision.action === "edit") items.push({ label: "Revert to the model's wording", run: () => { S.decisions[b.id] = { action: "keep" }; change(); rerender(); } });
+    if (b.type === "gap") items.push(b.removed ? { label: "Restore item", run: () => { setPath(S.overrides, `missing.${b.index}.removed`, false); change(); rerender(); } } : { label: "Remove item", danger: true, run: () => { setPath(S.overrides, `missing.${b.index}.removed`, true); change(); rerender(); } });
+    if (b.field && !b.insert && b.type !== "reviewer" && b.type !== "note") items.push({ label: "Revert to the model's wording", run: () => { setPath(S.overrides, b.field, ""); change(); rerender(); } });
+    if (b.insert) {
+      for (const [t, label] of Object.entries(Doc.INSERT_TYPES)) if (t !== b.type) items.push({ label: `Turn into ${label.toLowerCase()}`, run: () => { const f = findInsert(key); if (f) { f.item.type = t; if (t === "divider") f.item.html = ""; } change(); rerender(); focusKey(key); } });
+      items.push({ sep: true }, { label: "Delete block", danger: true, run: () => { deleteInsert(key); change(); rerender(); } });
+    }
+    items.push({ sep: true }, { label: "Add a block below", hint: "Enter", run: () => { const k = insertAfter(key); change(); rerender(); focusKey(k, "start"); } });
+    showMenu(items, rect.left, rect.bottom + 4);
+  }
+
+  function slashMenu(bc) {
+    const key = keyOf(bc), rect = bc.getBoundingClientRect();
+    const types = Object.entries(Doc.INSERT_TYPES).map(([t, label]) => ({ label, run: () => { const f = findInsert(key); if (f) { f.item.type = t; f.item.html = ""; } bc.innerHTML = ""; change(); rerender(); const nb = focusKey(key, "start"); if (t === "divider") { const k = insertAfter(key); change(); rerender(); focusKey(k, "start"); } } }));
+    const m = showMenu(types, rect.left, rect.bottom + 4, "slash");
+    m.dataset.for = key;
+  }
+
   doc.addEventListener("keydown", (e) => {
-    const el = e.target.closest("[contenteditable]"); if (!el) return;
-    const single = el.dataset.claim || el.classList.contains("inline") || el.dataset.field?.startsWith("questions.") || el.dataset.field?.startsWith("missing.");
-    if (e.key === "Enter" && single) { e.preventDefault(); el.blur(); }
-    if (e.key === "Escape") el.blur();
-    if (e.key === "Backspace" && el.dataset.claim && el.textContent.trim() === "") { e.preventDefault(); S.decisions[el.dataset.claim] = { action: "remove" }; renderDoc(c, mode); queueSave(); }
+    const bc = e.target.closest(".bc[contenteditable]"); if (!bc) return;
+    const key = keyOf(bc), b = currentBlocks(c).find((x) => x.key === key); if (!b) return;
+    const open = document.querySelector(".slash");
+    if (open) {
+      const btns = [...open.querySelectorAll("button")], i = btns.findIndex((x) => x.classList.contains("on"));
+      if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); btns[i]?.classList.remove("on"); btns[(i + (e.key === "ArrowDown" ? 1 : btns.length - 1)) % btns.length].classList.add("on"); return; }
+      if (e.key === "Enter") { e.preventDefault(); btns[i]?.click(); return; }
+      if (e.key === "Escape" || e.key === "Backspace") { closeMenus(); if (e.key === "Escape") e.preventDefault(); return; }
+    }
+    if (e.key === "/" && b.insert && bc.innerText.trim() === "") { e.preventDefault(); slashMenu(bc); return; }
+    if (e.key === "Escape") { bc.blur(); return; }
+    if ((e.metaKey || e.ctrlKey) && b.rich && (e.key === "b" || e.key === "i")) { e.preventDefault(); document.execCommand(e.key === "b" ? "bold" : "italic"); readBlock(bc, c); change(); return; }
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      if (b.type === "reviewer") { bc.blur(); return; }
+      let html = "";
+      if (b.rich && !caretAtEnd(bc)) { html = splitAtCaret(bc); readBlock(bc, c); }
+      const k = insertAfter(key, b.type === "bullet" && b.insert && bc.innerText.trim() ? "bullet" : "p", html);
+      change(); rerender(); focusKey(k, "start"); return;
+    }
+    if (e.key === "Backspace" && caretAtStart(bc) && bc.innerText.trim() === "") {
+      e.preventDefault();
+      if (b.insert) { const all = editableBlocks(); const i = all.findIndex((x) => keyOf(x) === key); deleteInsert(key); change(); rerender(); const prev = editableBlocks()[Math.max(0, i - 1)]; placeCaret(prev, "end"); return; }
+      if (b.type === "claim") { S.decisions[b.id] = { action: "remove" }; change(); rerender(); return; }
+      if (b.type === "gap") { setPath(S.overrides, `missing.${b.index}.removed`, true); change(); rerender(); return; }
+      return;
+    }
+    if ((e.key === "ArrowUp" && caretAtStart(bc)) || (e.key === "ArrowDown" && caretAtEnd(bc))) {
+      const all = editableBlocks(), i = all.indexOf(bc), next = all[i + (e.key === "ArrowUp" ? -1 : 1)];
+      if (next) { e.preventDefault(); placeCaret(next, e.key === "ArrowUp" ? "end" : "start"); }
+    }
   });
-  doc.addEventListener("input", (e) => {
-    const el = e.target.closest("[contenteditable]"); if (!el) return;
-    const text = el.innerText.replace(/\u00a0/g, " ").replace(/\n+$/, "");
-    if (el.dataset.claim) { const orig = Doc.statements(c.record.assessment).get(el.dataset.claim).stmt.text; S.decisions[el.dataset.claim] = text.trim() && text.trim() !== orig ? { action: "edit", text: text.trim() } : { action: "keep" }; }
-    else if (el.dataset.field === "note") S.note = text;
-    else if (el.dataset.field === "reviewer") { S.reviewer = text.trim(); localStorage.setItem("reviewer", S.reviewer); }
-    else if (el.dataset.field) setPath(S.overrides, el.dataset.field, text.trim());
-    queueSave();
-  });
-  doc.addEventListener("focusout", (e) => { const el = e.target.closest?.("[data-claim]"); if (el) { const d = S.decisions[el.dataset.claim]; if (d?.action === "edit") { el.classList.add("was-edited"); } } });
+  doc.addEventListener("paste", (e) => { const bc = e.target.closest(".bc[contenteditable]"); if (!bc) return; e.preventDefault(); document.execCommand("insertText", false, (e.clipboardData.getData("text/plain") || "").replace(/\r/g, "")); });
+  doc.addEventListener("input", (e) => { const bc = e.target.closest(".bc[contenteditable]"); if (!bc) return; readBlock(bc, c); blockEl(bc)?.classList.toggle("edited", bc.closest(".t-claim") && S.decisions[bc.closest(".t-claim").dataset.id]?.action === "edit"); queueSave(); });
+  document.addEventListener("click", (e) => { if (!e.target.closest(".menu,.slash,button[data-handle]")) closeMenus(); }, { capture: true });
   $("#browse").addEventListener("click", () => { renderSide(c, true); $("#split").classList.add("show"); $("#closeSide").hidden = false; });
   $("#closeSide").addEventListener("click", () => { $("#split").classList.remove("show"); $("#closeSide").hidden = true; });
 }

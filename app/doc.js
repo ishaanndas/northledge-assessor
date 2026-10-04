@@ -33,65 +33,110 @@
     return m;
   }
 
-  // mode: "review" (editable in place), "partner" (decisions and overrides applied), "static" (read-only, all)
-  // o.decisions: {id: {action, text}}  o.overrides: {summary, findings:{di}, thesis, missing:{i:{text,removed}}, questions:{"di.qi":text}}
+  // ---------------------------------------------------------------------------
+  // Block model. The document is an ordered list of blocks. Blocks that come
+  // from the model (claims, findings, summary, thesis, gaps) can be edited in
+  // place or removed; the associate can also insert blocks of their own after
+  // any block (paragraph, heading, bullet, quote). Nothing mutates the draft:
+  // edits live in review.decisions / review.overrides, inserts in
+  // overrides.inserts[anchorKey] = [{id, type, html}].
+  // ---------------------------------------------------------------------------
+  const INSERT_TYPES = { p: "Text", h: "Heading", bullet: "Bulleted item", quote: "Quote", divider: "Divider" };
   const ov = (o, path, fallback) => { const v = path.split(".").reduce((a, k) => (a == null ? a : a[k]), o.overrides || {}); return v == null || v === "" ? fallback : v; };
-  const ed = (o, field, text, cls = "", tag = "span", placeholder = "") =>
-    o.mode === "review"
-      ? `<${tag} class="e ${cls}" contenteditable="plaintext-only" data-field="${field}" data-placeholder="${esc(placeholder)}">${esc(text)}</${tag}>`
-      : `<${tag} class="${cls}">${esc(text)}</${tag}>`;
+  const sanitize = (html) => String(html || "")
+    .replace(/<div>/gi, "<br>").replace(/<\/div>/gi, "").replace(/<p[^>]*>/gi, "").replace(/<\/p>/gi, "<br>")
+    .replace(/<(?!\/?(b|strong|i|em|u|br|a)\b)[^>]*>/gi, "")
+    .replace(/<a\b[^>]*href="([^"]*)"[^>]*>/gi, '<a href="$1" target="_blank" rel="noopener">')
+    .replace(/(<br>\s*)+$/i, "");
 
-  function claim(id, s, o) {
-    const d = (o.decisions || {})[id] || { action: "keep" };
-    const removed = d.action === "remove";
-    if (o.mode !== "review" && removed) return "";
-    const st = s.verification?.status || "verified";
-    const text = d.action === "edit" && d.text ? d.text : s.text;
-    const refs = (s.citations || []).map((c) => `<span class="chip${c.status && c.status !== "ok" && c.status !== "quote_too_long" ? " bad" : ""}">${esc(c.passage_id)}</span>`).join("");
-    const cls = ["claim", st, o.selected === id ? "lit" : "", removed ? "removed" : "", d.action === "edit" && d.text ? "edited" : ""].join(" ");
-    const body = o.mode === "review" && !removed
-      ? `<span class="t e" contenteditable="plaintext-only" data-claim="${id}">${esc(text)}</span>`
-      : `<span class="t">${esc(text)}</span>`;
-    const acts = o.mode === "review" ? (removed ? `<button class="x" data-act="keep" title="Restore">Restore</button>` : `<button class="x" data-act="remove" title="Remove">×</button>`) : "";
-    return `<li class="${cls}" data-id="${id}"><span class="d"></span><span class="body">${body}<span class="refs">${refs}${s.basis !== "stated" ? `<span class="chip">${s.basis}</span>` : ""}</span></span>${acts}</li>`;
-  }
-
-  function document(c, o) {
+  function buildBlocks(c, o) {
     const r = c.record, a = r.assessment, rv = c.reviewDoc, v = r.verification_summary;
-    const claims = (arr, prefix) => arr.map((s, i) => claim(`${prefix}${i}`, s, o)).join("");
-    const reviewer = o.mode === "review" ? o.reviewer : rv?.reviewer;
-    let h = `<div class="label">Draft for partner review. Not a recommendation.</div><h1>${esc(a.company_name)}</h1>`;
-    h += `<p class="meta">${esc(c.one_liner || "")}${c.ask ? ` · ${esc(c.ask)}` : ""}</p>`;
-    h += `<p class="meta">Drafted ${esc(r.generated_at)} from ${r.sources.map((s) => esc(s.key)).join(", ")}. ${v.verified} of ${v.statements} statements verified against the source text${v.warning ? `, ${v.warning} with warnings` : ""}${v.failed ? `, ${v.failed} unverified` : ""}${r.repairs ? ", after one repair round" : ""}.</p>`;
-    if (o.mode === "review") h += `<p class="meta">Reviewed by ${ed(o, "reviewer", o.reviewer || "", "inline", "span", "your name")}</p>`;
-    else if (reviewer) h += `<p class="meta">Reviewed by ${esc(reviewer)}.</p>`;
-    const note = o.mode === "review" ? o.note || "" : rv?.note?.trim() || "";
-    if (o.mode === "review") h += `<section><h2>Note to partners</h2>${ed(o, "note", note, "note", "div", "Thesis fit, what the call felt like, anything the draft cannot know. Shown above the draft on the partner page.")}</section>`;
-    else if (note) h += `<section><h2>Note from ${esc(reviewer || "the associate")}</h2><p class="note">${esc(note)}</p></section>`;
-    h += `<section><h2>Summary</h2>${ed(o, "summary", ov(o, "summary", a.summary), "summary", "p")}</section>`;
-    if (a.integrity_notes.length) h += `<section><h2>Things that are not evidence</h2><ul class="flags">${a.integrity_notes.map((n) => `<li>${esc(n)}</li>`).join("")}</ul></section>`;
-    h += `<section><h2>Assessment</h2>${a.dimensions.map((d, di) => {
-      const items = claims(d.claims, `d${di}.c`);
-      if (o.mode !== "review" && !items) return "";
-      const qs = d.open_questions.map((q, qi) => `<li>${ed(o, `questions.${di}.${qi}`, ov(o, `questions.${di}.${qi}`, q))}</li>`).join("");
-      return `<div class="dim"><h3>${esc(d.name)}</h3>${ed(o, `findings.${di}`, ov(o, `findings.${di}`, d.finding), "finding", "p")}<ul class="claims">${items}</ul>${qs ? `<ul class="oq">${qs}</ul>` : ""}</div>`;
-    }).join("")}</section>`;
-    const x = claims(a.contradictions, "x");
-    h += `<section><h2>Where the sources disagree</h2>${x ? `<ul class="claims">${x}</ul>` : `<p class="finding">The sources do not contradict each other.</p>`}</section>`;
-    const gaps = a.missing.map((m, i) => {
+    const review = o.mode === "review";
+    const B = [];
+    const push = (b) => B.push(b);
+    const claimBlocks = (arr, prefix) => arr.forEach((s, i) => {
+      const id = `${prefix}${i}`, d = (o.decisions || {})[id] || { action: "keep" };
+      if (!review && d.action === "remove") return;
+      push({ key: `claim.${id}`, type: "claim", id, stmt: s, decision: d, editable: review && d.action !== "remove", text: d.action === "edit" && d.text ? d.text : s.text });
+    });
+    push({ key: "label", type: "label", text: "Draft for partner review. Not a recommendation.", fixed: true });
+    push({ key: "title", type: "title", text: a.company_name, fixed: true });
+    push({ key: "meta1", type: "meta", text: `${c.one_liner || ""}${c.ask ? ` · ${c.ask}` : ""}`, fixed: true });
+    push({ key: "meta2", type: "meta", text: `Drafted ${r.generated_at} from ${r.sources.map((s) => s.key).join(", ")}. ${v.verified} of ${v.statements} statements verified against the source text${v.warning ? `, ${v.warning} with warnings` : ""}${v.failed ? `, ${v.failed} unverified` : ""}${r.repairs ? ", after one repair round" : ""}.`, fixed: true });
+    const reviewer = review ? o.reviewer : rv?.reviewer;
+    if (review) push({ key: "reviewer", type: "reviewer", text: o.reviewer || "", editable: true, field: "reviewer", placeholder: "your name" });
+    else if (reviewer) push({ key: "meta3", type: "meta", text: `Reviewed by ${reviewer}.`, fixed: true });
+    const note = review ? o.note || "" : rv?.note?.trim() || "";
+    if (review) { push({ key: "h.note", type: "h2", text: "Note to partners", fixed: true }); push({ key: "note", type: "note", html: note, rich: true, editable: true, field: "note", placeholder: "Thesis fit, what the call felt like, anything the draft cannot know. Shown above the draft on the partner page." }); }
+    else if (note) { push({ key: "h.note", type: "h2", text: `Note from ${reviewer || "the associate"}`, fixed: true }); push({ key: "note", type: "note", html: note, rich: true }); }
+    push({ key: "h.summary", type: "h2", text: "Summary", fixed: true });
+    push({ key: "summary", type: "summary", text: ov(o, "summary", a.summary), editable: review, field: "summary" });
+    if (a.integrity_notes.length) { push({ key: "h.flags", type: "h2", text: "Things that are not evidence", fixed: true }); push({ key: "flags", type: "flags", items: a.integrity_notes, fixed: true }); }
+    push({ key: "h.assessment", type: "h2", text: "Assessment", fixed: true });
+    a.dimensions.forEach((d, di) => {
+      const visible = review || d.claims.some((_, ci) => ((o.decisions || {})[`d${di}.c${ci}`] || {}).action !== "remove");
+      if (!visible) return;
+      push({ key: `dim.${di}`, type: "h3", text: d.name, fixed: true });
+      push({ key: `finding.${di}`, type: "finding", text: ov(o, `findings.${di}`, d.finding), editable: review, field: `findings.${di}` });
+      claimBlocks(d.claims, `d${di}.c`);
+      d.open_questions.forEach((q, qi) => push({ key: `q.${di}.${qi}`, type: "bullet", text: ov(o, `questions.${di}.${qi}`, q), editable: review, field: `questions.${di}.${qi}`, muted: true }));
+    });
+    push({ key: "h.contra", type: "h2", text: "Where the sources disagree", fixed: true });
+    if (a.contradictions.length) claimBlocks(a.contradictions, "x"); else push({ key: "contra.none", type: "finding", text: "The sources do not contradict each other.", fixed: true });
+    push({ key: "h.missing", type: "h2", text: "What is missing", fixed: true });
+    a.missing.forEach((m, i) => {
       const g = (o.overrides?.missing || {})[i] || {};
-      if (g.removed && o.mode !== "review") return "";
-      const text = g.text || `${m.item}. ${m.why_it_matters}`;
-      return `<li class="gap ${g.removed ? "removed" : ""}" data-gap="${i}">${o.mode === "review" && !g.removed ? `<span class="e" contenteditable="plaintext-only" data-field="missing.${i}.text">${esc(text)}</span>` : `<span>${esc(text)}</span>`}${o.mode === "review" ? (g.removed ? `<button class="x" data-gapact="restore">Restore</button>` : `<button class="x" data-gapact="remove" title="Remove">×</button>`) : ""}</li>`;
-    }).join("");
-    h += `<section><h2>What is missing</h2><ul class="gaps">${gaps}</ul></section>`;
-    h += `<section><h2>The case against</h2><div class="bear">${ed(o, "thesis", ov(o, "thesis", a.bear_case.thesis), "thesis", "p")}<ul class="claims">${claims(a.bear_case.points, "b")}</ul></div></section>`;
-    if (o.mode !== "partner" && c.eval) {
-      const e = c.eval, j = e.judge?.counts, flagged = e.judge ? e.judge.rows.filter((r2) => r2.verdict !== "supported") : [];
-      h += `<section><h2>Automated checks</h2><div class="checks">Quotes found in source: <b>${e.deterministic.verified} of ${e.deterministic.statements}</b>.${j ? ` Second-model read of each claim against its passages: <b>${j.supported} supported</b>, <b>${j.partial} partial</b>, <b>${j.unsupported} unsupported</b>.` : ""} Recommendation or score language: <b>${e.leaks.length ? e.leaks.length + " hits" : "none"}</b>.${flagged.length ? `<div class="fl">Partial: ${flagged.map((f) => `${f.id}, ${esc(f.reason)}`).join(" · ")}</div>` : ""}</div></section>`;
-    }
-    return h;
+      if (g.removed && !review) return;
+      push({ key: `gap.${i}`, type: "gap", text: g.text || `${m.item}. ${m.why_it_matters}`, editable: review && !g.removed, field: `missing.${i}.text`, removed: !!g.removed, index: i });
+    });
+    push({ key: "h.bear", type: "h2", text: "The case against", fixed: true, bear: true });
+    push({ key: "thesis", type: "thesis", text: ov(o, "thesis", a.bear_case.thesis), editable: review, field: "thesis" });
+    claimBlocks(a.bear_case.points, "b");
+    if (o.mode !== "partner" && c.eval) push({ key: "checks", type: "checks", eval: c.eval, fixed: true });
+    // Weave in the associate's inserted blocks after their anchors.
+    const inserts = o.overrides?.inserts || {};
+    const out = [];
+    const addWithInserts = (b) => { out.push(b); for (const ins of inserts[b.key] || []) addWithInserts({ key: `ins.${ins.id}`, type: ins.type, html: ins.html || "", rich: ins.type !== "divider", editable: review && ins.type !== "divider", insert: true, id: ins.id }); };
+    B.forEach(addWithInserts);
+    return out;
   }
+
+  function renderBlock(b, o) {
+    const review = o.mode === "review";
+    const ce = b.editable ? (b.rich ? ' contenteditable="true"' : ' contenteditable="plaintext-only"') : "";
+    const ph = b.placeholder ? ` data-placeholder="${esc(b.placeholder)}"` : b.insert ? ' data-placeholder="Type, or press / for a block type"' : "";
+    const inner = b.rich ? sanitize(b.html) : esc(b.text ?? "");
+    const handle = review && !b.fixed ? `<button class="handle" data-handle="${esc(b.key)}" tabindex="-1" title="Block menu">⋮⋮</button>` : "";
+    const cls = `blk t-${b.type}${b.editable ? " editable" : ""}${b.insert ? " insert" : ""}${b.muted ? " muted" : ""}${b.removed ? " removed" : ""}`;
+    switch (b.type) {
+      case "label": return `<div class="${cls}">${esc(b.text)}</div>`;
+      case "title": return `<h1 class="${cls}">${esc(b.text)}</h1>`;
+      case "meta": return `<p class="${cls}">${esc(b.text)}</p>`;
+      case "reviewer": return `<p class="${cls}">Reviewed by <span class="bc inline"${ce} data-key="${b.key}"${ph}>${inner}</span></p>`;
+      case "h2": return `<h2 class="${cls}${b.bear ? " bear" : ""}" data-key="${esc(b.key)}">${esc(b.text)}</h2>`;
+      case "h3": return `<h3 class="${cls}" data-key="${esc(b.key)}">${esc(b.text)}</h3>`;
+      case "flags": return `<ul class="${cls}">${b.items.map((n) => `<li>${esc(n)}</li>`).join("")}</ul>`;
+      case "checks": {
+        const e = b.eval, j = e.judge?.counts, flagged = e.judge ? e.judge.rows.filter((r2) => r2.verdict !== "supported") : [];
+        return `<h2 class="blk t-h2">Automated checks</h2><div class="${cls}">Quotes found in source: <b>${e.deterministic.verified} of ${e.deterministic.statements}</b>.${j ? ` Second-model read of each claim against its passages: <b>${j.supported} supported</b>, <b>${j.partial} partial</b>, <b>${j.unsupported} unsupported</b>.` : ""} Recommendation or score language: <b>${e.leaks.length ? e.leaks.length + " hits" : "none"}</b>.${flagged.length ? `<div class="fl">Partial: ${flagged.map((f) => `${f.id}, ${esc(f.reason)}`).join(" · ")}</div>` : ""}</div>`;
+      }
+      case "claim": {
+        const s = b.stmt, st = s.verification?.status || "verified", d = b.decision;
+        const refs = (s.citations || []).map((c) => `<span class="chip${c.status && c.status !== "ok" && c.status !== "quote_too_long" ? " bad" : ""}">${esc(c.passage_id)}</span>`).join("") + (s.basis !== "stated" ? `<span class="chip">${s.basis}</span>` : "");
+        const removed = d.action === "remove";
+        return `<div class="${cls} ${st}${removed ? " removed" : ""}${d.action === "edit" && d.text ? " edited" : ""}${o.selected === b.id ? " lit" : ""}" data-key="${esc(b.key)}" data-id="${b.id}">${handle}<span class="dot"></span><div class="body"><span class="bc"${removed ? "" : ce} data-key="${esc(b.key)}">${inner}</span><span class="refs">${refs}</span></div>${review ? (removed ? `<button class="x" data-act="keep">Restore</button>` : `<button class="x" data-act="remove" title="Remove">×</button>`) : ""}</div>`;
+      }
+      case "gap": return `<div class="${cls}" data-key="${esc(b.key)}" data-gap="${b.index}">${handle}<span class="bc"${b.removed ? "" : ce} data-key="${esc(b.key)}">${inner}</span>${review ? (b.removed ? `<button class="x" data-gapact="restore">Restore</button>` : `<button class="x" data-gapact="remove" title="Remove">×</button>`) : ""}</div>`;
+      case "divider": return `<div class="${cls}" data-key="${esc(b.key)}">${handle}<hr></div>`;
+      case "bullet": return `<div class="${cls}" data-key="${esc(b.key)}">${handle}<span class="bul"></span><span class="bc"${ce} data-key="${esc(b.key)}"${ph}>${inner}</span></div>`;
+      case "h": return `<div class="${cls}" data-key="${esc(b.key)}">${handle}<span class="bc"${ce} data-key="${esc(b.key)}"${ph}>${inner}</span></div>`;
+      case "quote": return `<div class="${cls}" data-key="${esc(b.key)}">${handle}<span class="bc"${ce} data-key="${esc(b.key)}"${ph}>${inner}</span></div>`;
+      default: // p, note, summary, finding, thesis
+        return `<div class="${cls}" data-key="${esc(b.key)}">${handle}<span class="bc"${ce} data-key="${esc(b.key)}"${ph}>${inner}</span></div>`;
+    }
+  }
+
+  function document(c, o) { return buildBlocks(c, o).map((b) => renderBlock(b, o)).join(""); }
 
   function provenance(c, id) {
     if (!id) return `<p class="none">Select a statement in the draft. The passages it cites appear here with the quoted words marked.</p>`;
@@ -117,5 +162,5 @@
     return c.record.sources.map((s) => `<div class="src"><h5>${esc(s.key)} · ${esc(s.title)}</h5>${(bySource[s.key] || []).map(([id, p]) => `<div class="src"><div class="sh"><span class="chip">${esc(id)}</span></div><div class="tx">${esc(p.text)}</div></div>`).join("")}</div>`).join("");
   }
 
-  window.Doc = { esc, highlight, statements, document, provenance, browse };
+  window.Doc = { esc, highlight, statements, document, buildBlocks, provenance, browse, sanitize, INSERT_TYPES };
 })();

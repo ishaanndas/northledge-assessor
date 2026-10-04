@@ -146,62 +146,77 @@ mark{background:var(--amber-bg);color:var(--heading);box-shadow:inset 0 -1.5px 0
 .run ul.f{margin:6px 0 0;padding-left:16px;font-size:12.5px;color:var(--muted-foreground)}
 .run .result{display:flex;align-items:center;gap:18px;font-size:13px;color:var(--muted-foreground);padding:14px 16px;border-top:1px solid var(--border);background:var(--muted)}
 .run .result b{color:var(--heading);font-weight:600}
-/* document + sources panel. Notion-like: no boxes, click anywhere to type. */
+/* document + sources panel. A block editor: every block has a handle, Enter adds a block. */
 .split{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 400px}
 .docwrap{overflow:auto;min-width:0;background:#fff}
-.doc{max-width:760px;margin:0 auto;padding:48px 56px 160px;font-size:15px;line-height:1.65;color:var(--foreground)}
-.doc .label{font-size:10px;font-weight:500;letter-spacing:1.2px;text-transform:uppercase;color:var(--subtle);margin-bottom:14px}
-.doc h1{font-size:34px;font-weight:600;letter-spacing:-.8px;margin-bottom:10px}
-.doc .meta{font-size:13.5px;color:var(--muted-foreground);line-height:1.6}
-.doc section{margin-top:40px}
-.doc h2{font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--subtle);margin-bottom:10px}
-.doc .e{display:block;border-radius:4px;outline:none;padding:3px 6px;margin:-3px -6px;transition:background .12s;white-space:pre-wrap;cursor:text}
-.doc .e:hover{background:var(--muted)}
-.doc .e:focus{background:var(--muted-2)}
-.doc .e:empty::before,.doc .e[data-placeholder]:not(:focus):empty::before{content:attr(data-placeholder);color:var(--subtle);pointer-events:none}
-.doc span.e{display:inline;padding:1px 4px;margin:-1px -4px}
-.doc .e.inline{display:inline-block;min-width:80px;border-bottom:1px dashed var(--border-2);padding:0 2px;margin:0;border-radius:0;color:var(--heading)}
-.doc .summary{font-size:16px;line-height:1.7}
-.doc .note{font-size:15.5px;line-height:1.7;min-height:1.7em}
-.doc ul.flags{margin:0;padding:12px 16px 12px 34px;background:oklch(98.4% .003 247.858/.7);border-left:2px solid var(--border-2);font-size:13.5px;color:var(--muted-foreground)}
-.doc ul.flags li{margin:3px 0}
-.doc .dim{margin-top:28px}
-.doc h3{font-size:17px;font-weight:600;letter-spacing:-.3px;margin-bottom:4px}
-.doc .finding{color:var(--muted-foreground);font-size:14px;margin-bottom:6px;line-height:1.6}
-.doc ul.claims{list-style:none;margin:0;padding:0}
-.claim{position:relative;display:grid;grid-template-columns:14px 1fr auto;gap:8px;padding:4px 8px 4px 6px;margin:0 -8px 0 -6px;border-radius:4px;font-size:15px;line-height:1.6;align-items:start}
-.claim:hover{background:var(--muted)}
-.claim.lit{background:var(--amber-bg)}
-.claim .d{width:6px;height:6px;border-radius:50%;background:var(--green);margin:10px 0 0 2px;flex:none}
-.claim.warning .d{background:var(--amber)}.claim.failed .d{background:var(--red)}
-.claim .body{min-width:0}
-.claim .t{outline:none;border-radius:3px;cursor:text}
-.claim .t.e{display:inline;padding:0 2px;margin:0 -2px}
-.claim .t.e:hover{background:transparent}
-.claim .t.e:focus{background:#fff;box-shadow:0 0 0 1px var(--border-2)}
-.claim .refs{margin-left:6px;white-space:nowrap}
-.claim .refs .chip{margin-right:3px;vertical-align:1px}
-.claim.removed .t{color:var(--subtle);text-decoration:line-through}
-.claim.removed .refs{opacity:.5}
-.claim.edited .d{box-shadow:0 0 0 2px var(--blue-bg)}
-.claim .x{opacity:0;font-size:13px;color:var(--subtle);padding:0 6px;line-height:1.6;border-radius:3px;align-self:start}
-.claim:hover .x,.claim.removed .x{opacity:1}
-.claim .x:hover{color:var(--heading);background:#fff;box-shadow:inset 0 0 0 1px var(--border-2)}
-.claim.removed .x{font-size:12px;font-weight:500;color:var(--muted-foreground)}
-.doc ul.oq{margin:8px 0 0;padding-left:22px;color:var(--muted-foreground);font-size:14px}
-.doc ul.oq li{margin:2px 0}
-.doc ul.gaps{list-style:none;margin:0;padding:0}
-.doc .gap{position:relative;display:grid;grid-template-columns:1fr auto;gap:8px;padding:6px 8px;margin:0 -8px;border-radius:4px;font-size:15px;line-height:1.6;align-items:start}
-.doc .gap:hover{background:var(--muted)}
-.doc .gap.removed span{color:var(--subtle);text-decoration:line-through}
-.doc .gap .x{opacity:0;font-size:13px;color:var(--subtle);padding:0 6px;border-radius:3px}
-.doc .gap:hover .x,.doc .gap.removed .x{opacity:1}
-.doc .gap.removed .x{font-size:12px;font-weight:500;color:var(--muted-foreground)}
-.doc .bear{border-left:2px solid var(--red);padding-left:18px}
-.doc .thesis{font-size:15.5px;margin-bottom:8px;line-height:1.65}
-.doc .checks{font-size:13.5px;color:var(--muted-foreground);line-height:1.7}
-.doc .checks b{font-weight:500;color:var(--heading)}
-.doc .checks .fl{margin-top:6px;color:var(--subtle)}
+.doc{max-width:760px;margin:0 auto;padding:48px 56px 200px;font-size:15px;line-height:1.65;color:var(--foreground)}
+.blk{position:relative}
+.blk .handle{position:absolute;left:-30px;top:4px;width:22px;height:22px;display:flex;align-items:center;justify-content:center;color:var(--subtle);font-size:13px;letter-spacing:-2px;border-radius:4px;opacity:0;transition:opacity .1s}
+.blk:hover .handle,.blk:focus-within .handle{opacity:1}
+.blk .handle:hover{background:var(--muted-2);color:var(--heading)}
+.bc{outline:none;display:block;border-radius:3px;white-space:pre-wrap;word-break:break-word;min-height:1.4em}
+.bc[contenteditable]{cursor:text}
+.bc[contenteditable]:hover{background:oklch(98% .003 260)}
+.bc[contenteditable]:focus{background:var(--muted)}
+.bc:empty::before,.bc[data-placeholder]:empty::before{content:attr(data-placeholder);color:var(--subtle);pointer-events:none}
+.bc.inline{display:inline;padding:0 2px;border-bottom:1px dashed var(--border-2);min-width:60px;color:var(--heading)}
+.t-label{font-size:10px;font-weight:500;letter-spacing:1.2px;text-transform:uppercase;color:var(--subtle);margin-bottom:14px}
+h1.t-title{font-size:34px;font-weight:600;letter-spacing:-.8px;margin:0 0 10px}
+.t-meta,.t-reviewer{font-size:13.5px;color:var(--muted-foreground);line-height:1.6;margin:0}
+h2.t-h2{font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--subtle);margin:40px 0 10px}
+h2.t-h2.bear{color:var(--red)}
+h3.t-h3{font-size:17px;font-weight:600;letter-spacing:-.3px;margin:28px 0 4px}
+.t-summary .bc{font-size:16px;line-height:1.7}
+.t-note .bc{font-size:15.5px;line-height:1.7}
+.t-finding .bc{color:var(--muted-foreground);font-size:14px;line-height:1.6;margin-bottom:4px}
+.t-thesis{border-left:2px solid var(--red);padding-left:16px;margin-bottom:6px}
+.t-thesis .bc{font-size:15.5px}
+.t-thesis + .t-claim,.t-claim.b{border-left:2px solid transparent}
+ul.t-flags{margin:0;padding:12px 16px 12px 34px;background:oklch(98.4% .003 247.858/.7);border-left:2px solid var(--border-2);font-size:13.5px;color:var(--muted-foreground)}
+ul.t-flags li{margin:3px 0}
+.t-checks{font-size:13.5px;color:var(--muted-foreground);line-height:1.7}
+.t-checks b{font-weight:500;color:var(--heading)}.t-checks .fl{margin-top:6px;color:var(--subtle)}
+/* claims */
+.t-claim{display:grid;grid-template-columns:14px 1fr auto;gap:8px;padding:4px 8px 4px 6px;margin:0 -8px 0 -6px;border-radius:4px;font-size:15px;line-height:1.6;align-items:start}
+.t-claim:hover{background:var(--muted)}
+.t-claim.lit{background:var(--amber-bg)}
+.t-claim .dot{width:6px;height:6px;border-radius:50%;background:var(--green);margin:10px 0 0 2px}
+.t-claim.warning .dot{background:var(--amber)}.t-claim.failed .dot{background:var(--red)}
+.t-claim.edited .dot{box-shadow:0 0 0 2px var(--blue-bg)}
+.t-claim .body{min-width:0}
+.t-claim .bc{display:inline;padding:0 2px;margin:0 -2px}
+.t-claim .bc[contenteditable]:hover{background:transparent}
+.t-claim .bc[contenteditable]:focus{background:#fff;box-shadow:0 0 0 1px var(--border-2)}
+.t-claim .refs{margin-left:6px;white-space:nowrap}
+.t-claim .refs .chip{margin-right:3px;vertical-align:1px}
+.t-claim.removed .bc{color:var(--subtle);text-decoration:line-through}
+.t-claim.removed .refs{opacity:.5}
+.t-claim .handle{left:-24px}
+.x{opacity:0;font-size:13px;color:var(--subtle);padding:0 6px;line-height:1.6;border-radius:3px;align-self:start}
+.t-claim:hover .x,.t-claim.removed .x,.t-gap:hover .x,.t-gap.removed .x{opacity:1}
+.x:hover{color:var(--heading);background:#fff;box-shadow:inset 0 0 0 1px var(--border-2)}
+.removed .x{font-size:12px;font-weight:500;color:var(--muted-foreground)}
+/* gaps, bullets, inserted blocks */
+.t-gap{display:grid;grid-template-columns:1fr auto;gap:8px;padding:5px 8px;margin:0 -8px;border-radius:4px;font-size:15px;line-height:1.6;align-items:start}
+.t-gap:hover{background:var(--muted)}
+.t-gap.removed .bc{color:var(--subtle);text-decoration:line-through}
+.t-bullet{display:grid;grid-template-columns:18px 1fr;padding:2px 0;font-size:15px}
+.t-bullet .bul{width:5px;height:5px;border-radius:50%;background:var(--ink,#555);margin:11px 0 0 5px}
+.t-bullet.muted{color:var(--muted-foreground);font-size:14px}
+.t-bullet.muted .bul{background:var(--subtle)}
+.t-p{padding:2px 0;font-size:15px}
+.t-h{padding:10px 0 2px}.t-h .bc{font-size:20px;font-weight:600;letter-spacing:-.4px;color:var(--heading)}
+.t-quote{border-left:3px solid var(--heading);padding:2px 0 2px 14px;margin:6px 0}
+.t-quote .bc{font-size:15px;font-style:italic}
+.t-divider{padding:10px 0}.t-divider hr{border:0;border-top:1px solid var(--border-2);margin:0}
+.insert .bc[contenteditable]:hover{background:oklch(98% .003 260)}
+/* menus */
+.menu,.slash{position:fixed;z-index:50;min-width:230px;background:#fff;border:1px solid var(--border-2);box-shadow:0 8px 24px rgba(0,0,0,.1);padding:4px;font-size:13px}
+.menu button,.slash button{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:7px 10px;color:var(--heading)}
+.menu button:hover,.slash button:hover,.slash button.on,.menu button.on{background:var(--muted-2)}
+.menu button.danger{color:var(--red)}
+.menu button small,.slash button small{color:var(--subtle);font-size:11px}
+.menu .sep{height:1px;background:var(--border);margin:4px 0}
 aside.sources{border-left:1px solid var(--border);background:#fff;display:flex;flex-direction:column;min-height:0}
 aside.sources .h{display:flex;align-items:center;gap:10px;padding:0 20px;height:48px;border-bottom:1px solid var(--border);flex:none}
 aside.sources .h b{font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--subtle);flex:1}
@@ -232,6 +247,57 @@ aside.sources .none{color:var(--subtle);font-size:13px;line-height:1.6}
 @media (max-width:1100px){.split{grid-template-columns:1fr}aside.sources{display:none}.split.show aside.sources{display:flex;position:fixed;right:0;top:0;bottom:0;width:min(440px,100%);z-index:20;box-shadow:-12px 0 32px rgba(0,0,0,.14)}.fu{grid-template-columns:1fr}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:820px){.ws{grid-template-columns:1fr}.rail{display:none}.form .three{grid-template-columns:1fr}.page{padding:24px 20px}.cards{grid-template-columns:1fr}.callout{grid-template-columns:1fr}}
 @media print{.top,.rail,aside.sources,.stagehead,.acts,.reviewblock{display:none!important}.ws,.split{display:block}.docwrap{overflow:visible}.doc{max-width:none;padding:0}}
+
+/* nav link + count */
+.top .navlink{font-size:13px;font-weight:500;color:var(--muted-foreground);padding:6px 10px;border-radius:6px;display:inline-flex;align-items:center;gap:6px}
+.top .navlink:hover{color:var(--heading);background:var(--muted)}
+.top .count{font-size:11px;font-weight:600;background:var(--primary);color:#fff;border-radius:999px;padding:0 6px;line-height:16px}
+/* home: two callouts, view toggle */
+.callouts{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:32px}
+.callouts .callout{margin:0}
+.callout.live{border-color:var(--amber-line);background:var(--amber-bg)}
+.seg{display:inline-flex;border:1px solid var(--border-2);background:#fff}
+.seg button{font-size:12px;font-weight:500;padding:4px 10px;color:var(--muted-foreground)}
+.seg button.on{background:var(--muted-2);color:var(--heading)}
+table.list{width:100%;border-collapse:collapse;font-size:13.5px;background:#fff;border:1px solid var(--border-2)}
+.list th{text-align:left;font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--subtle);padding:10px 14px;border-bottom:1px solid var(--border-2);background:var(--muted)}
+.list td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+.list tr:last-child td{border-bottom:0}
+.list tr.row{cursor:pointer}.list tr.row:hover td{background:var(--muted)}
+.list .nm{font-weight:500;color:var(--heading)}.list .ol{color:var(--muted-foreground);font-size:12.5px;margin-top:1px}
+.list .num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.list .nw{white-space:nowrap}
+/* intake ingestion */
+.form .src .lab .st{font-size:12px;color:var(--muted-foreground);margin-left:4px}
+.form .src .lab .st.ok{color:var(--green)}.form .src .lab .st.bad{color:var(--red)}
+.form .src .lab .pick{margin-left:auto}
+.form .urlrow{display:flex;gap:8px}
+.form .urlrow .input{box-shadow:none;background:#fff}
+.form .drop{border:1px dashed transparent;margin:-1px}
+.form .drop.over{border-color:var(--ring);background:oklch(97% .015 250)}
+.form .drop.over textarea{opacity:.5}
+.form .fill{font-size:13px;padding:10px 14px;border:1px solid var(--border-2);background:var(--muted);color:var(--muted-foreground)}
+.form .fill.ok{background:var(--green-bg);color:var(--green);border-color:oklch(90% .06 155)}
+.form .fill.bad{background:var(--red-bg);color:var(--red)}
+.form .input.auto{background:var(--green-bg);border-color:oklch(90% .06 155)}
+/* inbox */
+.provs{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border-2);border:1px solid var(--border-2);margin-bottom:28px}
+.prov{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;background:#fff;font-size:13px}
+.prov .dot{width:8px;height:8px;border-radius:50%;background:var(--border-2);margin-top:6px;flex:none}
+.prov.on .dot{background:var(--green)}
+.prov b{display:block;font-weight:500;color:var(--heading)}.prov span{color:var(--muted-foreground);font-size:12.5px}
+.msgs{display:flex;flex-direction:column;gap:1px;background:var(--border-2);border:1px solid var(--border-2)}
+.msg{display:grid;grid-template-columns:220px 1fr auto;grid-template-areas:"who subj act" "who body act" "who att act";gap:4px 20px;padding:16px 18px;background:#fff;align-items:start}
+.msg.done{background:var(--muted)}
+.msg .who{grid-area:who;font-size:12.5px}.msg .who b{display:block;font-weight:500;color:var(--heading);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.msg .who span{color:var(--subtle)}
+.msg .subj{grid-area:subj;font-size:14px;font-weight:500;color:var(--heading)}
+.msg .body{grid-area:body;font-size:13px;color:var(--muted-foreground)}
+.msg .att{grid-area:att;display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.msg .act{grid-area:act;display:flex;gap:8px;align-items:center}
+.file{display:inline-flex;align-items:center;gap:6px;font-size:12px;border:1px solid var(--border-2);padding:3px 8px 3px 4px;color:var(--heading);background:#fff}
+.file .k{font-family:var(--mono);font-size:10px;font-weight:600;background:var(--muted-2);padding:1px 5px;color:var(--muted-foreground)}
+.file .sz{color:var(--subtle)}
+@media (max-width:900px){.callouts,.provs{grid-template-columns:1fr}.msg{grid-template-columns:1fr;grid-template-areas:"who" "subj" "body" "att" "act"}}
 </style>
 </head><body>
 <header class="top"><span class="name">Assessments</span><div class="crumbs"><span>/</span><b>Static report</b></div><div class="right"><span class="ter" style="font-size:12.5px">Committed run. No scores, no recommendations.</span></div></header>
@@ -272,65 +338,110 @@ aside.sources .none{color:var(--subtle);font-size:13px;line-height:1.6}
     return m;
   }
 
-  // mode: "review" (editable in place), "partner" (decisions and overrides applied), "static" (read-only, all)
-  // o.decisions: {id: {action, text}}  o.overrides: {summary, findings:{di}, thesis, missing:{i:{text,removed}}, questions:{"di.qi":text}}
+  // ---------------------------------------------------------------------------
+  // Block model. The document is an ordered list of blocks. Blocks that come
+  // from the model (claims, findings, summary, thesis, gaps) can be edited in
+  // place or removed; the associate can also insert blocks of their own after
+  // any block (paragraph, heading, bullet, quote). Nothing mutates the draft:
+  // edits live in review.decisions / review.overrides, inserts in
+  // overrides.inserts[anchorKey] = [{id, type, html}].
+  // ---------------------------------------------------------------------------
+  const INSERT_TYPES = { p: "Text", h: "Heading", bullet: "Bulleted item", quote: "Quote", divider: "Divider" };
   const ov = (o, path, fallback) => { const v = path.split(".").reduce((a, k) => (a == null ? a : a[k]), o.overrides || {}); return v == null || v === "" ? fallback : v; };
-  const ed = (o, field, text, cls = "", tag = "span", placeholder = "") =>
-    o.mode === "review"
-      ? `<${tag} class="e ${cls}" contenteditable="plaintext-only" data-field="${field}" data-placeholder="${esc(placeholder)}">${esc(text)}</${tag}>`
-      : `<${tag} class="${cls}">${esc(text)}</${tag}>`;
+  const sanitize = (html) => String(html || "")
+    .replace(/<div>/gi, "<br>").replace(/<\/div>/gi, "").replace(/<p[^>]*>/gi, "").replace(/<\/p>/gi, "<br>")
+    .replace(/<(?!\/?(b|strong|i|em|u|br|a)\b)[^>]*>/gi, "")
+    .replace(/<a\b[^>]*href="([^"]*)"[^>]*>/gi, '<a href="$1" target="_blank" rel="noopener">')
+    .replace(/(<br>\s*)+$/i, "");
 
-  function claim(id, s, o) {
-    const d = (o.decisions || {})[id] || { action: "keep" };
-    const removed = d.action === "remove";
-    if (o.mode !== "review" && removed) return "";
-    const st = s.verification?.status || "verified";
-    const text = d.action === "edit" && d.text ? d.text : s.text;
-    const refs = (s.citations || []).map((c) => `<span class="chip${c.status && c.status !== "ok" && c.status !== "quote_too_long" ? " bad" : ""}">${esc(c.passage_id)}</span>`).join("");
-    const cls = ["claim", st, o.selected === id ? "lit" : "", removed ? "removed" : "", d.action === "edit" && d.text ? "edited" : ""].join(" ");
-    const body = o.mode === "review" && !removed
-      ? `<span class="t e" contenteditable="plaintext-only" data-claim="${id}">${esc(text)}</span>`
-      : `<span class="t">${esc(text)}</span>`;
-    const acts = o.mode === "review" ? (removed ? `<button class="x" data-act="keep" title="Restore">Restore</button>` : `<button class="x" data-act="remove" title="Remove">×</button>`) : "";
-    return `<li class="${cls}" data-id="${id}"><span class="d"></span><span class="body">${body}<span class="refs">${refs}${s.basis !== "stated" ? `<span class="chip">${s.basis}</span>` : ""}</span></span>${acts}</li>`;
-  }
-
-  function document(c, o) {
+  function buildBlocks(c, o) {
     const r = c.record, a = r.assessment, rv = c.reviewDoc, v = r.verification_summary;
-    const claims = (arr, prefix) => arr.map((s, i) => claim(`${prefix}${i}`, s, o)).join("");
-    const reviewer = o.mode === "review" ? o.reviewer : rv?.reviewer;
-    let h = `<div class="label">Draft for partner review. Not a recommendation.</div><h1>${esc(a.company_name)}</h1>`;
-    h += `<p class="meta">${esc(c.one_liner || "")}${c.ask ? ` · ${esc(c.ask)}` : ""}</p>`;
-    h += `<p class="meta">Drafted ${esc(r.generated_at)} from ${r.sources.map((s) => esc(s.key)).join(", ")}. ${v.verified} of ${v.statements} statements verified against the source text${v.warning ? `, ${v.warning} with warnings` : ""}${v.failed ? `, ${v.failed} unverified` : ""}${r.repairs ? ", after one repair round" : ""}.</p>`;
-    if (o.mode === "review") h += `<p class="meta">Reviewed by ${ed(o, "reviewer", o.reviewer || "", "inline", "span", "your name")}</p>`;
-    else if (reviewer) h += `<p class="meta">Reviewed by ${esc(reviewer)}.</p>`;
-    const note = o.mode === "review" ? o.note || "" : rv?.note?.trim() || "";
-    if (o.mode === "review") h += `<section><h2>Note to partners</h2>${ed(o, "note", note, "note", "div", "Thesis fit, what the call felt like, anything the draft cannot know. Shown above the draft on the partner page.")}</section>`;
-    else if (note) h += `<section><h2>Note from ${esc(reviewer || "the associate")}</h2><p class="note">${esc(note)}</p></section>`;
-    h += `<section><h2>Summary</h2>${ed(o, "summary", ov(o, "summary", a.summary), "summary", "p")}</section>`;
-    if (a.integrity_notes.length) h += `<section><h2>Things that are not evidence</h2><ul class="flags">${a.integrity_notes.map((n) => `<li>${esc(n)}</li>`).join("")}</ul></section>`;
-    h += `<section><h2>Assessment</h2>${a.dimensions.map((d, di) => {
-      const items = claims(d.claims, `d${di}.c`);
-      if (o.mode !== "review" && !items) return "";
-      const qs = d.open_questions.map((q, qi) => `<li>${ed(o, `questions.${di}.${qi}`, ov(o, `questions.${di}.${qi}`, q))}</li>`).join("");
-      return `<div class="dim"><h3>${esc(d.name)}</h3>${ed(o, `findings.${di}`, ov(o, `findings.${di}`, d.finding), "finding", "p")}<ul class="claims">${items}</ul>${qs ? `<ul class="oq">${qs}</ul>` : ""}</div>`;
-    }).join("")}</section>`;
-    const x = claims(a.contradictions, "x");
-    h += `<section><h2>Where the sources disagree</h2>${x ? `<ul class="claims">${x}</ul>` : `<p class="finding">The sources do not contradict each other.</p>`}</section>`;
-    const gaps = a.missing.map((m, i) => {
+    const review = o.mode === "review";
+    const B = [];
+    const push = (b) => B.push(b);
+    const claimBlocks = (arr, prefix) => arr.forEach((s, i) => {
+      const id = `${prefix}${i}`, d = (o.decisions || {})[id] || { action: "keep" };
+      if (!review && d.action === "remove") return;
+      push({ key: `claim.${id}`, type: "claim", id, stmt: s, decision: d, editable: review && d.action !== "remove", text: d.action === "edit" && d.text ? d.text : s.text });
+    });
+    push({ key: "label", type: "label", text: "Draft for partner review. Not a recommendation.", fixed: true });
+    push({ key: "title", type: "title", text: a.company_name, fixed: true });
+    push({ key: "meta1", type: "meta", text: `${c.one_liner || ""}${c.ask ? ` · ${c.ask}` : ""}`, fixed: true });
+    push({ key: "meta2", type: "meta", text: `Drafted ${r.generated_at} from ${r.sources.map((s) => s.key).join(", ")}. ${v.verified} of ${v.statements} statements verified against the source text${v.warning ? `, ${v.warning} with warnings` : ""}${v.failed ? `, ${v.failed} unverified` : ""}${r.repairs ? ", after one repair round" : ""}.`, fixed: true });
+    const reviewer = review ? o.reviewer : rv?.reviewer;
+    if (review) push({ key: "reviewer", type: "reviewer", text: o.reviewer || "", editable: true, field: "reviewer", placeholder: "your name" });
+    else if (reviewer) push({ key: "meta3", type: "meta", text: `Reviewed by ${reviewer}.`, fixed: true });
+    const note = review ? o.note || "" : rv?.note?.trim() || "";
+    if (review) { push({ key: "h.note", type: "h2", text: "Note to partners", fixed: true }); push({ key: "note", type: "note", html: note, rich: true, editable: true, field: "note", placeholder: "Thesis fit, what the call felt like, anything the draft cannot know. Shown above the draft on the partner page." }); }
+    else if (note) { push({ key: "h.note", type: "h2", text: `Note from ${reviewer || "the associate"}`, fixed: true }); push({ key: "note", type: "note", html: note, rich: true }); }
+    push({ key: "h.summary", type: "h2", text: "Summary", fixed: true });
+    push({ key: "summary", type: "summary", text: ov(o, "summary", a.summary), editable: review, field: "summary" });
+    if (a.integrity_notes.length) { push({ key: "h.flags", type: "h2", text: "Things that are not evidence", fixed: true }); push({ key: "flags", type: "flags", items: a.integrity_notes, fixed: true }); }
+    push({ key: "h.assessment", type: "h2", text: "Assessment", fixed: true });
+    a.dimensions.forEach((d, di) => {
+      const visible = review || d.claims.some((_, ci) => ((o.decisions || {})[`d${di}.c${ci}`] || {}).action !== "remove");
+      if (!visible) return;
+      push({ key: `dim.${di}`, type: "h3", text: d.name, fixed: true });
+      push({ key: `finding.${di}`, type: "finding", text: ov(o, `findings.${di}`, d.finding), editable: review, field: `findings.${di}` });
+      claimBlocks(d.claims, `d${di}.c`);
+      d.open_questions.forEach((q, qi) => push({ key: `q.${di}.${qi}`, type: "bullet", text: ov(o, `questions.${di}.${qi}`, q), editable: review, field: `questions.${di}.${qi}`, muted: true }));
+    });
+    push({ key: "h.contra", type: "h2", text: "Where the sources disagree", fixed: true });
+    if (a.contradictions.length) claimBlocks(a.contradictions, "x"); else push({ key: "contra.none", type: "finding", text: "The sources do not contradict each other.", fixed: true });
+    push({ key: "h.missing", type: "h2", text: "What is missing", fixed: true });
+    a.missing.forEach((m, i) => {
       const g = (o.overrides?.missing || {})[i] || {};
-      if (g.removed && o.mode !== "review") return "";
-      const text = g.text || `${m.item}. ${m.why_it_matters}`;
-      return `<li class="gap ${g.removed ? "removed" : ""}" data-gap="${i}">${o.mode === "review" && !g.removed ? `<span class="e" contenteditable="plaintext-only" data-field="missing.${i}.text">${esc(text)}</span>` : `<span>${esc(text)}</span>`}${o.mode === "review" ? (g.removed ? `<button class="x" data-gapact="restore">Restore</button>` : `<button class="x" data-gapact="remove" title="Remove">×</button>`) : ""}</li>`;
-    }).join("");
-    h += `<section><h2>What is missing</h2><ul class="gaps">${gaps}</ul></section>`;
-    h += `<section><h2>The case against</h2><div class="bear">${ed(o, "thesis", ov(o, "thesis", a.bear_case.thesis), "thesis", "p")}<ul class="claims">${claims(a.bear_case.points, "b")}</ul></div></section>`;
-    if (o.mode !== "partner" && c.eval) {
-      const e = c.eval, j = e.judge?.counts, flagged = e.judge ? e.judge.rows.filter((r2) => r2.verdict !== "supported") : [];
-      h += `<section><h2>Automated checks</h2><div class="checks">Quotes found in source: <b>${e.deterministic.verified} of ${e.deterministic.statements}</b>.${j ? ` Second-model read of each claim against its passages: <b>${j.supported} supported</b>, <b>${j.partial} partial</b>, <b>${j.unsupported} unsupported</b>.` : ""} Recommendation or score language: <b>${e.leaks.length ? e.leaks.length + " hits" : "none"}</b>.${flagged.length ? `<div class="fl">Partial: ${flagged.map((f) => `${f.id}, ${esc(f.reason)}`).join(" · ")}</div>` : ""}</div></section>`;
-    }
-    return h;
+      if (g.removed && !review) return;
+      push({ key: `gap.${i}`, type: "gap", text: g.text || `${m.item}. ${m.why_it_matters}`, editable: review && !g.removed, field: `missing.${i}.text`, removed: !!g.removed, index: i });
+    });
+    push({ key: "h.bear", type: "h2", text: "The case against", fixed: true, bear: true });
+    push({ key: "thesis", type: "thesis", text: ov(o, "thesis", a.bear_case.thesis), editable: review, field: "thesis" });
+    claimBlocks(a.bear_case.points, "b");
+    if (o.mode !== "partner" && c.eval) push({ key: "checks", type: "checks", eval: c.eval, fixed: true });
+    // Weave in the associate's inserted blocks after their anchors.
+    const inserts = o.overrides?.inserts || {};
+    const out = [];
+    const addWithInserts = (b) => { out.push(b); for (const ins of inserts[b.key] || []) addWithInserts({ key: `ins.${ins.id}`, type: ins.type, html: ins.html || "", rich: ins.type !== "divider", editable: review && ins.type !== "divider", insert: true, id: ins.id }); };
+    B.forEach(addWithInserts);
+    return out;
   }
+
+  function renderBlock(b, o) {
+    const review = o.mode === "review";
+    const ce = b.editable ? (b.rich ? ' contenteditable="true"' : ' contenteditable="plaintext-only"') : "";
+    const ph = b.placeholder ? ` data-placeholder="${esc(b.placeholder)}"` : b.insert ? ' data-placeholder="Type, or press / for a block type"' : "";
+    const inner = b.rich ? sanitize(b.html) : esc(b.text ?? "");
+    const handle = review && !b.fixed ? `<button class="handle" data-handle="${esc(b.key)}" tabindex="-1" title="Block menu">⋮⋮</button>` : "";
+    const cls = `blk t-${b.type}${b.editable ? " editable" : ""}${b.insert ? " insert" : ""}${b.muted ? " muted" : ""}${b.removed ? " removed" : ""}`;
+    switch (b.type) {
+      case "label": return `<div class="${cls}">${esc(b.text)}</div>`;
+      case "title": return `<h1 class="${cls}">${esc(b.text)}</h1>`;
+      case "meta": return `<p class="${cls}">${esc(b.text)}</p>`;
+      case "reviewer": return `<p class="${cls}">Reviewed by <span class="bc inline"${ce} data-key="${b.key}"${ph}>${inner}</span></p>`;
+      case "h2": return `<h2 class="${cls}${b.bear ? " bear" : ""}" data-key="${esc(b.key)}">${esc(b.text)}</h2>`;
+      case "h3": return `<h3 class="${cls}" data-key="${esc(b.key)}">${esc(b.text)}</h3>`;
+      case "flags": return `<ul class="${cls}">${b.items.map((n) => `<li>${esc(n)}</li>`).join("")}</ul>`;
+      case "checks": {
+        const e = b.eval, j = e.judge?.counts, flagged = e.judge ? e.judge.rows.filter((r2) => r2.verdict !== "supported") : [];
+        return `<h2 class="blk t-h2">Automated checks</h2><div class="${cls}">Quotes found in source: <b>${e.deterministic.verified} of ${e.deterministic.statements}</b>.${j ? ` Second-model read of each claim against its passages: <b>${j.supported} supported</b>, <b>${j.partial} partial</b>, <b>${j.unsupported} unsupported</b>.` : ""} Recommendation or score language: <b>${e.leaks.length ? e.leaks.length + " hits" : "none"}</b>.${flagged.length ? `<div class="fl">Partial: ${flagged.map((f) => `${f.id}, ${esc(f.reason)}`).join(" · ")}</div>` : ""}</div>`;
+      }
+      case "claim": {
+        const s = b.stmt, st = s.verification?.status || "verified", d = b.decision;
+        const refs = (s.citations || []).map((c) => `<span class="chip${c.status && c.status !== "ok" && c.status !== "quote_too_long" ? " bad" : ""}">${esc(c.passage_id)}</span>`).join("") + (s.basis !== "stated" ? `<span class="chip">${s.basis}</span>` : "");
+        const removed = d.action === "remove";
+        return `<div class="${cls} ${st}${removed ? " removed" : ""}${d.action === "edit" && d.text ? " edited" : ""}${o.selected === b.id ? " lit" : ""}" data-key="${esc(b.key)}" data-id="${b.id}">${handle}<span class="dot"></span><div class="body"><span class="bc"${removed ? "" : ce} data-key="${esc(b.key)}">${inner}</span><span class="refs">${refs}</span></div>${review ? (removed ? `<button class="x" data-act="keep">Restore</button>` : `<button class="x" data-act="remove" title="Remove">×</button>`) : ""}</div>`;
+      }
+      case "gap": return `<div class="${cls}" data-key="${esc(b.key)}" data-gap="${b.index}">${handle}<span class="bc"${b.removed ? "" : ce} data-key="${esc(b.key)}">${inner}</span>${review ? (b.removed ? `<button class="x" data-gapact="restore">Restore</button>` : `<button class="x" data-gapact="remove" title="Remove">×</button>`) : ""}</div>`;
+      case "divider": return `<div class="${cls}" data-key="${esc(b.key)}">${handle}<hr></div>`;
+      case "bullet": return `<div class="${cls}" data-key="${esc(b.key)}">${handle}<span class="bul"></span><span class="bc"${ce} data-key="${esc(b.key)}"${ph}>${inner}</span></div>`;
+      case "h": return `<div class="${cls}" data-key="${esc(b.key)}">${handle}<span class="bc"${ce} data-key="${esc(b.key)}"${ph}>${inner}</span></div>`;
+      case "quote": return `<div class="${cls}" data-key="${esc(b.key)}">${handle}<span class="bc"${ce} data-key="${esc(b.key)}"${ph}>${inner}</span></div>`;
+      default: // p, note, summary, finding, thesis
+        return `<div class="${cls}" data-key="${esc(b.key)}">${handle}<span class="bc"${ce} data-key="${esc(b.key)}"${ph}>${inner}</span></div>`;
+    }
+  }
+
+  function document(c, o) { return buildBlocks(c, o).map((b) => renderBlock(b, o)).join(""); }
 
   function provenance(c, id) {
     if (!id) return `<p class="none">Select a statement in the draft. The passages it cites appear here with the quoted words marked.</p>`;
@@ -356,7 +467,7 @@ aside.sources .none{color:var(--subtle);font-size:13px;line-height:1.6}
     return c.record.sources.map((s) => `<div class="src"><h5>${esc(s.key)} · ${esc(s.title)}</h5>${(bySource[s.key] || []).map(([id, p]) => `<div class="src"><div class="sh"><span class="chip">${esc(id)}</span></div><div class="tx">${esc(p.text)}</div></div>`).join("")}</div>`).join("");
   }
 
-  window.Doc = { esc, highlight, statements, document, provenance, browse };
+  window.Doc = { esc, highlight, statements, document, buildBlocks, provenance, browse, sanitize, INSERT_TYPES };
 })();
 </script>
 <script>
