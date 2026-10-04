@@ -6,11 +6,14 @@ import path from "node:path";
 import { ROOT } from "./lib/env.mjs";
 import { OUT_DIR, COMPANIES_DIR, listCompanies, loadCompany, findCompanyDir, outDirFor } from "./lib/sources.mjs";
 import { draftCompany } from "./lib/pipeline.mjs";
+import { extractFile, extractUrl } from "./lib/extract.mjs";
+import { prefillFromDeck } from "./lib/prefill.mjs";
+import { listInbox, importInboxMessage, INBOX_DIR } from "./lib/inbox.mjs";
 
 const PORT = Number(process.env.PORT || 4950);
 const APP_DIR = path.join(ROOT, "app");
-const TYPES = { ".html": "text/html; charset=utf-8", ".json": "application/json", ".md": "text/markdown; charset=utf-8", ".js": "text/javascript", ".css": "text/css" };
-const SOURCE_ORDER = ["deck", "website", "founders", "call-notes"];
+const TYPES = { ".html": "text/html; charset=utf-8", ".json": "application/json", ".md": "text/markdown; charset=utf-8", ".js": "text/javascript", ".css": "text/css", ".pdf": "application/pdf", ".pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation", ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document" };
+const SOURCE_ORDER = ["deck", "website", "founders", "call-notes", "email"];
 const running = new Map(); // slug -> true while a draft is in flight
 
 const readJson = (f) => (fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, "utf8")) : null);
@@ -55,6 +58,31 @@ function slugify(name) {
 
 async function api(req, res, url) {
   const parts = url.pathname.split("/").filter(Boolean); // api, companies, slug?, action?
+
+  // Turn a file or a URL into source text. Files arrive as base64 JSON; no multipart parser needed.
+  if (parts[1] === "extract" && req.method === "POST") {
+    const b = await body(req);
+    try {
+      if (b.url) return send(res, 200, await extractUrl(String(b.url).trim()));
+      if (b.filename && b.data) return send(res, 200, await extractFile(b.filename, Buffer.from(b.data, "base64")));
+      return send(res, 400, { error: "send {url} or {filename, data}" });
+    } catch (err) { return send(res, 422, { error: err.message }); }
+  }
+  // Propose the intake fields from the deck text.
+  if (parts[1] === "prefill" && req.method === "POST") {
+    const b = await body(req);
+    if (!b.deck?.trim()) return send(res, 400, { error: "deck text required" });
+    try { return send(res, 200, await prefillFromDeck(b.deck)); } catch (err) { return send(res, 502, { error: err.message }); }
+  }
+  // The inbox: messages waiting in the drop folder (and, when configured, a mailbox).
+  if (parts[1] === "inbox") {
+    if (req.method === "GET" && !parts[2]) return send(res, 200, listInbox());
+    if (req.method === "POST" && parts[2] && parts[3] === "import") {
+      try { return send(res, 201, await importInboxMessage(parts[2], { companiesDir: COMPANIES_DIR, slugify })); } catch (err) { return send(res, 422, { error: err.message }); }
+    }
+    return send(res, 404, { error: "not found" });
+  }
+
   if (parts[1] !== "companies") return send(res, 404, { error: "not found" });
   const slug = parts[2], action = parts[3];
 
@@ -68,7 +96,7 @@ async function api(req, res, url) {
       const newSlug = slugify(b.name);
       const dir = path.join(COMPANIES_DIR, newSlug);
       fs.mkdirSync(path.join(dir, "sources"), { recursive: true });
-      fs.writeFileSync(path.join(dir, "company.json"), JSON.stringify({ slug: newSlug, name: b.name.trim(), one_liner: (b.one_liner || "").trim(), ask: (b.ask || "").trim(), created_at: new Date().toISOString() }, null, 2));
+      fs.writeFileSync(path.join(dir, "company.json"), JSON.stringify({ slug: newSlug, name: b.name.trim(), one_liner: (b.one_liner || "").trim(), ask: (b.ask || "").trim(), created_at: new Date().toISOString(), intake: b.intake || {} }, null, 2));
       sources
         .sort(([a], [b2]) => (SOURCE_ORDER.indexOf(a) + 100) % 100 - (SOURCE_ORDER.indexOf(b2) + 100) % 100)
         .forEach(([key, text], i) => {
@@ -138,6 +166,7 @@ http
       const safe = path.normalize(p).replace(/^(\.\.[/\\])+/, "");
       let f = path.join(APP_DIR, safe);
       if (!fs.existsSync(f)) f = path.join(OUT_DIR, safe);
+      if (!fs.existsSync(f) && (safe.startsWith("/samples/") || safe.startsWith("/inbox/") || safe.startsWith("/companies/"))) f = path.join(ROOT, safe);
       fs.readFile(f, (err, data) => {
         if (err) return send(res, 404, "Not found", "text/plain");
         send(res, 200, data, TYPES[path.extname(f)] || "application/octet-stream");

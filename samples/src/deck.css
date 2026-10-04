@@ -1,0 +1,18 @@
+@page{size:1280px 720px;margin:0}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,"Helvetica Neue",Helvetica,Arial,sans-serif;color:#15181f}
+.slide{width:1280px;height:720px;padding:72px 88px;page-break-after:always;display:flex;flex-direction:column;position:relative;background:#fff}
+.slide:last-child{page-break-after:auto}
+.slide.cover{background:#14213d;color:#fff;justify-content:flex-end}
+.slide.cover h1{font-size:64px;margin:0 0 14px;letter-spacing:-1.5px}
+.slide.cover p{font-size:24px;margin:0;opacity:.8}
+.slide.cover .tag{position:absolute;top:72px;left:88px;font-size:14px;letter-spacing:3px;text-transform:uppercase;opacity:.6}
+h2{font-size:40px;margin:0 0 28px;letter-spacing:-.8px}
+p,li{font-size:22px;line-height:1.5;margin:0 0 10px}
+ul{margin:0;padding-left:28px}
+.num{position:absolute;right:88px;bottom:44px;font-size:14px;color:#8a8f9c}
+.kpis{display:flex;gap:40px;margin:18px 0 26px}
+.kpi b{display:block;font-size:52px;letter-spacing:-1px;color:#14213d}
+.kpi span{font-size:16px;color:#5b6170;text-transform:uppercase;letter-spacing:1px}
+.foot{margin-top:auto;font-size:15px;color:#8a8f9c}
+.accent{color:#c8742a}

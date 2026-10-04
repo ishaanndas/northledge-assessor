@@ -11,8 +11,11 @@
     "report": "node report.mjs",
     "serve": "node serve.mjs"
   },
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.123.0"
+    "@anthropic-ai/sdk": "^0.123.0",
+    "pdf-parse": "^2.4.5"
   }
 }
