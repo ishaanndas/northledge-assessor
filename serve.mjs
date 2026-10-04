@@ -19,7 +19,7 @@ const PORT = Number(process.env.PORT || 4950);
 process.on("unhandledRejection", (err) => console.error("unhandled rejection:", err?.message || err));
 process.on("uncaughtException", (err) => console.error("uncaught exception:", err?.message || err));
 const APP_DIR = path.join(ROOT, "app");
-const TYPES = { ".html": "text/html; charset=utf-8", ".json": "application/json", ".md": "text/markdown; charset=utf-8", ".js": "text/javascript", ".css": "text/css", ".pdf": "application/pdf", ".pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation", ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document" };
+const TYPES = { ".zip": "application/zip", ".html": "text/html; charset=utf-8", ".json": "application/json", ".md": "text/markdown; charset=utf-8", ".js": "text/javascript", ".css": "text/css", ".pdf": "application/pdf", ".pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation", ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document" };
 const SOURCE_ORDER = ["deck", "website", "founders", "call-notes", "email"];
 // Drafts run as background jobs. The page starts one and then polls for
 // progress, so a dropped connection, a refresh or leaving the page never
@@ -341,7 +341,7 @@ const DOCS = [
   { id: "prd", file: "docs/PRD.md", title: "Product requirements", blurb: "The longer version of the brief: requirements, metrics, risks, rollout, roadmap." },
   { id: "eval-report", file: "out/eval-report.md", title: "Eval run", blurb: "The raw output of the last evaluation run: every flagged statement with the judge's reason." },
   { id: "test-cases", file: "docs/TEST-CASES.md", title: "Test cases", blurb: "What each example company is, what was hidden in it to trip the tool up, why that would fool an AI tool, and what the tool did." },
-  { id: "test-decks", file: "samples/README.md", title: "Test decks", blurb: "The sample decks for testing intake, and everything planted in the trap deck." },
+  { id: "test-decks", file: "samples/README.md", title: "Test decks", blurb: "Download the test decks, one by one or as a zip, to try the tool yourself; plus everything planted in the trap deck." },
 ];
 function docPage(title, bodyHtml, current) {
   const nav = DOCS.map((d) => `<a href="/docs/${d.id}" class="${d.id === current ? "on" : ""}">${d.title}</a>`).join("");
@@ -392,6 +392,8 @@ http
       if (!fs.existsSync(f) && (safe.startsWith("/samples/") || safe.startsWith("/inbox/") || safe.startsWith("/companies/") || /^\/examples\/[^/]+\/files\//.test(safe))) f = path.join(ROOT, safe);
       fs.readFile(f, (err, data) => {
         if (err) return send(res, 404, "Not found", "text/plain");
+        // ?download saves the file instead of opening it in the browser (used for the test decks).
+        if (url.searchParams.has("download")) res.setHeader("Content-Disposition", `attachment; filename="${path.basename(f)}"`);
         send(res, 200, data, TYPES[path.extname(f)] || "application/octet-stream");
       });
     } catch (err) {

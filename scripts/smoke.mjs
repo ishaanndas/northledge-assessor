@@ -82,6 +82,10 @@ try {
   ok("GET /api/inbox", inbox.status === 200 && Array.isArray(inbox.body?.messages), `${inbox.body?.messages?.length ?? 0} messages`);
   const ev = await getJson("/eval.json");
   ok("GET /eval.json", ev.status === 200 && Array.isArray(ev.body));
+  for (const f of ["test-decks.zip", "lumina-health-deck.pdf", "tidewatch-deck.pptx"]) {
+    const r = await fetch(`${base}/samples/${f}?download`);
+    ok(`download ${f}`, r.status === 200 && /attachment/.test(r.headers.get("content-disposition") || "") && (await r.arrayBuffer()).byteLength > 10000);
+  }
   for (const d of ["", "/readme", "/brief", "/how-it-works", "/evaluation", "/next-steps", "/test-cases", "/prd", "/eval-report", "/test-decks"]) {
     const r = await fetch(base + "/docs" + d); ok(`GET /docs${d}`, r.status === 200);
   }
@@ -122,7 +126,7 @@ try {
 
   const drafted = list.find((c) => c.origin === "example" && c.status !== "sources") || list.find((c) => c.status !== "sources");
   const notDrafted = list.find((c) => c.status === "sources");
-  const pages = [["home", "#/", "Companies"], ["new company", "#/new", "New company"], ["inbox", "#/inbox", "Inbox settings"], ["inbox settings", "#/settings", "Where emails come from"], ["docs", "", "Documents", "/docs"]];
+  const pages = [["home", "#/", "Companies"], ["new company", "#/new", "Download a test deck"], ["inbox", "#/inbox", "Inbox settings"], ["inbox settings", "#/settings", "Where emails come from"], ["docs", "", "Documents", "/docs"]];
   if (drafted) pages.push(["assessment (edit)", `#/c/${drafted.slug}`, "Send to partner"], ["assessment tag strip", `#/c/${drafted.slug}`, "+ Add tag"], ["assessment (preview)", `#/c/${drafted.slug}?mode=partner`, "Fit:"], ["sources", `#/c/${drafted.slug}/sources`, "What the model reads"], ["follow-up", `#/c/${drafted.slug}/followup`, "Email founder"]);
   if (notDrafted) pages.push(["assessment (not drafted)", `#/c/${notDrafted.slug}`, "What the draft will be built from"]);
   for (const [name, hash, expect, pathname = "/"] of pages) {

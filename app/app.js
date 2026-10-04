@@ -141,7 +141,8 @@ function pageNew() {
   <form class="form" id="f">
     <div class="deckzone" id="deckzone" data-drop="deck">
       <div class="dz-empty" id="dzEmpty"><div class="dz-icon">↓</div><b>Drop the deck here</b><span>PDF, PowerPoint or Word. Or <label class="dz-pick">choose a file<input type="file" accept=".pdf,.pptx,.docx,.md,.txt" data-into="deck"></label>, or paste a link below.</span>
-        <div class="urlrow dz-url"><input class="input" placeholder="Link to the deck: a PDF, a Google Slides link or a Drive link" data-url="deck"><button class="btn sm" data-fetch="deck">Fetch</button></div></div>
+        <div class="urlrow dz-url"><input class="input" placeholder="Link to the deck: a PDF, a Google Slides link or a Drive link" data-url="deck"><button class="btn sm" data-fetch="deck">Fetch</button></div>
+        <span class="dz-test">No deck to hand? <a href="/docs/test-decks" target="_blank">Download a test deck</a> or <a href="/samples/test-decks.zip?download">all of them as a zip</a>.</span></div>
       <div class="dz-busy" id="dzBusy" hidden><div class="spin"></div><b id="dzBusyText">Reading the deck…</b></div>
       <div class="dz-done" id="dzDone" hidden><div class="dz-file"><span class="k" id="dzKind">PDF</span><div><b id="dzName"></b><span id="dzMeta"></span></div><button class="btn sm quiet" type="button" id="dzReplace">Replace</button></div>
         <details class="dz-text"><summary>See the text that was read from it</summary><textarea class="textarea" name="deck" placeholder="Deck text"></textarea></details></div>
