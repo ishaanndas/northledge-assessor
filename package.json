@@ -5,7 +5,8 @@
   "type": "module",
   "description": "Drafts a traceable one-page seed-stage company assessment from a deck, website, founder bios and call notes. Every claim cites its passage; nothing decides.",
   "scripts": {
-    "start": "node assess.mjs && node eval.mjs && node report.mjs",
+    "start": "node assess.mjs && node eval.mjs && node scripts/check-tags.mjs && node report.mjs",
+    "check-tags": "node scripts/check-tags.mjs",
     "assess": "node assess.mjs",
     "eval": "node eval.mjs",
     "report": "node report.mjs",

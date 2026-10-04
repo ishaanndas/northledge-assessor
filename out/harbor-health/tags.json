@@ -1,0 +1,79 @@
+{
+  "ai": {
+    "fit": "not",
+    "fit_reasons": [
+      {
+        "text": "Website claims two live features and existing customers, but the founder says they don't exist or aren't used yet.",
+        "statement_ids": [
+          "x0",
+          "x1"
+        ]
+      },
+      {
+        "text": "Zero revenue, with only one unpriced verbal commitment and no named pilots.",
+        "statement_ids": [
+          "d3.c2",
+          "d3.c3",
+          "d4.c1"
+        ]
+      },
+      {
+        "text": "Technical co-founder is unnamed, unverified, and equity is unsettled, leaving half the team unassessed.",
+        "statement_ids": [
+          "d0.c1",
+          "d0.c2",
+          "d0.c3"
+        ]
+      },
+      {
+        "text": "Founder declined all quantitative questions and round has no lead, so pricing rests mainly on his story.",
+        "statement_ids": [
+          "b0",
+          "d5.c0"
+        ]
+      }
+    ],
+    "tags": [
+      {
+        "tag": "pre-revenue",
+        "reason": "Revenue is zero as of the call, with only a future unpriced commitment.",
+        "evidence_ids": [
+          "d3.c2",
+          "d4.c1"
+        ]
+      },
+      {
+        "tag": "numbers-overstated",
+        "reason": "Website markets three live modules and existing customers, but only one module is in pilot use.",
+        "evidence_ids": [
+          "x0",
+          "x1",
+          "d2.c1"
+        ]
+      },
+      {
+        "tag": "sources-disagree",
+        "reason": "Website and founder statements conflict on product status and customer usage.",
+        "evidence_ids": [
+          "x0",
+          "x1",
+          "x2"
+        ]
+      },
+      {
+        "tag": "needs-info",
+        "reason": "Co-founder identity, pilot names, pricing and compliance artefacts are all missing before a partner meeting.",
+        "evidence_ids": [
+          "d0.c3",
+          "d3.c3",
+          "d4.c0",
+          "d6.c3"
+        ]
+      }
+    ],
+    "dropped": [],
+    "model": "claude-sonnet-5",
+    "at": "2026-10-04T19:00:44.914Z"
+  },
+  "person": null
+}

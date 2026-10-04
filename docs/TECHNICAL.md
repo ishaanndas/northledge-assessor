@@ -50,7 +50,11 @@ The editor behaves like a Notion page. Click anywhere and type. Enter makes a ne
 
 The AI's draft is never overwritten. The associate's edits sit on top of it, so the original and the edited version can always be compared.
 
-A switch flips between Edit and Preview; Preview is what the partners receive. Export gives Word, PDF, Markdown or a clean copy, all with the edits applied. A follow-up email to the founder is composed from the missing list and the open questions. Search (Cmd+K) finds anything across every company: a phrase in a slide, a sentence in a draft, a missing item, an inbox message.
+Under the header sits a strip with the fit tag and the topic tags. Right after a draft is written, a second, smaller AI call reads the draft and suggests one fit tag (good fit, possible fit, not a fit) and up to four topic tags from a fixed list. Each reason has to name the statements in the draft it rests on, and a program drops any reason or tag that names none, or a "Warning signs" tag that does not point at a note about steering. "Why" opens the reasons with links to those statements. The associate can change the fit, add or remove tags, or go back to the AI's suggestion; their choice is saved next to the AI's original, never over it. The fit and tags also show on the company cards, where the list can be filtered by fit.
+
+Send to partner opens an email ready to go: the fit, the summary and a link to the Preview of the assessment, plus a Word copy to attach. It opens in the associate's own email app, and the assessment is marked as sent, with who it went to and when.
+
+A switch flips between Edit and Preview; Preview is what the partners receive, with the fit and tags at the top. Export gives Word, PDF, Markdown or a clean copy, all with the edits applied. A follow-up email to the founder is composed from the missing list and the open questions. Search (Cmd+K) finds anything across every company: a phrase in a slide, a sentence in a draft, a missing item, an inbox message.
 
 ## Cost and time
 

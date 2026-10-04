@@ -1,0 +1,76 @@
+{
+  "ai": {
+    "fit": "possible",
+    "fit_reasons": [
+      {
+        "text": "Real paying revenue confirmed on the call, but with significant concentration and churn risk.",
+        "statement_ids": [
+          "d3.c0",
+          "d3.c2",
+          "d3.c1"
+        ]
+      },
+      {
+        "text": "Deck overstates customer stability and team credentials versus what calls and bios confirm.",
+        "statement_ids": [
+          "x0",
+          "x2"
+        ]
+      },
+      {
+        "text": "Key diligence items like NRR cohort data and pilot agreements are missing before a partner meeting.",
+        "statement_ids": [
+          "b5",
+          "d6.c4"
+        ]
+      },
+      {
+        "text": "Core differentiation (tariff engine) is unproven against an incumbent that could expand into the same layer.",
+        "statement_ids": [
+          "d5.c1",
+          "d5.c3"
+        ]
+      }
+    ],
+    "tags": [
+      {
+        "tag": "needs-info",
+        "reason": "Cohort data, pilot agreements, cap table and pipeline detail are all absent.",
+        "evidence_ids": [
+          "d6.c4",
+          "d4.c3"
+        ]
+      },
+      {
+        "tag": "sources-disagree",
+        "reason": "Deck and call disagree on customer stability, pilot conversion odds, and team credentials.",
+        "evidence_ids": [
+          "x0",
+          "x1",
+          "x2",
+          "x3"
+        ]
+      },
+      {
+        "tag": "numbers-overstated",
+        "reason": "Website attributes 12,000+ applications and group leadership to the founding team, but bios show it's Priya alone.",
+        "evidence_ids": [
+          "x2",
+          "d0.c0",
+          "d0.c1"
+        ]
+      },
+      {
+        "tag": "paying-customers",
+        "reason": "Six utilities pay $38k MRR today, confirmed on the call.",
+        "evidence_ids": [
+          "d3.c0"
+        ]
+      }
+    ],
+    "dropped": [],
+    "model": "claude-sonnet-5",
+    "at": "2026-10-04T19:00:51.437Z"
+  },
+  "person": null
+}

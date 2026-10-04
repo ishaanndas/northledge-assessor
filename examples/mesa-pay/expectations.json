@@ -22,5 +22,17 @@
   "must_list_missing": [
     "founder|bio|background"
   ],
-  "bear_case_points_min": 3
+  "bear_case_points_min": 3,
+  "tags": {
+    "fit_not": [
+      "good"
+    ],
+    "must_include": [
+      "warning-signs",
+      "numbers-overstated"
+    ],
+    "must_not_include": [
+      "pre-revenue"
+    ]
+  }
 }

@@ -387,6 +387,103 @@ aside.sources .body{padding:14px 16px 40px}
 .ddm a,.ddm button{display:block;width:100%;padding:7px 10px;font-size:13px;color:var(--heading);text-align:left}
 .ddm a:hover,.ddm button:hover{background:var(--muted-2)}
 .ddm .sep{height:1px;background:var(--border);margin:4px 0}
+
+/* test cases */
+.tests{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1px;background:var(--border-2);border:1px solid var(--border-2);margin-bottom:32px}
+.test{background:#fff;padding:16px 18px;cursor:pointer;display:flex;flex-direction:column;gap:8px}
+.test:hover{background:oklch(99% .002 260)}
+.test .th{display:flex;align-items:center;justify-content:space-between;gap:10px}.test .th b{font-weight:600;font-size:15px;color:var(--heading)}
+.test p{font-size:13px;color:var(--muted-foreground);line-height:1.5;margin:0;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.test .tm{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted-foreground);padding-top:10px;border-top:1px solid var(--border);margin-top:auto}
+.test .tm b{color:var(--heading);font-weight:600}.test .tm .bad{color:var(--red)}
+
+.cardx .tc{font-size:11px;font-weight:500;color:var(--amber);margin-top:3px}
+.cardx .foot .evl{display:block;font-size:11px;color:var(--subtle);margin-top:3px}
+
+/* inbox connections */
+.provs{grid-template-columns:1fr}
+.prov{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center}
+.prov .pb{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+.prov .pb b{font-weight:500;color:var(--heading)}.prov .pb>span:not(.badge){flex-basis:100%;color:var(--muted-foreground);font-size:12.5px}
+.prov .addr{font-family:var(--mono);font-size:12px;background:var(--muted-2);padding:2px 6px}
+.auto{border:1px solid var(--border-2);background:#fff;padding:14px 16px;display:grid;gap:10px;font-size:13.5px}
+.auto label{display:flex;gap:10px;align-items:flex-start;line-height:1.5;color:var(--muted-foreground)}
+.auto label b{font-weight:500;color:var(--heading)}.auto input{margin-top:4px;accent-color:var(--primary)}
+.auto .hint{margin:0;padding-top:6px;border-top:1px solid var(--border)}
+.pal.connect{max-height:none}
+.connect .ch{display:flex;align-items:center;gap:12px;padding:0 18px;height:52px;border-bottom:1px solid var(--border)}
+.connect .ch b{font-weight:600;flex:1}.connect .ch span{font-size:12px;color:var(--subtle)}.connect .ch .x{font-size:18px;color:var(--subtle);opacity:1;padding:0 4px}
+.connect .cb{padding:22px 18px}.connect .cb h3{font-size:16px;font-weight:600;margin:0 0 10px}.connect .cb p{font-size:14px;line-height:1.6;color:var(--muted-foreground);margin:0 0 12px}
+.connect .cf{display:flex;gap:8px;padding:12px 18px;border-top:1px solid var(--border);background:var(--muted)}
+
+.suggest{display:flex;align-items:center;gap:16px;margin-top:14px;padding:12px 14px;border:1px dashed var(--border-2);background:#fff;font-size:13.5px}
+.suggest div{flex:1}.suggest b{font-weight:500;color:var(--heading)}.suggest span{display:block;font-size:12.5px;color:var(--muted-foreground);margin-top:2px}
+.dellink{font-size:11.5px;color:var(--red);margin-top:6px;padding:0}
+.dellink:hover{text-decoration:underline}
+
+/* deck drop zone */
+.deckzone{border:1.5px dashed var(--border-2);background:#fff;padding:28px 24px;transition:background .12s,border-color .12s}
+.deckzone.over,#newpage.dragging-file .deckzone:not(.has-deck){border-color:var(--ring);background:oklch(97% .015 250)}
+.deckzone.has-deck{border-style:solid;padding:16px 18px}
+.dz-empty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px}
+.dz-icon{width:40px;height:40px;border:1px solid var(--border-2);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--muted-foreground);margin-bottom:4px}
+.dz-empty b{font-size:16px;font-weight:600;color:var(--heading)}.dz-empty>span{font-size:13px;color:var(--muted-foreground)}
+.dz-pick{color:var(--blue);text-decoration:underline;cursor:pointer}.dz-pick input{display:none}
+.dz-url{width:100%;max-width:560px;margin-top:12px}
+.dz-busy{display:flex;align-items:center;justify-content:center;gap:12px;padding:18px 0;font-size:14px}
+.spin{width:16px;height:16px;border:2px solid var(--border-2);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.dz-file{display:flex;align-items:center;gap:12px}
+.dz-file .k{font-family:var(--mono);font-size:11px;font-weight:600;background:var(--muted-2);padding:6px 8px;color:var(--muted-foreground)}
+.dz-file div{flex:1;min-width:0}.dz-file b{display:block;font-weight:500;color:var(--heading);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dz-file span{font-size:12.5px;color:var(--muted-foreground)}
+.dz-text{margin-top:12px}.dz-text summary{font-size:12.5px;color:var(--muted-foreground);cursor:pointer}.dz-text textarea{margin-top:8px;font-family:var(--mono);font-size:12px;min-height:160px;box-shadow:none}
+.dz-err{margin:12px 0 0;color:var(--red);font-size:13px;text-align:center}
+#newpage.dragging-file .src .drop{border-color:var(--border-2)}
+.form .src .drop.over{border-color:var(--ring);background:oklch(97% .015 250)}
+
+/* inbox status strip */
+.instrip{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;padding:10px 14px;border:1px solid var(--border-2);background:oklch(98.4% .003 247.858/.6);font-size:12.5px;color:var(--muted-foreground);margin-bottom:16px}
+.instrip .btn{margin-left:auto}
+.instrip .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--border-2);margin-right:6px;vertical-align:1px}
+.instrip .dot.on{background:var(--green)}.instrip .dot.wait{background:var(--amber)}
+.instrip .sep{color:var(--border-2)}
+
+/* fit and tags */
+.fitpill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:2px 8px;border:1px solid var(--border-2);background:#fff;color:var(--heading);white-space:nowrap}
+.fitpill i{width:7px;height:7px;border-radius:50%;background:var(--subtle)}
+.fitpill.good i{background:var(--green)}.fitpill.possible i{background:var(--amber)}.fitpill.not i{background:var(--red)}
+.fitpill small{font-size:10px;font-weight:600;color:var(--muted-foreground);background:var(--muted-2);padding:0 4px;margin-left:2px}
+.tagchip{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;padding:2px 8px;background:var(--muted-2);color:oklch(37.2% .044 257.287);white-space:nowrap}
+.tagchip button{color:var(--subtle);font-size:13px;line-height:1;padding:0 0 0 2px}.tagchip button:hover{color:var(--red)}
+.cardx .chips .tagchip button{display:none}
+.tagbar{flex:none;display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:8px 24px;border-bottom:1px solid var(--border);background:oklch(99% 0 0);font-size:12.5px;min-height:44px}
+.tagbar .lbl{font-size:11px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;color:var(--subtle)}
+.tagbar .who{color:var(--muted-foreground)}
+.tagbar .muted{color:var(--muted-foreground)}
+.tagbar .sep{width:1px;height:18px;background:var(--border-2);margin:0 6px}
+.fitbtn{display:inline-flex;align-items:center;gap:4px}.fitbtn .arr{font-size:10px;color:var(--muted-foreground)}
+.fitbtn:hover .fitpill{border-color:var(--heading)}
+.linkbtn{color:var(--blue);font-size:12.5px;font-weight:500}.linkbtn:hover{text-decoration:underline}
+.whypop{position:fixed;z-index:60;width:480px;max-height:60vh;overflow:auto;background:#fff;border:1px solid var(--border-2);box-shadow:0 12px 32px rgba(0,0,0,.14);padding:14px 16px;font-size:13px}
+.whypop .h{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.whypop ul{margin:0 0 10px;padding-left:18px}.whypop li{margin:0 0 8px;line-height:1.45}
+.whypop .refs{margin-top:4px;display:flex;flex-wrap:wrap;gap:4px}.whypop .refs .chip{cursor:pointer}.whypop .refs .chip:hover{background:var(--amber-bg)}
+.whypop .micro{margin:6px 0 6px}
+.dlgwrap{position:fixed;inset:0;background:rgba(20,24,33,.28);z-index:100;display:flex;justify-content:center;align-items:flex-start;padding-top:8vh}
+.dlg{width:min(640px,94vw);background:#fff;border:1px solid var(--border-2);box-shadow:0 20px 60px rgba(0,0,0,.22);padding:18px 20px;display:flex;flex-direction:column;gap:12px;max-height:86vh;overflow:auto}
+.dlg .dh{display:flex;justify-content:space-between;align-items:center}.dlg .dh b{font-size:15px}
+.dlg .fl{display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600;color:var(--muted-foreground)}
+.dlg .fl .input{font-weight:400;color:var(--heading);width:100%}
+.dlg textarea.input{font:13px/1.5 inherit;font-family:inherit;padding:10px;resize:vertical;min-height:200px;height:auto}
+.dlg .input.bad{border-color:var(--red)}
+.dlg .picks{display:flex;flex-wrap:wrap;gap:6px;margin-top:-4px}.dlg .picks .chip{cursor:pointer}
+.dlg .da{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.dlg .grow{flex:1}
+.dlg .hint{margin:0}
+.gridhead{gap:10px}
+@media print{.tagbar,.whypop,.dlgwrap{display:none!important}}
+.gridhead > .seg:nth-of-type(1){margin-left:auto}
+.btn.more{padding:0 10px;font-size:16px;letter-spacing:1px}
+@media (max-width:1280px){#savestate{display:none}}
 </style>
 </head><body>
 <header class="top"><span class="name">Assessments</span><div class="crumbs"><span>/</span><b>Static report</b></div><div class="right"><span class="ter" style="font-size:12.5px">Committed run. No scores, no recommendations.</span></div></header>
@@ -453,13 +550,20 @@ aside.sources .body{padding:14px 16px 40px}
       if (!review && d.action === "remove") return;
       push({ key: `claim.${id}`, type: "claim", id, stmt: s, decision: d, editable: review && d.action !== "remove", text: d.action === "edit" && d.text ? d.text : s.text });
     });
-    push({ key: "label", type: "label", text: "Draft for partner review. Not a recommendation.", fixed: true });
+    push({ key: "label", type: "label", text: "Draft for partner review.", fixed: true });
     push({ key: "title", type: "title", text: a.company_name, fixed: true });
     push({ key: "meta1", type: "meta", text: `${c.one_liner || ""}${c.ask ? ` · ${c.ask}` : ""}`, fixed: true });
     push({ key: "meta2", type: "meta", text: `Drafted ${r.generated_at} from ${r.sources.map((s) => s.key).join(", ")}. ${v.verified} of ${v.statements} statements verified against the source text${v.warning ? `, ${v.warning} with warnings` : ""}${v.failed ? `, ${v.failed} unverified` : ""}${r.repairs ? ", after one repair round" : ""}.`, fixed: true });
     const reviewer = review ? o.reviewer : rv?.reviewer;
     if (review) push({ key: "reviewer", type: "reviewer", text: o.reviewer || "", editable: true, field: "reviewer", placeholder: "your name" });
     else if (reviewer) push({ key: "meta3", type: "meta", text: `Reviewed by ${reviewer}.`, fixed: true });
+    // Fit and tags, for partners and exports. In the editor they live in the tag strip instead.
+    const tv = !review && c.tagsView;
+    if (tv && (tv.fit || tv.tags.length)) {
+      const who = tv.fitBy === "ai" ? "suggested by AI, not yet confirmed" : `set by ${tv.fitBy}`;
+      push({ key: "fit", type: "meta", text: `${tv.fit ? `Fit: ${tv.fitLabel} (${who}).` : ""}${tv.tagLabels.length ? ` Tags: ${tv.tagLabels.join(", ")}.` : ""}`.trim(), fixed: true });
+      if (tv.reasons?.length) push({ key: "fitwhy", type: "flags", items: tv.reasons, fixed: true });
+    }
     const note = review ? o.note || "" : rv?.note?.trim() || "";
     if (review) { push({ key: "h.note", type: "h2", text: "Note to partners", fixed: true }); push({ key: "note", type: "note", html: note, rich: true, editable: true, field: "note", placeholder: "Thesis fit, what the call felt like, anything the draft cannot know. Shown above the draft on the partner page." }); }
     else if (note) { push({ key: "h.note", type: "h2", text: `Note from ${reviewer || "the associate"}`, fixed: true }); push({ key: "note", type: "note", html: note, rich: true }); }

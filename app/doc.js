@@ -59,13 +59,20 @@
       if (!review && d.action === "remove") return;
       push({ key: `claim.${id}`, type: "claim", id, stmt: s, decision: d, editable: review && d.action !== "remove", text: d.action === "edit" && d.text ? d.text : s.text });
     });
-    push({ key: "label", type: "label", text: "Draft for partner review. Not a recommendation.", fixed: true });
+    push({ key: "label", type: "label", text: "Draft for partner review.", fixed: true });
     push({ key: "title", type: "title", text: a.company_name, fixed: true });
     push({ key: "meta1", type: "meta", text: `${c.one_liner || ""}${c.ask ? ` · ${c.ask}` : ""}`, fixed: true });
     push({ key: "meta2", type: "meta", text: `Drafted ${r.generated_at} from ${r.sources.map((s) => s.key).join(", ")}. ${v.verified} of ${v.statements} statements verified against the source text${v.warning ? `, ${v.warning} with warnings` : ""}${v.failed ? `, ${v.failed} unverified` : ""}${r.repairs ? ", after one repair round" : ""}.`, fixed: true });
     const reviewer = review ? o.reviewer : rv?.reviewer;
     if (review) push({ key: "reviewer", type: "reviewer", text: o.reviewer || "", editable: true, field: "reviewer", placeholder: "your name" });
     else if (reviewer) push({ key: "meta3", type: "meta", text: `Reviewed by ${reviewer}.`, fixed: true });
+    // Fit and tags, for partners and exports. In the editor they live in the tag strip instead.
+    const tv = !review && c.tagsView;
+    if (tv && (tv.fit || tv.tags.length)) {
+      const who = tv.fitBy === "ai" ? "suggested by AI, not yet confirmed" : `set by ${tv.fitBy}`;
+      push({ key: "fit", type: "meta", text: `${tv.fit ? `Fit: ${tv.fitLabel} (${who}).` : ""}${tv.tagLabels.length ? ` Tags: ${tv.tagLabels.join(", ")}.` : ""}`.trim(), fixed: true });
+      if (tv.reasons?.length) push({ key: "fitwhy", type: "flags", items: tv.reasons, fixed: true });
+    }
     const note = review ? o.note || "" : rv?.note?.trim() || "";
     if (review) { push({ key: "h.note", type: "h2", text: "Note to partners", fixed: true }); push({ key: "note", type: "note", html: note, rich: true, editable: true, field: "note", placeholder: "Thesis fit, what the call felt like, anything the draft cannot know. Shown above the draft on the partner page." }); }
     else if (note) { push({ key: "h.note", type: "h2", text: `Note from ${reviewer || "the associate"}`, fixed: true }); push({ key: "note", type: "note", html: note, rich: true }); }

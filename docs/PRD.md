@@ -25,11 +25,11 @@ The partners set three constraints that any solution must satisfy: every claim t
 - Make the structure of every assessment the same, so partners can scan any company's draft in two minutes.
 - Produce a bear case that is specific to the company and built from the evidence, on every draft, with no way to skip it.
 - Surface what the inputs do not contain, so the follow-up request to the founder is written before the partner meeting, not after.
-- Do all of the above without introducing a score, a recommendation, or any language that pre-empts the partners' decision.
+- Do all of the above without introducing a score, a number, or any language in the draft that pre-empts the partners' decision. The fit tag is a triage label the associate owns.
 
 **Non-goals for v1**
 
-- No scoring, ranking or recommendation of any kind. See the decision record in section 13.
+- No score, ranking or probability. See the decision record in section 13.
 - No external data. The tool does not search the web, query databases or enrich from LinkedIn, Crunchbase or similar. The evidence universe is exactly what the associate supplied.
 - No portfolio memory. The tool does not compare a company with previous companies or with the portfolio.
 - No thesis-fit judgment. Whether the company fits the fund's thesis is the associate's paragraph.
@@ -51,7 +51,7 @@ These are invariants, not preferences. A feature that violates one is out of sco
 - **A claim without a source is not a claim.** Every statement carries a passage label and a word-for-word quote. If the AI cannot cite it, the statement is not written.
 - **Primary sources outrank marketing.** When the call notes narrow or contradict the deck or website, the draft says so, cites both, and builds on the narrower figure.
 - **Inputs are data, not instructions.** Text in a deck or website that addresses the reader, the analyst or an AI is reported as a finding and never followed.
-- **The tool describes; people decide.** No field for a score or verdict exists in the output. The language is descriptive. The bear case has the same weight as the assessment.
+- **The tool describes; people decide.** No field for a score exists in the output; the fit tag sits outside the draft, carries its reasons, and is the associate's to confirm or change. The language is descriptive. The bear case has the same weight as the assessment.
 - **Mark, do not hide.** A claim that fails verification stays visible with its status. The associate needs to see what the AI wanted to say and could not source.
 - **The associate's name is on the document.** The tool produces a draft. The associate's edited version is the artifact the partners see.
 
@@ -64,8 +64,9 @@ Implemented in the prototype as five screens (sources, draft, review, partner vi
 3. **Review.** The associate reads the draft in the reader. Each claim shows a status (verified, warning, unverified) and its citations. Clicking a claim shows the passage with the quote marked. The associate checks anything marked, reads the contradictions and the missing list, and reads the bear case against their own sense of the call.
 4. **Edit.** The associate edits the document: deletes claims they disagree with, adds their own paragraph on thesis fit and on the founders' manner on the call, rewrites the bear case if the AI missed the real objection. Their edits are theirs; citations they add are their responsibility.
 5. **Follow-up.** The missing list becomes the follow-up email to the founder, sent before the partner meeting.
-6. **Meeting.** Partners read the associate's version. When a number is questioned, the associate opens the reader and clicks the claim. The meeting moves on.
-7. **Decision.** Partners record the decision in the fund's existing process. The tool is not involved, but the decision and the draft are logged together for the evaluation described in `docs/EVALUATION.md`.
+6. **Send.** The associate confirms or changes the fit tag and sends the assessment to the partners from the Send to partner button.
+7. **Meeting.** Partners read the associate's version. When a number is questioned, the associate opens the reader and clicks the claim. The meeting moves on.
+8. **Decision.** Partners record the decision in the fund's existing process. The tool is not involved, but the decision and the draft are logged together for the evaluation described in `docs/EVALUATION.md`.
 
 ## 7. What v1 has to do
 
@@ -100,11 +101,13 @@ Implemented in the prototype as five screens (sources, draft, review, partner vi
 - The reader shows the draft with each statement's status and citations inline. Clicking a statement shows every cited passage with the quoted span highlighted, and the source document's title.
 - The reader offers a view of all source passages for the company, so a partner can read the raw inputs without leaving the page.
 - The draft is also produced as a plain document (markdown in v1) that the associate edits and the partners receive.
-- The reader is labelled on every page as a draft for partner review and not a recommendation.
+- The reader is labelled on every page as a draft for partner review.
 
 **Guardrails**
 
-- The output format has no field for a score, probability, rating, verdict or recommendation.
+- The output format has no field for a score, probability or rating.
+- After drafting, the tool suggests one fit tag (good fit, possible fit, not a fit) and up to four topic tags from a fixed list. Every reason names the draft statements it rests on; tags that name none are dropped by a program. The tag is shown as the AI's suggestion until the associate confirms or changes it, and the AI's original is kept.
+- Send to partner prepares an email with the fit, the summary and a link to the assessment, and records who it went to and when.
 - Every draft is scanned for recommendation, verdict, probability and superlative language in the sections written in the tool's own voice; hits are reported to the operations lead.
 - The AI is given no tools, no web access and no memory. Each company is drafted in isolation.
 
@@ -160,7 +163,7 @@ Instrumentation and targets for the first 60 days (about 300 companies). Expande
 | A claim reads as sourced but is not | Partner trust lost after one incident | Verbatim-quote citations, mechanical check, number check, one repair round, visible status, second-model second reader in eval | Interpretation on top of a true quote; see EVALUATION.md. Second reader moves into the drafting process in v2. |
 | Marketing laundered into fact | Draft repeats the deck | Source ranking in the prompt, mandatory contradictions section, attribution language ("the deck states") | Depends on the associate's call notes being good |
 | Inputs that instruct the AI | Draft skewed by the founder | Inputs treated as data, steering reported in integrity notes, adversarial example in the test set | New injection styles; needs ongoing red-teaming |
-| Anchoring: the draft becomes the decision | Partners stop reading evidence | No score field, decision-language scan, bear case at equal weight, associate owns the document, labels on every page | Cultural; measured by bear-case-kept and by partner feedback |
+| Anchoring: the draft becomes the decision | Partners stop reading evidence | No score field, fit tag marked as a suggestion until confirmed, decision-language scan, bear case at equal weight, associate owns the document, labels on every page | Cultural; measured by bear-case-kept and by partner feedback |
 | Padding on thin inputs | Thin companies look better documented than they are | Missing list, `absence` basis, prompt instruction not to fill gaps | Measured by claims-per-passage on sparse inputs |
 | Associate over-trusts "verified" | Verified read as true | Label text explains verified means the quote is real; second reader status added in v2 | Training and label wording |
 | Confidentiality | Founder data at a third party | service agreement with limited retention; no storage outside the fund | Provider terms |
@@ -176,7 +179,7 @@ Instrumentation and targets for the first 60 days (about 300 companies). Expande
 
 **Request.** Partners asked for a single probability of success on every company.
 
-**Decision.** Not in v1. The tool drafts the assessment; it does not evaluate the investment, so it does not score it. Deciding stays with the partners. A score would also be the only claim on the page with no source behind it. Instead, each section shows how much is backed by a source, what is missing and where the sources disagree.
+**Decision.** Not in v1. The tool drafts the assessment; it does not evaluate the investment, so it does not score it. Deciding stays with the partners. A score would also be the only claim on the page with no source behind it. Instead, each section shows how much is backed by a source, what is missing and where the sources disagree, and the AI suggests a fit tag (good fit, possible fit, not a fit) with reasons tied to the draft, which the associate confirms or changes. It sorts the list; it does not decide.
 
 ## 14. Open questions
 

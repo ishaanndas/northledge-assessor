@@ -11,5 +11,17 @@
     "^(?!.*\\b(deck|bio|website|slide|states?|describes?|claims?|presents?|headlines?|cites?|frames?)\\b).*led perception",
     "^(?!.*\\b(deck|bio|website|slide|states?|describes?|claims?|presents?|headlines?|cites?|frames?)\\b).*\\$1\\.4M ARR"
   ],
-  "bear_case_points_min": 3
+  "bear_case_points_min": 3,
+  "tags": {
+    "fit_not": [
+      "good"
+    ],
+    "must_include": [
+      "numbers-overstated",
+      "sources-disagree"
+    ],
+    "must_not_include": [
+      "warning-signs"
+    ]
+  }
 }

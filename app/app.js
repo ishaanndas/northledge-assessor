@@ -20,6 +20,7 @@ function topbar(crumbs = [], right = "") {
 function assessmentState(c) {
   if (c.running) return { key: "drafting", label: "Drafting", tone: "blue" };
   if (!c.record) return { key: "none", label: "Not drafted", tone: "" };
+  if (c.sent) return { key: "sent", label: "Sent to partner", tone: "green", detail: `to ${c.sent.to} · ${fmt(c.sent.at)}` };
   const d = Object.values(c.reviewDoc?.decisions || {});
   const touched = c.reviewDoc && (d.length || (c.reviewDoc.note || "").trim() || Object.keys(c.reviewDoc.overrides || {}).some((k) => k !== "inserts" ? Object.keys(c.reviewDoc.overrides[k] || {}).length || typeof c.reviewDoc.overrides[k] === "string" : Object.keys(c.reviewDoc.overrides.inserts || {}).length));
   if (touched) return { key: "reviewed", label: "Reviewed", tone: "green", detail: `${d.filter((x) => x.action === "remove").length} removed, ${d.filter((x) => x.action === "edit").length} edited${c.reviewDoc.reviewer ? ` · ${c.reviewDoc.reviewer}` : ""}` };
@@ -104,24 +105,30 @@ async function pageCompanies() {
   const evalLine = (c) => { const ev = evalOf(c); if (!ev) return ""; const j = ev.judge?.counts; const miss = ev.expectations.filter((x) => !x.pass).length; return `<span class="evl">${j ? `${j.supported} supported · ${j.partial} partial · ${j.unsupported} unsupported` : ""}${ev.expectations.length ? ` · ${ev.expectations.length - miss}/${ev.expectations.length} expectations` : ""}</span>`; };
   const waiting = inbox.messages.filter((m) => !m.imported);
   const view = localStorage.getItem("view") || "grid";
-  const badge = (c) => c.running ? `<span class="badge blue">Drafting</span>` : c.status === "reviewed" ? `<span class="badge green">Reviewed</span>` : c.status === "drafted" ? `<span class="badge amber">Draft</span>` : `<span class="badge">Not drafted</span>`;
-  const tone = (c) => c.running ? "run" : c.status === "reviewed" ? "ok" : c.status === "drafted" ? "warn" : "";
+  const badge = (c) => c.running ? `<span class="badge blue">Drafting</span>` : c.status === "sent" ? `<span class="badge green">Sent to partner</span>` : c.status === "reviewed" ? `<span class="badge green">Reviewed</span>` : c.status === "drafted" ? `<span class="badge amber">Draft</span>` : `<span class="badge">Not drafted</span>`;
+  const tone = (c) => c.running ? "run" : c.status === "reviewed" || c.status === "sent" ? "ok" : c.status === "drafted" ? "warn" : "";
   const target = (c) => `#/c/${c.slug}`;
   const initials = (n) => n.split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
   const via = (c) => c.intake?.via === "inbox" ? "Inbox" : c.origin === "example" ? "Example" : "Manual";
   const filler = list.length % 3 ? `<div class="cardx add" data-href="#/new"><div class="ico">+</div><h3>New company</h3><p class="desc">Drop a deck, paste a link, or import from the inbox.</p></div>` : "";
-  const cards = list.map((c) => `<div class="cardx ${tone(c)}" data-href="${target(c)}"><div class="row1"><div class="ico">${esc(initials(c.name))}</div>${badge(c)}</div><div><h3>${esc(c.name)}</h3>${c.origin === "example" ? `<div class="tc">${esc(testLabel(c))}</div>` : ""}</div><p class="desc">${esc(c.one_liner || "")}${c.ask ? ` · ${esc(c.ask)}` : ""}</p><div class="forms"><div class="micro">Sources</div><div class="chips">${c.sources.map((s) => `<span class="chip">${esc(s.key)} · ${s.passages}</span>`).join("")}</div></div><div class="foot"><span>${c.verification_summary ? `<b>${c.verification_summary.verified}/${c.verification_summary.statements}</b> verified · <b>${c.missing_count}</b> gaps${c.review?.reviewer ? ` · ${esc(c.review.reviewer)}` : ""}` : "Not drafted"}${evalLine(c)}</span><span>${c.status === "sources" ? "Open" : "Open assessment"} →</span></div></div>`).join("");
-  const rows = list.map((c) => `<tr class="row" data-href="${target(c)}"><td><div class="nm">${esc(c.name)}</div><div class="ol">${esc(c.one_liner || "")}</div></td><td class="nw">${badge(c)}</td><td class="sec">${c.sources.map((s) => esc(s.key)).join(", ")}</td><td class="num">${c.verification_summary ? `${c.verification_summary.verified} / ${c.verification_summary.statements}` : ""}</td><td class="num">${c.missing_count ?? ""}</td><td class="sec nw">${esc(c.ask || "")}</td><td class="sec">${c.origin === "example" ? esc(testLabel(c)) : via(c)}</td><td class="sec nw">${c.review ? esc(c.review.reviewer || "") : ""}</td></tr>`).join("");
-  const table = `<table class="list"><thead><tr><th>Company</th><th>Stage</th><th>Sources</th><th>Verified</th><th>Gaps</th><th>Round</th><th>Source</th><th>Reviewer</th></tr></thead><tbody>${rows}</tbody></table>`;
-  $("#main").innerHTML = `<div class="page"><div class="inner"><div class="head"><h1>Seed assessments</h1><p class="sub">First-pass drafts for partner review. Every claim cites a passage from the deck, website, bios or call notes; nothing here scores or recommends.</p></div>
+  const fitRow = (c) => c.tags && (c.tags.fit || c.tags.tags.length) ? `${c.tags.fit ? fitPill(c.tags.fit, c.tags.fitBy === "ai") : ""}${c.tags.tagLabels.map((t) => `<span class="tagchip">${esc(t)}</span>`).join("")}` : "";
+  const fitFilter = localStorage.getItem("fitFilter") || "all";
+  const shown = fitFilter === "all" ? list : list.filter((c) => c.tags?.fit === fitFilter);
+  const count = (k) => list.filter((c) => c.tags?.fit === k).length;
+  const filterSeg = `<div class="seg">${[["all", `All ${list.length}`], ...Object.entries(FIT).map(([k, l]) => [k, `${l} ${count(k)}`])].map(([k, l]) => `<button data-fit="${k}" class="${fitFilter === k ? "on" : ""}">${l}</button>`).join("")}</div>`;
+  const cards = shown.map((c) => `<div class="cardx ${tone(c)}" data-href="${target(c)}"><div class="row1"><div class="ico">${esc(initials(c.name))}</div>${badge(c)}</div><div><h3>${esc(c.name)}</h3>${c.origin === "example" ? `<div class="tc">${esc(testLabel(c))}</div>` : ""}</div><p class="desc">${esc(c.one_liner || "")}${c.ask ? ` · ${esc(c.ask)}` : ""}</p>${fitRow(c) ? `<div class="forms"><div class="micro">Fit and tags</div><div class="chips">${fitRow(c)}</div></div>` : `<div class="forms"><div class="micro">Sources</div><div class="chips">${c.sources.map((s) => `<span class="chip">${esc(s.key)} · ${s.passages}</span>`).join("")}</div></div>`}<div class="foot"><span>${c.verification_summary ? `<b>${c.verification_summary.verified}/${c.verification_summary.statements}</b> verified · <b>${c.missing_count}</b> gaps${c.review?.reviewer ? ` · ${esc(c.review.reviewer)}` : ""}` : "Not drafted"}${evalLine(c)}</span><span>${c.status === "sources" ? "Open" : "Open assessment"} →</span></div></div>`).join("");
+  const rows = shown.map((c) => `<tr class="row" data-href="${target(c)}"><td><div class="nm">${esc(c.name)}</div><div class="ol">${esc(c.one_liner || "")}</div></td><td class="nw">${badge(c)}</td><td class="nw">${c.tags?.fit ? fitPill(c.tags.fit, c.tags.fitBy === "ai") : ""}</td><td class="sec">${(c.tags?.tagLabels || []).map(esc).join(", ")}</td><td class="num">${c.verification_summary ? `${c.verification_summary.verified} / ${c.verification_summary.statements}` : ""}</td><td class="num">${c.missing_count ?? ""}</td><td class="sec nw">${esc(c.ask || "")}</td><td class="sec">${c.origin === "example" ? esc(testLabel(c)) : via(c)}</td></tr>`).join("");
+  const table = `<table class="list"><thead><tr><th>Company</th><th>Stage</th><th>Fit</th><th>Tags</th><th>Verified</th><th>Gaps</th><th>Round</th><th>Source</th></tr></thead><tbody>${rows}</tbody></table>`;
+  $("#main").innerHTML = `<div class="page"><div class="inner"><div class="head"><h1>Seed assessments</h1><p class="sub">First-pass drafts for partner review. Every claim cites a passage from the deck, website, bios or call notes. Fit tags are suggested by AI and set by the associate.</p></div>
   <div class="callouts"><div class="callout"><div class="ico">+</div><div><div class="micro">Start here</div><h3>Add a company</h3><p>Drop a deck (PDF, PPTX, DOCX), paste a website link, or paste text. The fields fill themselves from the deck.</p></div><a class="btn primary" href="#/new">New company <span class="arr">→</span></a></div>
   <div class="callout ${waiting.length ? "live" : ""}"><div class="ico">✉</div><div><div class="micro">Inbox</div><h3>${waiting.length ? `${waiting.length} email${waiting.length === 1 ? "" : "s"} with decks waiting` : "Nothing waiting"}</h3><p>Decks that arrive by email land here. Import one to create the company with its attachments already read.</p></div><a class="btn" href="#/inbox">Open inbox <span class="arr">→</span></a></div></div>
-  <div class="gridhead"><span class="seclabel">Companies · ${list.length}</span><div class="seg" role="tablist"><button data-view="grid" class="${view === "grid" ? "on" : ""}">Cards</button><button data-view="list" class="${view === "list" ? "on" : ""}">List</button></div></div>
-  ${list.length ? (view === "list" ? table : `<div class="cards">${cards}${filler}</div>`) : `<div class="empty">No companies yet.</div>`}</div></div>`;
-  $("#main").addEventListener("click", (e) => {
+  <div class="gridhead"><span class="seclabel">Companies · ${list.length}</span>${filterSeg}<div class="seg" role="tablist"><button data-view="grid" class="${view === "grid" ? "on" : ""}">Cards</button><button data-view="list" class="${view === "list" ? "on" : ""}">List</button></div></div>
+  ${list.length ? (shown.length ? (view === "list" ? table : `<div class="cards">${cards}${fitFilter === "all" ? filler : ""}</div>`) : `<div class="empty">No companies tagged ${esc(FIT[fitFilter] || "")}.</div>`) : `<div class="empty">No companies yet.</div>`}</div></div>`;
+  $("#main").onclick = (e) => {
     const v = e.target.closest("button[data-view]"); if (v) { localStorage.setItem("view", v.dataset.view); pageCompanies(); return; }
+    const f = e.target.closest("button[data-fit]"); if (f) { localStorage.setItem("fitFilter", f.dataset.fit); pageCompanies(); return; }
     const el = e.target.closest("[data-href]"); if (el) location.hash = el.dataset.href;
-  });
+  };
 }
 
 // ---------- new company ----------
@@ -585,7 +592,7 @@ function queueSave() {
   }, 700);
 }
 // ---------- the assessment: one document, several states ----------
-const RUN_ROWS = [["split", "Read the sources"], ["draft", "Write the draft"], ["verify", "Check every quote"], ["repair", "Fix failed quotes"], ["reverify", "Check again"], ["done", "Save"]];
+const RUN_ROWS = [["split", "Read the sources"], ["draft", "Write the draft"], ["verify", "Check every quote"], ["repair", "Fix failed quotes"], ["reverify", "Check again"], ["done", "Save"], ["tags", "Suggest tags"]];
 function runHtml(log, running, slug) {
   const by = Object.fromEntries(log.map((e) => [e.step, e]));
   const last = log.length ? log[log.length - 1].step : null;
@@ -597,7 +604,7 @@ function runHtml(log, running, slug) {
   }).join("");
   const err = log.find((e) => e.step === "error"), done = by.done, retry = log.filter((e) => e.step === "retry").pop();
   const elapsed = !done && !err && running ? `<div class="step"><i></i><span class="k"></span><span class="m" style="color:var(--muted-foreground)">Usually two to three minutes. You can leave this page; the draft carries on and will be here when you come back.${retry ? ` ${esc(retry.message)}.` : ""}</span></div>` : "";
-  return `<div class="run">${list}${elapsed}${err ? `<div class="step err"><i></i><span class="k">Error</span><span class="m">${esc(err.message)}</span></div>` : ""}${done ? `<div class="result"><span><b>${done.summary.verified}</b> of ${done.summary.statements} verified</span><span><b>${done.summary.warning}</b> warnings</span><span><b>${done.summary.failed}</b> unverified</span><span>${done.seconds}s</span><span style="margin-left:auto">Opening the draft</span></div>` : ""}</div>`;
+  return `<div class="run">${list}${elapsed}${err ? `<div class="step err"><i></i><span class="k">Error</span><span class="m">${esc(err.message)}</span></div>` : ""}${done ? `<div class="result"><span><b>${done.summary.verified}</b> of ${done.summary.statements} verified</span><span><b>${done.summary.warning}</b> warnings</span><span><b>${done.summary.failed}</b> unverified</span><span>${done.seconds}s</span><span style="margin-left:auto">${running ? "Suggesting tags" : "Opening the draft"}</span></div>` : ""}</div>`;
 }
 // Drafting runs as a job on the server; the page starts it and polls. Leaving,
 // refreshing or losing the connection never loses it: opening the company
@@ -659,12 +666,16 @@ async function pageAssessment(slug, q = new URLSearchParams()) {
   const modeSwitch = `<div class="seg"><a href="#/c/${slug}" class="${mode === "review" ? "on" : ""}">Edit</a><a href="#/c/${slug}?mode=partner" class="${mode === "partner" ? "on" : ""}">Preview</a></div>`;
   const exportBtn = `<div class="dd"><button class="btn" id="exportBtn">Export <span class="arr">▾</span></button><div class="ddm" id="exportMenu" hidden><a href="/api/companies/${slug}/export?format=docx">Word (.docx)</a><button data-export="pdf">PDF</button><a href="/api/companies/${slug}/export?format=md&download=1">Markdown (.md)</a><div class="sep"></div><button data-export="copy">Copy as text</button><button data-export="copymd">Copy as Markdown</button></div></div>`;
   const right = mode === "review"
-    ? `<span class="state" id="savestate">${S.saved ? "Saved " + S.saved.slice(11, 16) : "Edits save automatically"}</span>${modeSwitch}${exportBtn}<a class="btn" href="#/c/${slug}/followup">Email founder</a><button class="btn quiet" id="redraft" title="Replace the draft and clear the review">Draft again</button>`
-    : `${modeSwitch}${exportBtn}<a class="btn" href="#/c/${slug}/followup">Email founder</a>`;
-  const body = `<div class="stagehead"><h2>Assessment</h2>${pill}<div class="r">${right}</div></div><div id="assessbody" style="display:contents">${splitView(c, mode)}</div>`;
+    ? `<span class="state" id="savestate">${S.saved ? "Saved " + S.saved.slice(11, 16) : "Edits save automatically"}</span>${modeSwitch}${exportBtn}<a class="btn" href="#/c/${slug}/followup">Email founder</a><button class="btn primary" id="sendPartner">Send to partner</button><button class="btn quiet more" id="moreBtn" title="More">⋯</button>`
+    : `${modeSwitch}${exportBtn}<a class="btn" href="#/c/${slug}/followup">Email founder</a><button class="btn primary" id="sendPartner">Send to partner</button>`;
+  if (mode === "partner") c.tagsView = c.tags; // preview shows the fit line the partner will see
+  const body = `<div class="stagehead"><h2>Assessment</h2>${pill}<div class="r">${right}</div></div><div id="assessbody" style="display:contents">${mode === "review" ? `<div class="tagbar" id="tagbar">${tagbarHtml(c)}</div>` : ""}${splitView(c, mode)}</div>`;
   workspace(c, "assessment", body);
   wireSplit(c, mode);
-  $("#redraft")?.addEventListener("click", () => { if (confirm("Draft again? This replaces the current draft and clears the review.")) { $("#assessbody").style.display = "block"; startDraft(slug); } });
+  if (mode === "review") wireTagbar(c);
+  $("#sendPartner").addEventListener("click", () => sendToPartner(c));
+  const redraft = () => { if (confirm("Draft again? This replaces the current draft, its tags and the review.")) { $("#assessbody").style.display = "block"; startDraft(slug); } };
+  $("#moreBtn")?.addEventListener("click", (e) => { const r = e.currentTarget.getBoundingClientRect(); const m = showMenu([{ label: "Draft again", hint: "replaces the draft", run: redraft }], r.right - 230, r.bottom + 4); m.querySelector("button.on")?.classList.remove("on"); });
   if (c.running) { $("#assessbody").style.display = "block"; followDraft(slug); }
   $("#exportBtn").addEventListener("click", (e) => { e.stopPropagation(); const m = $("#exportMenu"); m.hidden = !m.hidden; });
   document.addEventListener("click", () => { const m = $("#exportMenu"); if (m) m.hidden = true; }, { once: false });
@@ -677,6 +688,129 @@ async function pageAssessment(slug, q = new URLSearchParams()) {
   });
   const target = q.get("s") ? `.t-claim[data-id="${CSS.escape(q.get("s"))}"]` : q.get("g") ? `.blk[data-key="gap.${q.get("g")}"]` : q.get("k") ? `.blk[data-key="${CSS.escape(q.get("k"))}"]` : null;
   if (target) { const el = $("#doc").querySelector(target); if (el) { el.scrollIntoView({ block: "center" }); el.classList.add("flash"); if (q.get("s")) { renderSide(c, false); $("#split").classList.add("show"); } } }
+}
+
+// ---------- fit and tags ----------
+const FIT = { good: "Good fit", possible: "Possible fit", not: "Not a fit" };
+const TAGS = { "needs-info": "Needs more info", "sources-disagree": "Sources disagree", "numbers-overstated": "Claims overstated", "warning-signs": "Warning signs", "paying-customers": "Paying customers", "pre-revenue": "Pre-revenue", "strong-team": "Strong team", "crowded-market": "Crowded market" };
+const fitPill = (fit, ai) => fit ? `<span class="fitpill ${fit}"><i></i>${FIT[fit]}${ai ? `<small>AI</small>` : ""}</span>` : "";
+function tagbarHtml(c) {
+  const t = c.tags, doc = c.tagsDoc;
+  if (!t || (!doc && !t.fit)) return `<span class="lbl">Fit</span><span class="muted">No tags yet.</span><button class="btn sm" id="suggestTags">Suggest tags</button>`;
+  const ai = t.fitBy === "ai";
+  const who = ai ? "AI suggestion" : `Set by ${esc(t.fitBy)}`;
+  const chips = t.tags.map((k) => `<span class="tagchip">${esc(TAGS[k] || k)}<button data-untag="${esc(k)}" title="Remove">×</button></span>`).join("");
+  return `<span class="lbl">Fit</span><button class="fitbtn" id="fitBtn">${t.fit ? fitPill(t.fit, false) : `<span class="muted">Not set</span>`}<span class="arr">▾</span></button><span class="who">${who}</span>${doc?.ai ? `<button class="linkbtn" id="whyBtn">Why</button>` : ""}<span class="sep"></span><span class="lbl">Tags</span>${chips}<button class="linkbtn" id="addTag">+ Add tag</button>`;
+}
+function wireTagbar(c) {
+  const bar = $("#tagbar"); if (!bar) return;
+  const redraw = () => { bar.innerHTML = tagbarHtml(c); };
+  const save = async (patch) => {
+    try { c.tagsDoc = await api(`/companies/${c.slug}/tags`, { method: "PUT", body: JSON.stringify({ ...patch, by: S.reviewer }) }); }
+    catch (err) { alert(err.message); return; }
+    c.tags = effective(c.tagsDoc); redraw();
+  };
+  bar.addEventListener("click", async (e) => {
+    const r = (el) => el.getBoundingClientRect();
+    if (e.target.closest("#suggestTags") || e.target.closest("[data-again]")) {
+      const b = e.target.closest("button"); b.disabled = true; b.textContent = "Suggesting…";
+      try { c.tagsDoc = await api(`/companies/${c.slug}/tags`, { method: "POST" }); c.tags = effective(c.tagsDoc); redraw(); } catch (err) { b.disabled = false; b.textContent = "Suggest tags"; alert(err.message); }
+      return;
+    }
+    const fb = e.target.closest("#fitBtn");
+    if (fb) {
+      const ai = c.tagsDoc?.ai, items = Object.entries(FIT).map(([k, label]) => ({ label, hint: ai?.fit === k ? "AI suggestion" : "", run: () => save({ fit: k }) }));
+      if (c.tagsDoc?.person) items.push({ sep: true }, { label: "Go back to the AI suggestion", run: () => save({ reset: true }) });
+      items.push({ sep: true }, { label: "Suggest again", hint: "asks the AI", run: async () => { bar.querySelector(".who").textContent = "Suggesting…"; try { const d = await api(`/companies/${c.slug}/tags`, { method: "POST" }); c.tagsDoc = d; c.tags = effective(d); redraw(); } catch (err) { alert(err.message); redraw(); } } });
+      const m = showMenu(items, r(fb).left, r(fb).bottom + 4); m.querySelector("button.on")?.classList.remove("on"); return;
+    }
+    const add = e.target.closest("#addTag");
+    if (add) {
+      const left = Object.keys(TAGS).filter((k) => !c.tags.tags.includes(k));
+      if (!left.length) return;
+      const m = showMenu(left.map((k) => ({ label: TAGS[k], run: () => save({ tags: [...c.tags.tags, k] }) })), r(add).left, r(add).bottom + 4); m.querySelector("button.on")?.classList.remove("on"); return;
+    }
+    const un = e.target.closest("[data-untag]");
+    if (un) return save({ tags: c.tags.tags.filter((k) => k !== un.dataset.untag) });
+    const why = e.target.closest("#whyBtn");
+    if (why) { $("#whypop") ? $("#whypop").remove() : showWhy(c, why); }
+  });
+}
+// Mirrors lib/tags.mjs effectiveTags, so the strip updates without a reload.
+function effective(doc) {
+  const p = doc?.person, ai = doc?.ai;
+  const fit = p && "fit" in p ? p.fit : ai?.fit ?? null;
+  const tags = p && Array.isArray(p.tags) ? p.tags : (ai?.tags || []).map((t) => t.tag);
+  return { fit, fitLabel: fit ? FIT[fit] : null, fitBy: p && "fit" in p ? (p.by || "the associate") : ai ? "ai" : null, tags, tagLabels: tags.map((t) => TAGS[t]), reasons: ai && fit === ai.fit ? ai.fit_reasons.map((x) => x.text) : [] };
+}
+function showWhy(c, anchor) {
+  const ai = c.tagsDoc.ai, rect = anchor.getBoundingClientRect();
+  const refs = (ids) => ids.map((id) => `<button class="chip" data-stmt="${esc(id)}">${esc(stmtLabel(c, id))}</button>`).join(" ");
+  const el = document.createElement("div"); el.id = "whypop"; el.className = "whypop";
+  el.style.left = Math.min(rect.left, innerWidth - 500) + "px"; el.style.top = rect.bottom + 6 + "px";
+  el.innerHTML = `<div class="h"><b>AI suggestion: ${FIT[ai.fit]}</b><button class="linkbtn" data-close>Close</button></div><ul>${ai.fit_reasons.map((x) => `<li>${esc(x.text)}<div class="refs">${refs(x.statement_ids)}</div></li>`).join("")}</ul>${ai.tags.length ? `<div class="micro">Tags</div><ul>${ai.tags.map((t) => `<li><b>${esc(TAGS[t.tag])}.</b> ${esc(t.reason)}${t.evidence_ids?.length ? `<div class="refs">${refs(t.evidence_ids)}</div>` : ""}</li>`).join("")}</ul>` : ""}<p class="hint">Click a reference to open the statement and its source.</p>`;
+  document.body.appendChild(el);
+  el.addEventListener("click", (e) => {
+    if (e.target.closest("[data-close]")) return el.remove();
+    const b = e.target.closest("[data-stmt]"); if (!b) return;
+    const id = b.dataset.stmt; el.remove();
+    if (id.startsWith("n")) { const f = $("#doc").querySelector('.blk.t-flags'); f?.scrollIntoView({ block: "center" }); f?.classList.add("flash"); return; }
+    S.selected = id; const t = $("#doc").querySelector(`.t-claim[data-id="${CSS.escape(id)}"]`);
+    if (t) { t.scrollIntoView({ block: "center" }); t.classList.add("flash"); }
+    renderSide(c, false); $("#split").classList.add("show");
+  });
+  setTimeout(() => document.addEventListener("mousedown", function off(e) { if (!el.contains(e.target) && e.target !== anchor) { el.remove(); document.removeEventListener("mousedown", off); } }), 0);
+}
+function stmtLabel(c, id) {
+  const a = c.record.assessment;
+  if (id.startsWith("x")) return `Disagreement ${Number(id.slice(1)) + 1}`;
+  if (id.startsWith("b")) return `Case against ${Number(id.slice(1)) + 1}`;
+  if (id.startsWith("n")) return `Not evidence ${Number(id.slice(1)) + 1}`;
+  const m = id.match(/^d(\d+)\.c(\d+)$/); return m ? `${a.dimensions[m[1]]?.name || "Claim"} ${Number(m[2]) + 1}` : id;
+}
+
+// ---------- send to partner ----------
+function sendToPartner(c) {
+  const a = c.record.assessment, t = c.tags;
+  const partners = (() => { try { return JSON.parse(localStorage.getItem("partners") || "[]"); } catch { return []; } })();
+  const link = `${location.origin}/#/c/${c.slug}?mode=partner`;
+  const summary = (S.overrides?.summary ?? a.summary).replace(/<[^>]+>/g, "");
+  const fitLine = t?.fit ? `Fit: ${t.fitLabel}${t.fitBy === "ai" ? " (AI suggestion)" : ""}.${t.tagLabels.length ? ` Tags: ${t.tagLabels.join(", ")}.` : ""}\n\n` : "";
+  const subject = `Assessment: ${c.name}`;
+  const bodyText = `Hi,\n\nThe first-pass assessment for ${c.name}${c.one_liner ? ` (${c.one_liner}${c.ask ? `, ${c.ask}` : ""})` : ""} is ready for you.\n\n${fitLine}${summary}\n\nThe full assessment, with every claim linked to its source:\n${link}\n\n${S.reviewer || ""}`.trim();
+  const el = document.createElement("div"); el.id = "sendDlg"; el.className = "dlgwrap";
+  el.innerHTML = `<div class="dlg"><div class="dh"><b>Send to partner</b><button class="linkbtn" data-close>Close</button></div>
+    <label class="fl">To<input class="input" id="sendTo" placeholder="partner@fund.com" value="${esc(partners[0] || "")}"></label>
+    ${partners.length > 1 ? `<div class="picks">${partners.slice(0, 5).map((p) => `<button class="chip" data-pick="${esc(p)}">${esc(p)}</button>`).join("")}</div>` : ""}
+    <label class="fl">Subject<input class="input" id="sendSubj" value="${esc(subject)}"></label>
+    <label class="fl">Message<textarea class="input" id="sendBody" rows="12">${esc(bodyText)}</textarea></label>
+    ${t?.fitBy === "ai" ? `<p class="hint">The fit tag is still the AI's suggestion. You can change it in the tag strip before sending.</p>` : ""}
+    <div class="da"><a class="btn" href="/api/companies/${c.slug}/export?format=docx">Download Word to attach</a><span class="grow"></span><button class="btn" id="sendCopy">Copy message</button><button class="btn primary" id="sendOpen">Open in email</button></div></div>`;
+  document.body.appendChild(el);
+  $("#sendTo").focus();
+  const close = () => el.remove();
+  const record = async () => {
+    const to = $("#sendTo").value.trim(); if (!to) { $("#sendTo").focus(); $("#sendTo").classList.add("bad"); return false; }
+    localStorage.setItem("partners", JSON.stringify([to, ...partners.filter((p) => p !== to)].slice(0, 8)));
+    try { c.sent = await api(`/companies/${c.slug}/sent`, { method: "POST", body: JSON.stringify({ to, by: S.reviewer }) }); } catch (err) { alert(err.message); return false; }
+    return to;
+  };
+  el.addEventListener("click", async (e) => {
+    if (e.target === el || e.target.closest("[data-close]")) return close();
+    const pk = e.target.closest("[data-pick]"); if (pk) { $("#sendTo").value = pk.dataset.pick; return; }
+    if (e.target.closest("#sendCopy")) {
+      const to = await record(); if (!to) return;
+      try { await navigator.clipboard.writeText(`To: ${to}\nSubject: ${$("#sendSubj").value}\n\n${$("#sendBody").value}`); }
+      catch { $("#sendBody").select(); document.execCommand("copy"); }
+      close(); pageAssessment(c.slug, new URLSearchParams(location.hash.split("?")[1] || ""));
+    }
+    if (e.target.closest("#sendOpen")) {
+      const to = await record(); if (!to) return;
+      location.href = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent($("#sendSubj").value)}&body=${encodeURIComponent($("#sendBody").value)}`;
+      close(); setTimeout(() => pageAssessment(c.slug, new URLSearchParams(location.hash.split("?")[1] || "")), 300);
+    }
+  });
+  el.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
 }
 
 // ---------- follow-up ----------
@@ -703,6 +837,9 @@ async function route() {
   const [hashPath, query = ""] = location.hash.replace(/^#\/?/, "").split("?");
   const p = hashPath.split("/").filter(Boolean);
   const q = new URLSearchParams(query);
+  // A fresh container per page, so one page's listeners never fire on the next.
+  const m = $("#main"); if (m) m.replaceWith(Object.assign(m.cloneNode(false), { onclick: null }));
+  document.querySelectorAll("#whypop,#sendDlg").forEach((x) => x.remove());
   try {
     if (!p.length) return await pageCompanies();
     if (p[0] === "new") return pageNew();

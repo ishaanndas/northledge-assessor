@@ -1,0 +1,176 @@
+[
+  {
+    "slug": "harbor-health",
+    "name": "every reason points at real statements",
+    "pass": true,
+    "detail": "4 reasons"
+  },
+  {
+    "slug": "harbor-health",
+    "name": "every tag is backed by the draft",
+    "pass": true,
+    "detail": "4 tags"
+  },
+  {
+    "slug": "harbor-health",
+    "name": "fit is not Good fit",
+    "pass": true,
+    "detail": "got Not a fit"
+  },
+  {
+    "slug": "harbor-health",
+    "name": "tagged Needs more info",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "slug": "harbor-health",
+    "name": "not tagged Paying customers",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "slug": "lumen-grid",
+    "name": "every reason points at real statements",
+    "pass": true,
+    "detail": "4 reasons"
+  },
+  {
+    "slug": "lumen-grid",
+    "name": "every tag is backed by the draft",
+    "pass": true,
+    "detail": "4 tags"
+  },
+  {
+    "slug": "lumen-grid",
+    "name": "fit is not Not a fit",
+    "pass": true,
+    "detail": "got Possible fit"
+  },
+  {
+    "slug": "lumen-grid",
+    "name": "tagged Paying customers",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "slug": "lumen-grid",
+    "name": "not tagged Warning signs",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "slug": "lumina-health",
+    "name": "every reason points at real statements",
+    "pass": true,
+    "detail": "4 reasons"
+  },
+  {
+    "slug": "lumina-health",
+    "name": "every tag is backed by the draft",
+    "pass": true,
+    "detail": "4 tags"
+  },
+  {
+    "slug": "lumina-health",
+    "name": "fit is not Good fit",
+    "pass": true,
+    "detail": "got Not a fit"
+  },
+  {
+    "slug": "lumina-health",
+    "name": "tagged Warning signs",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "slug": "lumina-health",
+    "name": "tagged Claims overstated",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "slug": "mesa-pay",
+    "name": "every reason points at real statements",
+    "pass": true,
+    "detail": "4 reasons"
+  },
+  {
+    "slug": "mesa-pay",
+    "name": "every tag is backed by the draft",
+    "pass": true,
+    "detail": "3 tags"
+  },
+  {
+    "slug": "mesa-pay",
+    "name": "fit is not Good fit",
+    "pass": true,
+    "detail": "got Not a fit"
+  },
+  {
+    "slug": "mesa-pay",
+    "name": "tagged Warning signs",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "slug": "mesa-pay",
+    "name": "tagged Claims overstated",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "slug": "mesa-pay",
+    "name": "not tagged Pre-revenue",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "slug": "quill-robotics",
+    "name": "every reason points at real statements",
+    "pass": true,
+    "detail": "4 reasons"
+  },
+  {
+    "slug": "quill-robotics",
+    "name": "every tag is backed by the draft",
+    "pass": true,
+    "detail": "3 tags"
+  },
+  {
+    "slug": "quill-robotics",
+    "name": "fit is not Good fit",
+    "pass": true,
+    "detail": "got Not a fit"
+  },
+  {
+    "slug": "quill-robotics",
+    "name": "tagged Claims overstated",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "slug": "quill-robotics",
+    "name": "tagged Sources disagree",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "slug": "quill-robotics",
+    "name": "not tagged Warning signs",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "slug": "planted",
+    "name": "reason pointing at statements that do not exist is dropped",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "slug": "planted",
+    "name": "five bad tags dropped, the real one kept",
+    "pass": true,
+    "detail": "dropped 5"
+  }
+]

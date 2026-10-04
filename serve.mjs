@@ -12,6 +12,7 @@ import { listInbox, importInboxMessage, INBOX_DIR, readSettings, writeSettings, 
 import { search } from "./lib/search.mjs";
 import { toMarkdownApplied, toPlainText, toDocx } from "./lib/export.mjs";
 import { markdownToHtml } from "./lib/markdown-html.mjs";
+import { suggestTags, readTags, writeTags, effectiveTags, FIT, TAGS } from "./lib/tags.mjs";
 
 const PORT = Number(process.env.PORT || 4950);
 // One bad request or a failed background job must never take the app down.
@@ -26,6 +27,17 @@ const SOURCE_ORDER = ["deck", "website", "founders", "call-notes", "email"];
 // and reported rather than left looking busy forever.
 const jobs = new Map(); // slug -> { running, log: [], error, startedAt, finishedAt }
 const running = { has: (slug) => !!jobs.get(slug)?.running };
+// Suggest fit and topic tags from a finished draft. A failure here never fails the draft.
+async function runTagging(slug, job, record) {
+  record ??= readJson(path.join(outDirFor(slug), "assessment.json"));
+  if (!record) return;
+  const ev = { step: "tags", message: "Suggesting a fit tag" }; job?.log.push(ev);
+  try {
+    const ai = await suggestTags(record);
+    writeTags(outDirFor(slug), { ai, person: null });
+    ev.message = `${FIT[ai.fit]}${ai.tags.length ? ", " + ai.tags.map((t) => TAGS[t.tag]).join(", ") : ""}`;
+  } catch (err) { ev.message = "Tags could not be suggested; add them by hand"; console.error("tagging failed", slug, err.message); }
+}
 function startDraftJob(slug) {
   const cur = jobs.get(slug);
   if (cur?.running) return cur;
@@ -33,7 +45,10 @@ function startDraftJob(slug) {
   jobs.set(slug, job);
   const reviewPath = path.join(outDirFor(slug), "review.json");
   if (fs.existsSync(reviewPath)) fs.unlinkSync(reviewPath); // a fresh draft supersedes the old review
+  const tagsPath = path.join(outDirFor(slug), "tags.json");
+  if (fs.existsSync(tagsPath)) fs.unlinkSync(tagsPath); // and the old tags
   draftCompany(slug, (e) => job.log.push(e.step === "done" ? { step: "done", message: e.message, summary: e.record.verification_summary, seconds: e.record.seconds, usage: e.record.usage } : e))
+    .then((rec) => runTagging(slug, job, rec))
     .catch((err) => { job.error = err.message || String(err); job.log.push({ step: "error", message: job.error }); console.error("draft failed", slug, job.error); })
     .finally(() => { job.running = false; job.finishedAt = Date.now(); });
   return job;
@@ -84,12 +99,16 @@ function companySummary({ slug, dir, origin }) {
   const company = readJson(path.join(dir, "company.json"));
   const record = readJson(path.join(outDirFor(slug), "assessment.json"));
   const review = readJson(path.join(outDirFor(slug), "review.json"));
+  const sentLog = readJson(path.join(outDirFor(slug), "sent.json")) || [];
+  const sent = record ? sentLog.filter((x) => x.draft === record.generated_at).pop() || null : null;
   const ex = loadCompany(dir);
   return {
     slug,
     origin,
     ...company,
-    status: review ? "reviewed" : record ? "drafted" : "sources",
+    status: sent ? "sent" : review ? "reviewed" : record ? "drafted" : "sources",
+    sent,
+    tags: record ? effectiveTags(readTags(outDirFor(slug))) : null,
     sources: ex.sources.map((s) => ({ key: s.key, passages: s.passages.length })),
     generated_at: record?.generated_at ?? null,
     verification_summary: record?.verification_summary ?? null,
@@ -219,6 +238,7 @@ async function api(req, res, url) {
       ...companySummary({ slug, dir, origin: dir.startsWith(COMPANIES_DIR) ? "intake" : "example" }),
       sourceDocs: ex.sources.map((s) => ({ key: s.key, title: s.title, file: s.file, passages: s.passages })),
       record: readJson(path.join(outDirFor(slug), "assessment.json")),
+      tagsDoc: readTags(outDirFor(slug)),
       reviewDoc: readJson(path.join(outDirFor(slug), "review.json")),
       eval: evalData.find((e) => e.slug === slug) || null,
     });
@@ -262,12 +282,41 @@ async function api(req, res, url) {
     const record = readJson(path.join(outDirFor(slug), "assessment.json"));
     if (!record) return send(res, 404, { error: "not drafted yet" });
     const company = readJson(path.join(dir, "company.json"));
-    const c = { ...company, record, reviewDoc: readJson(path.join(outDirFor(slug), "review.json")) };
+    const c = { ...company, record, reviewDoc: readJson(path.join(outDirFor(slug), "review.json")), tagsView: effectiveTags(readTags(outDirFor(slug))) };
     const fmt = url.searchParams.get("format") || "md", base = `${slug}-assessment`;
     const dispo = (ext) => `attachment; filename="${base}.${ext}"`;
     if (fmt === "docx") { res.writeHead(200, { "Content-Type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "Content-Disposition": dispo("docx") }); return res.end(toDocx(c)); }
     if (fmt === "txt") return send(res, 200, toPlainText(c), "text/plain; charset=utf-8");
     res.writeHead(200, { "Content-Type": "text/markdown; charset=utf-8", ...(url.searchParams.get("download") ? { "Content-Disposition": dispo("md") } : {}) }); return res.end(toMarkdownApplied(c));
+  }
+
+  // Tags: POST asks the AI again; PUT records the associate's choice.
+  if (action === "tags" && req.method === "POST") {
+    if (running.has(slug)) return send(res, 409, { error: "A draft is running for this company." });
+    const record = readJson(path.join(outDirFor(slug), "assessment.json"));
+    if (!record) return send(res, 409, { error: "Draft the assessment first." });
+    try { const ai = await suggestTags(record); const prev = readTags(outDirFor(slug)); return send(res, 200, writeTags(outDirFor(slug), { ai, person: prev?.person || null })); }
+    catch (err) { return send(res, 502, { error: "Tags could not be suggested: " + err.message }); }
+  }
+  if (action === "tags" && req.method === "PUT") {
+    const b = await body(req); const prev = readTags(outDirFor(slug)) || { ai: null, person: null };
+    if (b.reset) return send(res, 200, writeTags(outDirFor(slug), { ...prev, person: null }));
+    const person = { ...(prev.person || {}) };
+    if ("fit" in b) { if (b.fit !== null && !FIT[b.fit]) return send(res, 400, { error: "unknown fit" }); person.fit = b.fit; }
+    if (Array.isArray(b.tags)) person.tags = [...new Set(b.tags.filter((t) => TAGS[t]))];
+    person.by = String(b.by || "").trim() || "the associate"; person.at = new Date().toISOString();
+    return send(res, 200, writeTags(outDirFor(slug), { ...prev, person }));
+  }
+  // Record that the assessment went to a partner.
+  if (action === "sent" && req.method === "POST") {
+    const b = await body(req);
+    const record = readJson(path.join(outDirFor(slug), "assessment.json"));
+    if (!record) return send(res, 409, { error: "Draft the assessment first." });
+    const to = String(b.to || "").trim(); if (!to) return send(res, 400, { error: "Who is it going to?" });
+    const f = path.join(outDirFor(slug), "sent.json"); const log = readJson(f) || [];
+    const entry = { to, by: String(b.by || "").trim(), at: new Date().toISOString(), draft: record.generated_at };
+    log.push(entry); fs.mkdirSync(outDirFor(slug), { recursive: true }); fs.writeFileSync(f, JSON.stringify(log, null, 2));
+    return send(res, 200, entry);
   }
 
   if (action === "review" && req.method === "PUT") {

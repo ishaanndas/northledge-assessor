@@ -4,7 +4,7 @@ Built by `build_decks.py` (python-pptx for the .pptx, headless Chrome for the .p
 
 | Deck | What it is | Use it to test |
 |---|---|---|
-| `relay-voice-deck` | Cloud phone system for support teams (Aircall-shaped) | A clean, internally consistent deck. |
+| `relay-voice-deck` | Cloud phone system for support teams (Aircall-shaped) | Meant to be clean, but it carries an unplanned slip: 1,900 seats at $79 a month is about $150k a month, not the $71k headline. The tool flags it. |
 | `grainline-deck` | Specialty-grain marketplace for brewers and bakers | A clean marketplace deck with GMV vs net revenue. |
 | `tidewatch-deck` | Boat-monitoring sensor plus subscription | A clean hardware-plus-subscription deck. |
 | `lumina-health-deck` | AI scheduling for dental clinics | The trap deck. See below. |

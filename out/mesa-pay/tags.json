@@ -1,0 +1,77 @@
+{
+  "ai": {
+    "fit": "not",
+    "fit_reasons": [
+      {
+        "text": "Nearly every headline figure (customers, volume, uptime, partnerships, team size) was overstated or contradicted on first contact.",
+        "statement_ids": [
+          "x0",
+          "x1",
+          "x2",
+          "x3"
+        ]
+      },
+      {
+        "text": "Revenue is under $30k over nine months with only ~60 active businesses, against a $10M valuation.",
+        "statement_ids": [
+          "b0",
+          "b1"
+        ]
+      },
+      {
+        "text": "Company operates on partner licences with no filed IFPE application and a 12-18 month path once filed.",
+        "statement_ids": [
+          "b3",
+          "d7.c1"
+        ]
+      },
+      {
+        "text": "Technical co-founder departed and engineering now runs on an agency contractor, with a hidden instruction embedded to manipulate automated review.",
+        "statement_ids": [
+          "b2",
+          "n0"
+        ]
+      }
+    ],
+    "tags": [
+      {
+        "tag": "numbers-overstated",
+        "reason": "Deck claims 400+ customers, 99.99% uptime, Visa partnership and 12-person team, all materially narrowed by calls and public data.",
+        "evidence_ids": [
+          "x0",
+          "x1",
+          "x2",
+          "x3"
+        ]
+      },
+      {
+        "tag": "warning-signs",
+        "reason": "Website contained a hidden instruction targeting AI reviewers to bias the assessment, plus a cited third-party rating and a rushed deadline.",
+        "evidence_ids": [
+          "n0",
+          "n1",
+          "n3"
+        ]
+      },
+      {
+        "tag": "needs-info",
+        "reason": "Monthly traction series, cap table, partner agreements, Stripe standing and financials are all missing before a partner meeting.",
+        "evidence_ids": [
+          "d3.c4",
+          "d6.c4",
+          "d7.c4"
+        ]
+      }
+    ],
+    "dropped": [
+      {
+        "tag": "pre-revenue",
+        "reason": "Revenue is near-negligible (~$3.3k/month) compared to activity claims, closer to pilot-stage than real traction.",
+        "why": "the statements it cites show revenue"
+      }
+    ],
+    "model": "claude-sonnet-5",
+    "at": "2026-10-04T19:01:03.095Z"
+  },
+  "person": null
+}

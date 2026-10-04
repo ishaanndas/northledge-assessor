@@ -32,6 +32,8 @@ node serve.mjs                 # the app, at http://localhost:4950
 node assess.mjs lumina-health  # draft one company
 node eval.mjs --no-judge       # mechanical checks only, no model calls
 node selftest.mjs              # plant four defects and confirm the checks catch them
+npm run check-tags             # check the fit and topic tags, free
+node assess.mjs --tags-only    # suggest tags again for the existing drafts
 npm run smoke                  # open every screen in a browser and fail on any error
 ```
 
@@ -59,7 +61,7 @@ Three more ordinary decks (Relay Voice, Grainline, Tidewatch) sit in `samples/` 
 
 ## What the evaluation found
 
-Four checks run over every draft: is each quote real, does the quote actually support its sentence (a second AI reads it), did the tool use decision words, and did it fall for the traps built into two of the examples. Across five companies and 227 sentences, every quote was real after one round of fixes, nothing was found unsupported, and ten sentences were marked partly supported, each one a real quote carrying a word too strong, mostly in the case against. That is the one weakness found: the tool does not invent, but when it argues it reaches. Both traps were handled. The full story, including what the checks cannot see and how we would judge the tool after a year of real decisions, is in `docs/EVALUATION.md`.
+Four checks run over every draft: is each quote real, does the quote actually support its sentence (a second AI reads it), did the tool use decision words, and did it fall for the traps built into two of the examples. Across five companies and 227 sentences, every quote was real after one round of fixes, nothing was found unsupported, and ten sentences were marked partly supported, each one a real quote carrying a word too strong, mostly in the case against. That is the one weakness found: the tool does not invent, but when it argues it reaches. Both traps were handled. A separate check covers the fit tags: every tag points at real statements, the two trap companies are never tagged "Good fit", and "Warning signs" appears only where something tried to steer the review. The full story, including what the checks cannot see and how we would judge the tool after a year of real decisions, is in `docs/EVALUATION.md`.
 
 ## Key decisions
 
@@ -68,7 +70,8 @@ Four checks run over every draft: is each quote real, does the quote actually su
 - **One repair round, not a loop.** Retrying until everything passes would teach the model to write vaguer claims.
 - **Failures are marked, not deleted.** The associate needs to see what the model wanted to say and could not source.
 - **Different models draft and judge.** A judge from the same model shares its blind spots.
-- **No field for a score.** It is structurally impossible for the output to contain one, and the evaluation scans for the language anyway.
+- **Tags, not a score.** After each draft the AI suggests a fit tag (good fit, possible fit, not a fit) and up to four topic tags. Every reason points at statements in the draft, a program drops any tag the draft does not back up, and the associate can change any of them. There are no numbers anywhere, and the draft itself is still scanned for decision language.
+- **Send to partner goes through the associate's own email.** The button prepares the email with the fit, the summary and a link to the assessment, opens it in their email app, and records who it went to. Sending from inside the app would use the fund's own email connection, set up like the inbox.
 - **The draft is never overwritten.** Edits sit on top of it, so the original and the associate's version can always be compared.
 
 ## What was cut
@@ -84,7 +87,7 @@ This is a working prototype, not a finished product. Getting it ready for real d
 3. **Sign-in and permissions**, using the fund's Google or Microsoft accounts.
 4. **Security and privacy**: an agreement with the AI provider on data use, encryption, backups, deletion on request.
 5. **Connecting the fund's inbox**, set up with their IT.
-6. **Fitting it to the fund**: their sections, their checklist, their house style.
+6. **Fitting it to the fund**: their sections, their checklist, their house style, and their CRM if they track deals in one (Affinity, Attio, HubSpot, a spreadsheet), so drafts, tags and decisions flow into the list they already use.
 7. **Recording outcomes from day one**, then a gradual rollout.
 
 The full list, with the open questions to settle with a fund, is in `docs/NEXT-STEPS.md` (also at `/docs/next-steps`).
@@ -93,9 +96,11 @@ The full list, with the open questions to settle with a fund, is in `docs/NEXT-S
 
 The whole thing was built with Claude Code over a long session: the code, the example companies, the prompts, the test decks and first drafts of every document, with me directing, reviewing the output and deciding what to cut. The design choices listed above are mine; many of the implementations were Claude's first attempt and survived.
 
-Four places it got something wrong:
+Six places it got something wrong:
 
 - **It flagged correct claims as wrong.** The first version of the number check reported a call's date and length as unsupported because they live in the document title, which the splitter had dropped. If I had not read the flagged claims I would have reported two false warnings as findings.
 - **It wrote a test that punished good behaviour.** An expectation for Quill Robotics forbade any claim containing "led perception". The model's claim was "The deck states Marsh led perception at Tesla", which is exactly right. The test had to learn the difference between asserting and attributing.
 - **It built a PowerPoint only its own parser could open.** To avoid a dependency it assembled the file by hand. My extractor read it fine; Google Slides and Keynote refused it. A file format is defined by the programs that open it.
 - **It undid too much, twice.** During a refactor it reverted a whole file to undo one bad edit and took the editor with it; caught on the first page load. Later, adding the inbox connection screen, it replaced one page using an end marker that sat much further down the file, deleting the editor, the source viewer and autosave. That one shipped: the hosted app showed "fileUrl is not defined". The fix was the code, and also a smoke test that opens every screen in a browser before any deploy, which fails on exactly that error.
+- **Its "clean" test deck did not add up, and the tool caught it.** Relay Voice was meant to be an ordinary, consistent deck. It says 1,900 agent seats at $79 a month and an average customer paying $2,370 a month across 64 customers, which comes to about $150k a month, yet the headline says $71k. Nobody noticed until the assessment tool flagged it as a contradiction. The deck is left as it is, because the tool reading it correctly is a better demo than a fixed deck.
+- **Its tagger reached past its evidence.** It put "Warning signs" on Quill Robotics for an overstated credential, which is not an attempt to steer the review, and tagged a company with $43k of monthly revenue "Pre-revenue". Rewording the instructions did not fix either; rules in code that check what each tag points at did.

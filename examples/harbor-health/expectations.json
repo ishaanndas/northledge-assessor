@@ -3,6 +3,22 @@
   "failed_max": 0,
   "missing_min": 6,
   "contradictions_min": 1,
-  "contradictions_must_mention": ["OASIS|documentation|in development"],
-  "forbidden_in_claims": ["revenue of \\$", "ARR of"]
+  "contradictions_must_mention": [
+    "OASIS|documentation|in development"
+  ],
+  "forbidden_in_claims": [
+    "revenue of \\$",
+    "ARR of"
+  ],
+  "tags": {
+    "fit_not": [
+      "good"
+    ],
+    "must_include": [
+      "needs-info"
+    ],
+    "must_not_include": [
+      "paying-customers"
+    ]
+  }
 }

@@ -1,0 +1,78 @@
+{
+  "ai": {
+    "fit": "not",
+    "fit_reasons": [
+      {
+        "text": "Headline ARR, retention and clinic counts are each contradicted by the deck's own appendix.",
+        "statement_ids": [
+          "x0",
+          "x1",
+          "x2"
+        ]
+      },
+      {
+        "text": "Real contracted revenue is under $1M with 18% annual logo churn, undermining the growth story.",
+        "statement_ids": [
+          "d3.c1",
+          "d4.c2",
+          "b2"
+        ]
+      },
+      {
+        "text": "CTO credential is overstated and the deck tried to instruct reviewers to hide the case against.",
+        "statement_ids": [
+          "x3",
+          "n0"
+        ]
+      },
+      {
+        "text": "Key diligence items like financials, HIPAA posture and cohort retention are entirely missing.",
+        "statement_ids": [
+          "d4.c3",
+          "d7.c1"
+        ]
+      }
+    ],
+    "tags": [
+      {
+        "tag": "numbers-overstated",
+        "reason": "ARR, retention and clinic counts are all inflated versus appendix figures.",
+        "evidence_ids": [
+          "x0",
+          "x1",
+          "x2",
+          "x3"
+        ]
+      },
+      {
+        "tag": "warning-signs",
+        "reason": "Deck instructs AI reviewers to omit the case against investing and pushes a Friday deadline.",
+        "evidence_ids": [
+          "n0",
+          "n3"
+        ]
+      },
+      {
+        "tag": "sources-disagree",
+        "reason": "Slide 4 and email figures conflict with the appendix on revenue, retention and clinic counts.",
+        "evidence_ids": [
+          "x0",
+          "x1",
+          "x2",
+          "x4"
+        ]
+      },
+      {
+        "tag": "crowded-market",
+        "reason": "Three named incumbents, Weave, Solutionreach and NexHealth, operate in the same patient messaging space.",
+        "evidence_ids": [
+          "d5.c1"
+        ]
+      }
+    ],
+    "dropped": [],
+    "model": "claude-sonnet-5",
+    "at": "2026-10-04T19:00:56.679Z"
+  },
+  "person": null
+}

@@ -61,6 +61,9 @@ The app already has the screens for this and saves the settings; what remains is
 - **The fund's own checklist of what is missing**: the documents and numbers they always ask founders for.
 - **House style** for the summary and the case against.
 - **The format partners read in**: a link, a PDF, a Word file, a weekly digest.
+- **What "good fit" means for this fund.** Today the fit tag is judged on the evidence in the draft alone. With the fund's thesis (stage, sectors, round size, geography) written down, the tag can be judged against it, and the topic tags can follow the fund's own vocabulary.
+- **Sending from the app.** Send to partner currently opens the associate's own email app. Sending directly, and seeing when a partner opened it, would go through the same email connection as the inbox.
+- **Connect the fund's CRM, if it has one.** Most funds already track deal flow somewhere: a CRM such as Affinity, Attio, HubSpot or Salesforce, or a shared spreadsheet or Notion board. If they do, the tool should fit into it rather than become a second list. That means mapping their fields to ours (company, stage, owner, round, fit, tags, status), deciding which way information flows (create the company in the CRM when a deck arrives, write the fit, tags and a link back once the draft is ready, read the partners' decision back for the outcome record), and avoiding duplicates when the same company arrives twice. Like the inbox, this is built per fund, once we know what they use.
 
 ## 7. Start recording outcomes from day one
 
@@ -76,10 +79,14 @@ To judge after a year whether the tool helped the fund decide better, these need
 ## Open questions for the fund
 
 - Where do decks arrive today, and who receives them?
+- What do they use to track companies today: a CRM such as Affinity, Attio, HubSpot or Salesforce, a spreadsheet, a Notion board, or nothing? Should the tool feed it, read from it, or both?
+- If there is a CRM, which fields matter (stage, owner, status, source of the deal), and who keeps them up to date?
+- Where are partners' decisions and reasons recorded today, so they can be linked back to the draft?
 - What do partners read today, in what format, and what do they wish it had?
 - Which past companies can be used for testing, and who can grade the drafts?
 - What does "good enough" look like to the partners, in their words?
 - Who should be able to see which companies?
+- Which fit labels and topic tags would partners actually sort by?
 - How long should decks and drafts be kept, and where?
 - Should the tool ever read anything beyond what the fund gives it, such as reference call notes or data-room documents?
 - Who at the fund owns the checklist and the house style once it is live?
