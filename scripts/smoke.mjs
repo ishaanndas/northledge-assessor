@@ -82,13 +82,40 @@ try {
   ok("GET /api/inbox", inbox.status === 200 && Array.isArray(inbox.body?.messages), `${inbox.body?.messages?.length ?? 0} messages`);
   const ev = await getJson("/eval.json");
   ok("GET /eval.json", ev.status === 200 && Array.isArray(ev.body));
-  for (const d of ["", "/readme", "/brief", "/how-it-works", "/evaluation", "/next-steps", "/prd", "/eval-report", "/test-decks"]) {
+  for (const d of ["", "/readme", "/brief", "/how-it-works", "/evaluation", "/next-steps", "/test-cases", "/prd", "/eval-report", "/test-decks"]) {
     const r = await fetch(base + "/docs" + d); ok(`GET /docs${d}`, r.status === 200);
   }
   for (const c of list) {
     const p = await getJson(`/api/companies/${c.slug}/progress`);
     ok(`progress ${c.slug}`, p.status === 200 && typeof p.body?.running === "boolean");
     if (c.status !== "sources") { const r = await fetch(`${base}/api/companies/${c.slug}/export?format=docx`); ok(`export docx ${c.slug}`, r.status === 200 && (await r.arrayBuffer()).byteLength > 1000); }
+  }
+
+  // Create a company from an uploaded file, the way the New company page does,
+  // then delete it. On the host the upload and the company folders must end up
+  // on the same disk; this is the path that once failed with EXDEV.
+  {
+    const deck = "# Smoke Test Co\n\nSmoke Test Co sells test widgets. Revenue was $10k last month.\n";
+    const ex = await fetch(base + "/api/extract", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ filename: "smoke-deck.txt", data: Buffer.from(deck).toString("base64") }) });
+    const exb = await ex.json().catch(() => null);
+    ok("upload a deck file", ex.status === 200 && !!exb?.file?.token, exb?.error || "");
+    let slug = null;
+    if (exb?.file?.token) {
+      const cr = await fetch(base + "/api/companies", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: "Smoke Test Co", one_liner: "test", sources: { deck: exb.text || deck }, files: { deck: exb.file }, intake: { via: "smoke" } }) });
+      const crb = await cr.json().catch(() => null);
+      slug = crb?.slug;
+      ok("create company with the file", cr.status === 201 && !!slug, crb?.error || "");
+    }
+    if (slug) {
+      const c = await getJson(`/api/companies/${slug}`);
+      const fname = c.body?.files?.deck?.name;
+      ok("company keeps the file", c.status === 200 && !!fname);
+      if (fname) { const fr = await fetch(`${base}/companies/${slug}/files/${encodeURIComponent(fname)}`); ok("stored file opens", fr.status === 200 && (await fr.text()).includes("Smoke Test Co")); }
+      const del = await fetch(`${base}/api/companies/${slug}`, { method: "DELETE" });
+      ok("delete test company", del.status === 200);
+    }
+    const hidden = await fetch(base + "/companies/.inbox-settings.json");
+    ok("hidden files are not served", hidden.status === 404);
   }
 
   const drafted = list.find((c) => c.origin === "example" && c.status !== "sources") || list.find((c) => c.status !== "sources");

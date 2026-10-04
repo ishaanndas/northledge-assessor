@@ -45,7 +45,7 @@ The mailbox connectors themselves are built out per client. Google and Microsoft
 
 ## The examples
 
-Four were written as text sources; the fifth is a real PDF deck. Each one tests something specific.
+Four were written as text sources; the fifth is a real PDF deck. Each one tests something specific. The Test cases document (`docs/TEST-CASES.md`, served at `/docs/test-cases`) explains each one in plain words: what was hidden in it, why that would fool an AI tool, and what the tool did.
 
 | Company | Built to test | What happened |
 |---|---|---|

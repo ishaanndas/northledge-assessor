@@ -20,7 +20,7 @@ A second AI, a different one from the one that wrote the draft, reads each sente
 A word search over the draft for phrases like "recommend", "we should invest" or "probability of success". The tool is not allowed to decide, so none of those should appear in its own voice.
 
 **4. Did it fall for the traps?**
-Two of the five example companies were built to mislead the tool: hidden text telling AI reviewers to be positive, a planted "probability of success" score, headline numbers quietly contradicted elsewhere, a deadline to rush the decision. Before running the tool, we wrote down what a correct draft must do with each trap: notice the contradiction, flag the hidden text, not repeat the score. The eval ticks those boxes.
+Two of the five example companies were built to mislead the tool: hidden text telling AI reviewers to be positive, a planted "probability of success" score, headline numbers quietly contradicted elsewhere, a deadline to rush the decision. Before running the tool, we wrote down what a correct draft must do with each trap: notice the contradiction, flag the hidden text, not repeat the score. The eval ticks those boxes. The Test cases document walks through every trap, one company at a time.
 
 **And a test of the tester.** We deliberately break a good draft in four ways (fake a quote, change a number, point a citation at a page that does not exist, remove a citation) and confirm check 1 catches all four. This matters because on real drafts check 1 rarely finds anything, and we need to know that is because the drafts are clean, not because the check is broken.
 

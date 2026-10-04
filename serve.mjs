@@ -38,7 +38,31 @@ function startDraftJob(slug) {
     .finally(() => { job.running = false; job.finishedAt = Date.now(); });
   return job;
 }
-const UPLOADS = path.join(ROOT, "uploads"); // files kept between extract and create; gitignored
+// Files kept between "read this deck" and "create the company". They live inside
+// companies/ so that, on the host, they sit on the same persistent volume as the
+// company folders they are moved into.
+const UPLOADS = path.join(COMPANIES_DIR, ".uploads");
+// Move a file, even between two disks (a plain rename cannot cross disks: EXDEV).
+function moveFile(from, to) {
+  try { fs.renameSync(from, to); }
+  catch (err) { if (err.code !== "EXDEV") throw err; fs.copyFileSync(from, to); fs.unlinkSync(from); }
+}
+// On start: remove company folders left half-made by a failed create (no company.json),
+// and uploads older than a day that were never turned into a company.
+function tidyCompanies() {
+  if (!fs.existsSync(COMPANIES_DIR)) return;
+  for (const d of fs.readdirSync(COMPANIES_DIR)) {
+    if (d.startsWith(".") || d === "lost+found") continue;
+    const dir = path.join(COMPANIES_DIR, d);
+    // Only folders this app made: they always get a sources/ or files/ folder first.
+    const ours = fs.statSync(dir).isDirectory() && (fs.existsSync(path.join(dir, "sources")) || fs.existsSync(path.join(dir, "files")));
+    if (ours && !fs.existsSync(path.join(dir, "company.json"))) { fs.rmSync(dir, { recursive: true, force: true }); console.log("removed half-made company folder", d); }
+  }
+  if (fs.existsSync(UPLOADS)) for (const f of fs.readdirSync(UPLOADS)) {
+    const p = path.join(UPLOADS, f);
+    if (Date.now() - fs.statSync(p).mtimeMs > 86400000) fs.rmSync(p, { force: true });
+  }
+}
 const safeName = (n) => String(n).replace(/[^\w.\- ]+/g, "_").slice(0, 120) || "file";
 const FILE_KINDS = { ".pdf": "pdf", ".pptx": "pptx", ".docx": "docx", ".md": "text", ".txt": "text" };
 
@@ -78,7 +102,7 @@ function companySummary({ slug, dir, origin }) {
 function slugify(name) {
   let base = String(name).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40) || "company";
   let slug = base, n = 2;
-  while (findCompanyDir(slug)) slug = `${base}-${n++}`;
+  while (findCompanyDir(slug) || fs.existsSync(path.join(COMPANIES_DIR, slug))) slug = `${base}-${n++}`;
   return slug;
 }
 
@@ -153,15 +177,16 @@ async function api(req, res, url) {
       if (!sources.length) return send(res, 400, { error: "at least one source is required" });
       const newSlug = slugify(b.name);
       const dir = path.join(COMPANIES_DIR, newSlug);
+      try {
       fs.mkdirSync(path.join(dir, "sources"), { recursive: true });
       const files = {};
       for (const [key, f] of Object.entries(b.files || {})) {
         if (!f?.token) continue;
-        const src = fs.readdirSync(UPLOADS).find((n) => n.startsWith(f.token + "__"));
+        const src = fs.existsSync(UPLOADS) && fs.readdirSync(UPLOADS).find((n) => n.startsWith(f.token + "__"));
         if (!src) continue;
         fs.mkdirSync(path.join(dir, "files"), { recursive: true });
         const name = src.split("__").slice(1).join("__");
-        fs.renameSync(path.join(UPLOADS, src), path.join(dir, "files", name));
+        moveFile(path.join(UPLOADS, src), path.join(dir, "files", name));
         files[key] = { name, kind: f.kind, pages: f.pages };
       }
       fs.writeFileSync(path.join(dir, "company.json"), JSON.stringify({ slug: newSlug, name: b.name.trim(), one_liner: (b.one_liner || "").trim(), ask: (b.ask || "").trim(), created_at: new Date().toISOString(), intake: b.intake || {}, files }, null, 2));
@@ -173,6 +198,12 @@ async function api(req, res, url) {
           const titled = /^#\s/.test(t) ? t : `# ${b.name.trim()} — ${safe}\n\n${t}`;
           fs.writeFileSync(path.join(dir, "sources", `${String(i + 1).padStart(2, "0")}-${safe}.md`), titled + "\n");
         });
+      } catch (err) {
+        // Never leave a half-made company behind.
+        fs.rmSync(dir, { recursive: true, force: true });
+        console.error("create company failed", newSlug, err);
+        return send(res, 500, { error: "The company could not be saved. Please try again." });
+      }
       return send(res, 201, { slug: newSlug });
     }
     return send(res, 405, { error: "method" });
@@ -260,6 +291,7 @@ const DOCS = [
   { id: "next-steps", file: "docs/NEXT-STEPS.md", title: "Next steps", blurb: "What it would take to make this ready for real use: testing against real assessments with a fund, an engineering review, sign-in, security, the inbox connection, and the open questions." },
   { id: "prd", file: "docs/PRD.md", title: "Product requirements", blurb: "The longer version of the brief: requirements, metrics, risks, rollout, roadmap." },
   { id: "eval-report", file: "out/eval-report.md", title: "Eval run", blurb: "The raw output of the last evaluation run: every flagged statement with the judge's reason." },
+  { id: "test-cases", file: "docs/TEST-CASES.md", title: "Test cases", blurb: "What each example company is, what was hidden in it to trip the tool up, why that would fool an AI tool, and what the tool did." },
   { id: "test-decks", file: "samples/README.md", title: "Test decks", blurb: "The sample decks for testing intake, and everything planted in the trap deck." },
 ];
 function docPage(title, bodyHtml, current) {
@@ -305,6 +337,7 @@ http
       let p = decodeURIComponent(url.pathname);
       if (p === "/" || p === "/index.html") p = "/app.html";
       const safe = path.normalize(p).replace(/^(\.\.[/\\])+/, "");
+      if (/\/\./.test(safe)) return send(res, 404, "Not found", "text/plain"); // hidden files (uploads, inbox settings) are never served
       let f = path.join(APP_DIR, safe);
       if (!fs.existsSync(f)) f = path.join(OUT_DIR, safe);
       if (!fs.existsSync(f) && (safe.startsWith("/samples/") || safe.startsWith("/inbox/") || safe.startsWith("/companies/") || /^\/examples\/[^/]+\/files\//.test(safe))) f = path.join(ROOT, safe);
@@ -320,4 +353,4 @@ http
     if (err.code === "EADDRINUSE") { console.error(`Port ${PORT} is already in use. Another copy of the app is probably running; open http://localhost:${PORT} or stop it first (lsof -ti:${PORT} | xargs kill).`); process.exit(1); }
     throw err;
   })
-  .listen(PORT, () => { console.log(`app at http://localhost:${PORT}`); startWatcher({ companiesDir: COMPANIES_DIR, slugify, draft: (slug) => { startDraftJob(slug); } }); });
+  .listen(PORT, () => { try { tidyCompanies(); } catch (e) { console.error("tidy failed", e.message); } console.log(`app at http://localhost:${PORT}`); startWatcher({ companiesDir: COMPANIES_DIR, slugify, draft: (slug) => { startDraftJob(slug); } }); });
