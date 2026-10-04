@@ -9,6 +9,7 @@ import { draftCompany } from "./lib/pipeline.mjs";
 import { extractFile, extractUrl } from "./lib/extract.mjs";
 import { prefillFromDeck } from "./lib/prefill.mjs";
 import { listInbox, importInboxMessage, INBOX_DIR } from "./lib/inbox.mjs";
+import { search } from "./lib/search.mjs";
 
 const PORT = Number(process.env.PORT || 4950);
 const APP_DIR = path.join(ROOT, "app");
@@ -62,6 +63,7 @@ function slugify(name) {
 async function api(req, res, url) {
   const parts = url.pathname.split("/").filter(Boolean); // api, companies, slug?, action?
 
+  if (parts[1] === "search" && req.method === "GET") return send(res, 200, search(url.searchParams.get("q") || ""));
   // Turn a file or a URL into source text. Files arrive as base64 JSON; no multipart parser needed.
   if (parts[1] === "extract" && req.method === "POST") {
     const b = await body(req);

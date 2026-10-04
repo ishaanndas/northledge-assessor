@@ -93,11 +93,17 @@
     push({ key: "thesis", type: "thesis", text: ov(o, "thesis", a.bear_case.thesis), editable: review, field: "thesis" });
     claimBlocks(a.bear_case.points, "b");
     if (o.mode !== "partner" && c.eval) push({ key: "checks", type: "checks", eval: c.eval, fixed: true });
+    // Moves: overrides.moves[key] = anchorKey means "render this block right after anchorKey".
+    // Applied in two passes so a block can be dropped after an inserted block too.
+    const moves = Object.entries(o.overrides?.moves || {});
+    const applyMoves = (list, pending) => { const left = []; for (const [key, anchor] of pending) { const i = list.findIndex((b) => b.key === key); const j = list.findIndex((b) => b.key === anchor); if (i < 0 || j < 0 || key === anchor) { if (i >= 0 && j < 0) left.push([key, anchor]); continue; } const [b] = list.splice(i, 1); const j2 = list.findIndex((x) => x.key === anchor); list.splice(j2 + 1, 0, b); } return left; };
+    const later = applyMoves(B, moves);
     // Weave in the associate's inserted blocks after their anchors.
     const inserts = o.overrides?.inserts || {};
     const out = [];
     const addWithInserts = (b) => { out.push(b); for (const ins of inserts[b.key] || []) addWithInserts({ key: `ins.${ins.id}`, type: ins.type, html: ins.html || "", rich: ins.type !== "divider", editable: review && ins.type !== "divider", insert: true, id: ins.id }); };
     B.forEach(addWithInserts);
+    applyMoves(out, later);
     return out;
   }
 
@@ -106,7 +112,7 @@
     const ce = b.editable ? (b.rich ? ' contenteditable="true"' : ' contenteditable="plaintext-only"') : "";
     const ph = b.placeholder ? ` data-placeholder="${esc(b.placeholder)}"` : b.insert ? ' data-placeholder="Type, or press / for a block type"' : "";
     const inner = b.rich ? sanitize(b.html) : esc(b.text ?? "");
-    const handle = review && !b.fixed ? `<button class="handle" data-handle="${esc(b.key)}" tabindex="-1" title="Block menu">⋮⋮</button>` : "";
+    const handle = review && !b.fixed ? `<button class="handle" data-handle="${esc(b.key)}" draggable="true" tabindex="-1" title="Drag to move, click for options">⋮⋮</button>` : "";
     const cls = `blk t-${b.type}${b.editable ? " editable" : ""}${b.insert ? " insert" : ""}${b.muted ? " muted" : ""}${b.removed ? " removed" : ""}`;
     switch (b.type) {
       case "label": return `<div class="${cls}">${esc(b.text)}</div>`;

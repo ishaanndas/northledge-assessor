@@ -13,7 +13,8 @@ const fmt = (iso) => iso ? iso.replace("T", " ").slice(0, 16) : "";
 // ---------- shell ----------
 let inboxCount = null;
 function topbar(crumbs = [], right = "") {
-  $("#top").innerHTML = `<a class="name" href="#/"><span class="mark">SA</span>Seed assessments</a>${crumbs.length ? `<div class="crumbs">${crumbs.map((c, i) => `<span>/</span>${c.href ? `<a href="${c.href}">${esc(c.label)}</a>` : `<b>${esc(c.label)}</b>`}`).join("")}</div>` : ""}<div class="right"><a class="navlink" href="#/inbox" id="inboxLink">Inbox${inboxCount ? ` <span class="count">${inboxCount}</span>` : ""}</a>${right}</div>`;
+  $("#top").innerHTML = `<a class="name" href="#/"><span class="mark">SA</span>Seed assessments</a>${crumbs.length ? `<div class="crumbs">${crumbs.map((c, i) => `<span>/</span>${c.href ? `<a href="${c.href}">${esc(c.label)}</a>` : `<b>${esc(c.label)}</b>`}`).join("")}</div>` : ""}<button class="searchbox" id="openSearch"><span class="ico">⌕</span><span>Search companies, decks, claims…</span><kbd>⌘K</kbd></button><div class="right"><a class="navlink" href="#/inbox" id="inboxLink">Inbox${inboxCount ? ` <span class="count">${inboxCount}</span>` : ""}</a>${right}</div>`;
+  $("#openSearch").addEventListener("click", openPalette);
   if (inboxCount === null) api("/inbox").then((r) => { inboxCount = r.messages.filter((m) => !m.imported).length; const el = $("#inboxLink"); if (el) el.innerHTML = `Inbox${inboxCount ? ` <span class="count">${inboxCount}</span>` : ""}`; }).catch(() => {});
 }
 function stageState(c, key) {
@@ -40,6 +41,57 @@ async function load(slug) {
   S.slug = slug; S.company = c; blocksCache = null;
   return c;
 }
+
+
+// ---------- command palette ----------
+const COMMANDS = [
+  { type: "command", title: "New company", subtitle: "Drop a deck, paste a link, or paste text", href: "#/new" },
+  { type: "command", title: "Inbox", subtitle: "Decks that arrived by email", href: "#/inbox" },
+  { type: "command", title: "All companies", subtitle: "Cards or list", href: "#/" },
+];
+const TYPE_LABEL = { command: "Go to", company: "Companies", file: "Files", passage: "Source passages", claim: "Claims", gap: "Missing items", flag: "Not evidence", summary: "Summaries", bear: "Case against", message: "Inbox" };
+let paletteTimer = null;
+function openPalette() {
+  if ($("#palette")) return;
+  const el = document.createElement("div"); el.id = "palette";
+  el.innerHTML = `<div class="pal"><div class="pal-in"><span class="ico">⌕</span><input id="palq" placeholder="Search companies, decks, passages, claims, inbox…" autocomplete="off"><kbd>esc</kbd></div><div class="pal-res" id="palres"></div></div>`;
+  document.body.appendChild(el);
+  const input = $("#palq"), res = $("#palres");
+  let items = [], active = 0;
+  const render = () => {
+    if (!items.length) { res.innerHTML = `<div class="pal-empty">${input.value.trim() ? "Nothing matches." : "Type to search everything: company names, deck slides, website text, call notes, drafted claims, missing items and inbox messages."}</div>`; return; }
+    let lastType = null, h = "";
+    items.forEach((it, i) => {
+      if (it.type !== lastType) { h += `<div class="pal-grp">${TYPE_LABEL[it.type] || it.type}</div>`; lastType = it.type; }
+      h += `<button class="pal-item ${i === active ? "on" : ""}" data-i="${i}"><span class="pt">${esc(it.title)}</span>${it.snippet && it.type !== "company" && it.type !== "command" ? `<span class="ps">${esc(it.snippet)}</span>` : ""}<span class="pm">${esc(it.subtitle || "")}</span></button>`;
+    });
+    res.innerHTML = h;
+    res.querySelector(".pal-item.on")?.scrollIntoView({ block: "nearest" });
+  };
+  const go = (it) => { closePalette(); if (it.type === "message") { location.hash = "#/inbox"; return; } location.hash = it.href; if (location.hash === it.href) window.dispatchEvent(new HashChangeEvent("hashchange")); };
+  const run = async () => {
+    const q = input.value.trim();
+    if (!q) { items = COMMANDS; active = 0; render(); return; }
+    const r = await api(`/search?q=${encodeURIComponent(q)}`);
+    const cmds = COMMANDS.filter((c) => c.title.toLowerCase().includes(q.toLowerCase()));
+    // Group by type in a sensible order, keep score order within a type.
+    const order = ["command", "company", "file", "message", "claim", "passage", "gap", "flag", "summary", "bear"];
+    items = [...cmds, ...r.results].sort((a, b) => order.indexOf(a.type) - order.indexOf(b.type) || b.score - a.score);
+    active = 0; render();
+  };
+  input.addEventListener("input", () => { clearTimeout(paletteTimer); paletteTimer = setTimeout(run, 120); });
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowDown") { e.preventDefault(); active = Math.min(items.length - 1, active + 1); render(); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); active = Math.max(0, active - 1); render(); }
+    else if (e.key === "Enter") { e.preventDefault(); if (items[active]) go(items[active]); }
+    else if (e.key === "Escape") closePalette();
+  });
+  res.addEventListener("click", (e) => { const b = e.target.closest(".pal-item"); if (b) go(items[b.dataset.i]); });
+  el.addEventListener("click", (e) => { if (e.target === el) closePalette(); });
+  items = COMMANDS; render(); input.focus();
+}
+function closePalette() { $("#palette")?.remove(); }
+document.addEventListener("keydown", (e) => { if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(); $("#palette") ? closePalette() : openPalette(); } });
 
 // ---------- companies ----------
 async function pageCompanies() {
@@ -160,7 +212,7 @@ async function pageInbox() {
 }
 
 // ---------- sources ----------
-async function pageSources(slug) {
+async function pageSources(slug, openPid) {
   const c = await load(slug);
   topbar([{ label: c.name }]);
   const body = stagehead("Sources", c.record ? `<a class="btn" href="#/c/${slug}/draft">Draft again</a>` : `<a class="btn primary" href="#/c/${slug}/draft?start=1">Draft assessment <span class="arr">→</span></a>`, "What the model reads. Click a passage to see where it came from.") +
@@ -170,6 +222,7 @@ async function pageSources(slug) {
   const show = (pid) => { $("#side").innerHTML = viewerHtml(c, pid); $("#split").classList.add("show"); $("#closeSide").hidden = false; document.querySelectorAll(".psg.lit").forEach((x) => x.classList.remove("lit")); document.querySelector(`.psg[data-pid="${CSS.escape(pid)}"]`)?.classList.add("lit"); };
   $("#main").addEventListener("click", (e) => { const v = e.target.closest("[data-view]"); if (v) { show(v.dataset.view); return; } const p = e.target.closest(".psg[data-pid]"); if (p) show(p.dataset.pid); });
   $("#closeSide").addEventListener("click", () => { $("#split").classList.remove("show"); $("#closeSide").hidden = true; });
+  if (openPid) { show(openPid); document.querySelector(`.psg[data-pid="${CSS.escape(openPid)}"]`)?.scrollIntoView({ block: "center" }); }
 }
 
 // ---------- draft ----------
@@ -327,13 +380,54 @@ function wireSplit(c, mode) {
     if (b.type === "claim" && b.decision.action === "edit") items.push({ label: "Revert to the model's wording", run: () => { S.decisions[b.id] = { action: "keep" }; change(); rerender(); } });
     if (b.type === "gap") items.push(b.removed ? { label: "Restore item", run: () => { setPath(S.overrides, `missing.${b.index}.removed`, false); change(); rerender(); } } : { label: "Remove item", danger: true, run: () => { setPath(S.overrides, `missing.${b.index}.removed`, true); change(); rerender(); } });
     if (b.field && !b.insert && b.type !== "reviewer" && b.type !== "note") items.push({ label: "Revert to the model's wording", run: () => { setPath(S.overrides, b.field, ""); change(); rerender(); } });
+    if (!b.insert && (S.overrides.moves || {})[key]) items.push({ label: "Put back where the draft had it", run: () => { delete S.overrides.moves[key]; change(); rerender(); } });
     if (b.insert) {
       for (const [t, label] of Object.entries(Doc.INSERT_TYPES)) if (t !== b.type) items.push({ label: `Turn into ${label.toLowerCase()}`, run: () => { const f = findInsert(key); if (f) { f.item.type = t; if (t === "divider") f.item.html = ""; } change(); rerender(); focusKey(key); } });
       items.push({ sep: true }, { label: "Delete block", danger: true, run: () => { deleteInsert(key); change(); rerender(); } });
     }
+    items.push({ sep: true }, { label: "Move up", hint: "Alt+↑", run: () => moveBlock(key, -1) }, { label: "Move down", hint: "Alt+↓", run: () => moveBlock(key, 1) });
     items.push({ sep: true }, { label: "Add a block below", hint: "Enter", run: () => { const k = insertAfter(key); change(); rerender(); focusKey(k, "start"); } });
     showMenu(items, rect.left, rect.bottom + 4);
   }
+
+  // Moving blocks. Inserted blocks move by re-anchoring; model blocks record a move override.
+  function placeAfter(key, anchorKey) {
+    if (key === anchorKey || anchorKey === key) return;
+    if (key.startsWith("ins.")) { const f = findInsert(key); if (!f) return; const item = f.item; deleteInsert(key); const ins = (S.overrides.inserts ??= {}); (ins[anchorKey] ??= []).unshift(item); if (ins[anchorKey].length > 1) { const rest = ins[anchorKey].splice(1); ins[key] = [...rest, ...(ins[key] || [])]; } }
+    else setPath(S.overrides, `moves.${key}`, anchorKey);
+    change(); rerender();
+  }
+  function moveBlock(key, dir) {
+    const els = [...doc.querySelectorAll(".blk[data-key]")]; const i = els.findIndex((e) => e.dataset.key === key); if (i < 0) return;
+    const anchor = dir < 0 ? els[i - 2] : els[i + 1];
+    if (dir < 0 && i === 1) return; // already first movable position
+    if (!anchor) return;
+    placeAfter(key, anchor.dataset.key);
+    const el = doc.querySelector(`.blk[data-key="${CSS.escape(key)}"]`); el?.classList.add("flash"); el?.scrollIntoView({ block: "nearest" });
+    const bc = el?.querySelector(".bc[contenteditable]"); if (bc) placeCaret(bc, "end");
+  }
+  let dragKey = null, dropTarget = null, dropAfter = true;
+  const clearDrop = () => { doc.querySelectorAll(".drop-before,.drop-after").forEach((e) => e.classList.remove("drop-before", "drop-after")); };
+  doc.addEventListener("dragstart", (e) => {
+    const h = e.target.closest("button[data-handle]"); if (!h) return;
+    dragKey = h.dataset.handle; e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("text/plain", dragKey);
+    const blk = h.closest(".blk"); blk.classList.add("dragging"); try { e.dataTransfer.setDragImage(blk, 20, 12); } catch {}
+  });
+  doc.addEventListener("dragover", (e) => {
+    if (!dragKey) return; const blk = e.target.closest(".blk[data-key]"); if (!blk || blk.dataset.key === dragKey) return;
+    e.preventDefault(); e.dataTransfer.dropEffect = "move";
+    const r = blk.getBoundingClientRect(); dropAfter = e.clientY > r.top + r.height / 2; dropTarget = blk;
+    clearDrop(); blk.classList.add(dropAfter ? "drop-after" : "drop-before");
+  });
+  doc.addEventListener("dragleave", (e) => { if (!doc.contains(e.relatedTarget)) clearDrop(); });
+  doc.addEventListener("drop", (e) => {
+    if (!dragKey || !dropTarget) return; e.preventDefault();
+    const els = [...doc.querySelectorAll(".blk[data-key]")]; const i = els.indexOf(dropTarget);
+    const anchor = dropAfter ? dropTarget : els[i - 1];
+    const key = dragKey; dragKey = null; clearDrop();
+    if (anchor && anchor.dataset.key !== key) placeAfter(key, anchor.dataset.key);
+  });
+  doc.addEventListener("dragend", () => { dragKey = null; dropTarget = null; clearDrop(); doc.querySelectorAll(".dragging").forEach((x) => x.classList.remove("dragging")); });
 
   function slashMenu(bc) {
     const key = keyOf(bc), rect = bc.getBoundingClientRect();
@@ -370,6 +464,7 @@ function wireSplit(c, mode) {
       if (b.type === "gap") { setPath(S.overrides, `missing.${b.index}.removed`, true); change(); rerender(); return; }
       return;
     }
+    if (e.altKey && (e.key === "ArrowUp" || e.key === "ArrowDown") && !b.fixed) { e.preventDefault(); moveBlock(key, e.key === "ArrowUp" ? -1 : 1); return; }
     if ((e.key === "ArrowUp" && caretAtStart(bc)) || (e.key === "ArrowDown" && caretAtEnd(bc))) {
       const all = editableBlocks(), i = all.indexOf(bc), next = all[i + (e.key === "ArrowUp" ? -1 : 1)];
       if (next) { e.preventDefault(); placeCaret(next, e.key === "ArrowUp" ? "end" : "start"); }
@@ -393,12 +488,15 @@ function queueSave() {
     const st = document.querySelector('.stage[href$="/review"] small'); if (st) st.textContent = stageState(S.company, "review");
   }, 700);
 }
-async function pageReview(slug) {
+async function pageReview(slug, q = new URLSearchParams()) {
   const c = await load(slug);
   if (!c.record) return (location.hash = `#/c/${slug}/draft`);
+  if (q.get("s")) S.selected = q.get("s");
   topbar([{ label: c.name }]);
   workspace(c, "review", stagehead("Review", `<span class="state" id="savestate">${S.saved ? "Saved " + S.saved.slice(11, 16) : "Edits save automatically"}</span><a class="btn primary" href="#/c/${slug}/partner">Partner page <span class="arr">→</span></a>`, "Click anywhere to edit. Click a statement to see its source.") + splitView(c, "review"));
   wireSplit(c, "review");
+  const target = q.get("s") ? `.t-claim[data-id="${CSS.escape(q.get("s"))}"]` : q.get("g") ? `.blk[data-key="gap.${q.get("g")}"]` : q.get("k") ? `.blk[data-key="${CSS.escape(q.get("k"))}"]` : null;
+  if (target) { const el = $("#doc").querySelector(target); if (el) { el.scrollIntoView({ block: "center" }); el.classList.add("flash"); if (q.get("s")) { renderSide(c, false); $("#split").classList.add("show"); } } }
 }
 async function pagePartner(slug) {
   const c = await load(slug);
@@ -437,9 +535,9 @@ async function route() {
     if (p[0] === "inbox") return await pageInbox();
     if (p[0] === "c" && p[1]) {
       const slug = p[1], stage = p[2] || "review";
-      if (stage === "sources") return await pageSources(slug);
+      if (stage === "sources") return await pageSources(slug, q.get("p"));
       if (stage === "draft") return await pageDraft(slug, q.get("start") === "1");
-      if (stage === "review") return await pageReview(slug);
+      if (stage === "review") return await pageReview(slug, q);
       if (stage === "partner") return await pagePartner(slug);
       if (stage === "followup") return await pageFollowup(slug);
     }
