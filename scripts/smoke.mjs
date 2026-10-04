@@ -27,6 +27,12 @@ const ok = (name, pass, detail = "") => { results.push({ name, pass, detail }); 
 
 // ---- server ----
 let server = null, base = argUrl;
+if (base) {
+  // Right after a deploy the host answers with an error page for a little
+  // while; wait up to three minutes for the app itself before testing.
+  let up = false;
+  for (let i = 0; i < 36 && !up; i++) { try { const r = await fetch(base + "/api/companies"); up = r.ok && Array.isArray(await r.json()); } catch {} if (!up) { if (i === 0) console.log("waiting for the app to come up…"); await wait(5000); } }
+}
 if (!base) {
   const port = 4977;
   server = spawn(process.execPath, ["serve.mjs"], { cwd: ROOT, env: { ...process.env, PORT: String(port) }, stdio: "ignore" });
