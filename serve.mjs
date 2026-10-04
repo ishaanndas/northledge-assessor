@@ -10,6 +10,7 @@ import { extractFile, extractUrl } from "./lib/extract.mjs";
 import { prefillFromDeck } from "./lib/prefill.mjs";
 import { listInbox, importInboxMessage, INBOX_DIR } from "./lib/inbox.mjs";
 import { search } from "./lib/search.mjs";
+import { toMarkdownApplied, toPlainText, toDocx } from "./lib/export.mjs";
 
 const PORT = Number(process.env.PORT || 4950);
 const APP_DIR = path.join(ROOT, "app");
@@ -176,6 +177,19 @@ async function api(req, res, url) {
       res.end();
     }
     return;
+  }
+
+  // Export with the review applied: ?format=md|txt|docx
+  if (action === "export" && req.method === "GET") {
+    const record = readJson(path.join(outDirFor(slug), "assessment.json"));
+    if (!record) return send(res, 404, { error: "not drafted yet" });
+    const company = readJson(path.join(dir, "company.json"));
+    const c = { ...company, record, reviewDoc: readJson(path.join(outDirFor(slug), "review.json")) };
+    const fmt = url.searchParams.get("format") || "md", base = `${slug}-assessment`;
+    const dispo = (ext) => `attachment; filename="${base}.${ext}"`;
+    if (fmt === "docx") { res.writeHead(200, { "Content-Type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "Content-Disposition": dispo("docx") }); return res.end(toDocx(c)); }
+    if (fmt === "txt") return send(res, 200, toPlainText(c), "text/plain; charset=utf-8");
+    res.writeHead(200, { "Content-Type": "text/markdown; charset=utf-8", ...(url.searchParams.get("download") ? { "Content-Disposition": dispo("md") } : {}) }); return res.end(toMarkdownApplied(c));
   }
 
   if (action === "review" && req.method === "PUT") {

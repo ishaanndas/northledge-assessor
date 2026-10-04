@@ -28,8 +28,7 @@ function assessmentState(c) {
 function workspace(c, current, body) {
   const st = assessmentState(c);
   const item = (key, label, small, href) => `<a class="stage ${key === current ? "on" : ""}" href="${href}"><span>${label}</span><small>${esc(small || "")}</small></a>`;
-  const rail = `<div class="grp"><div class="seclabel">Assessment</div>${item("assessment", "Assessment", st.label, `#/c/${c.slug}`)}${c.record ? item("partner", "Partner view", st.key === "reviewed" ? "ready" : "unreviewed", `#/c/${c.slug}?mode=partner`) : ""}</div>
-    <div class="grp"><div class="seclabel">Evidence and tools</div>${item("sources", "Sources", `${c.sources.reduce((n, s) => n + s.passages, 0)} passages`, `#/c/${c.slug}/sources`)}${c.record ? item("followup", "Follow-up email", `${c.record.assessment.missing.length} items`, `#/c/${c.slug}/followup`) : ""}${c.record ? `<a class="stage" href="/${c.origin === "example" ? c.slug : "companies/" + c.slug + "/out"}/assessment.md" target="_blank"><span>Markdown</span></a>` : ""}<a class="stage" href="#/"><span>All companies</span></a></div>`;
+  const rail = `<div class="grp">${item("assessment", "Assessment", st.label, `#/c/${c.slug}`)}${item("sources", "Sources", `${c.sources.reduce((n, s) => n + s.passages, 0)} passages`, `#/c/${c.slug}/sources`)}</div>`;
   $("#main").innerHTML = `<div class="ws"><nav class="rail"><div class="co"><b>${esc(c.name)}</b><span>${esc(c.one_liner || "")}${c.ask ? ` · ${esc(c.ask)}` : ""}</span></div>${rail}<div class="foot">${c.origin === "example" ? "Example company" : "Added " + fmt(c.created_at)}</div></nav><div class="content">${body}</div></div>`;
 }
 const stagehead = (title, right = "", state = "") => `<div class="stagehead"><h2>${title}</h2>${state ? `<span class="state">${state}</span>` : ""}<div class="r">${right}</div></div>`;
@@ -553,15 +552,25 @@ async function pageAssessment(slug, q = new URLSearchParams()) {
     return;
   }
 
-  // Drafted: the document, in edit or partner mode.
-  const modeSwitch = `<div class="seg"><a href="#/c/${slug}" class="${mode === "review" ? "on" : ""}">Edit</a><a href="#/c/${slug}?mode=partner" class="${mode === "partner" ? "on" : ""}">Partner view</a></div>`;
+  // Drafted: the document, editing or previewing what the partners receive.
+  const modeSwitch = `<div class="seg"><a href="#/c/${slug}" class="${mode === "review" ? "on" : ""}">Edit</a><a href="#/c/${slug}?mode=partner" class="${mode === "partner" ? "on" : ""}">Preview</a></div>`;
+  const exportBtn = `<div class="dd"><button class="btn" id="exportBtn">Export <span class="arr">▾</span></button><div class="ddm" id="exportMenu" hidden><a href="/api/companies/${slug}/export?format=docx">Word (.docx)</a><button data-export="pdf">PDF</button><a href="/api/companies/${slug}/export?format=md&download=1">Markdown (.md)</a><div class="sep"></div><button data-export="copy">Copy as text</button><button data-export="copymd">Copy as Markdown</button></div></div>`;
   const right = mode === "review"
-    ? `<span class="state" id="savestate">${S.saved ? "Saved " + S.saved.slice(11, 16) : "Edits save automatically"}</span>${modeSwitch}<button class="btn" id="redraft" title="Replace the draft and clear the review">Draft again</button>`
-    : `${modeSwitch}<button class="btn" onclick="window.print()">Print</button><a class="btn primary" href="#/c/${slug}/followup">Follow-up <span class="arr">→</span></a>`;
+    ? `<span class="state" id="savestate">${S.saved ? "Saved " + S.saved.slice(11, 16) : "Edits save automatically"}</span>${modeSwitch}${exportBtn}<a class="btn" href="#/c/${slug}/followup">Email founder</a><button class="btn quiet" id="redraft" title="Replace the draft and clear the review">Draft again</button>`
+    : `${modeSwitch}${exportBtn}<a class="btn" href="#/c/${slug}/followup">Email founder</a>`;
   const body = `<div class="stagehead"><h2>Assessment</h2>${pill}<div class="r">${right}</div></div><div id="assessbody" style="display:contents">${splitView(c, mode)}</div>`;
-  workspace(c, mode === "partner" ? "partner" : "assessment", body);
+  workspace(c, "assessment", body);
   wireSplit(c, mode);
   $("#redraft")?.addEventListener("click", () => { if (confirm("Draft again? This replaces the current draft and clears the review.")) { $("#assessbody").style.display = "block"; startDraft(slug, c); } });
+  $("#exportBtn").addEventListener("click", (e) => { e.stopPropagation(); const m = $("#exportMenu"); m.hidden = !m.hidden; });
+  document.addEventListener("click", () => { const m = $("#exportMenu"); if (m) m.hidden = true; }, { once: false });
+  $("#exportMenu").addEventListener("click", async (e) => {
+    const b = e.target.closest("button[data-export]"); if (!b) return;
+    const kind = b.dataset.export;
+    if (kind === "pdf") { if (mode !== "partner") { location.hash = `#/c/${slug}?mode=partner`; setTimeout(() => window.print(), 600); } else window.print(); return; }
+    const text = await (await fetch(`/api/companies/${slug}/export?format=${kind === "copy" ? "txt" : "md"}`)).text();
+    await navigator.clipboard.writeText(text); b.textContent = "Copied"; setTimeout(() => (b.textContent = kind === "copy" ? "Copy as text" : "Copy as Markdown"), 1400);
+  });
   const target = q.get("s") ? `.t-claim[data-id="${CSS.escape(q.get("s"))}"]` : q.get("g") ? `.blk[data-key="gap.${q.get("g")}"]` : q.get("k") ? `.blk[data-key="${CSS.escape(q.get("k"))}"]` : null;
   if (target) { const el = $("#doc").querySelector(target); if (el) { el.scrollIntoView({ block: "center" }); el.classList.add("flash"); if (q.get("s")) { renderSide(c, false); $("#split").classList.add("show"); } } }
 }
@@ -573,7 +582,7 @@ async function pageFollowup(slug) {
   topbar([{ label: c.name }]);
   const a = c.record.assessment;
   const items = a.missing, qs = a.dimensions.flatMap((d) => d.open_questions.map((q) => ({ dim: d.name, q })));
-  workspace(c, "followup", stagehead("Follow-up email", `<a class="btn" href="#/c/${slug}">Back to the assessment</a><button class="btn primary" id="copy">Copy email</button>`, "Sent to the founder before the partner meeting.") +
+  workspace(c, "assessment", stagehead("Email founder", `<a class="btn" href="#/c/${slug}">Back to the assessment</a><button class="btn primary" id="copy">Copy email</button>`, "The missing list as a request, sent before the partner meeting.") +
     `<div class="scroll"><div class="pad"><div class="fu"><div><h3>Missing</h3><ul>${items.map((m, i) => `<li><input type="checkbox" id="m${i}" checked><div><b>${esc(m.item)}</b><span>${esc(m.why_it_matters)}</span></div></li>`).join("")}</ul><h3>Open questions</h3><ul>${qs.map((x, i) => `<li><input type="checkbox" id="q${i}"><div>${esc(x.q)}<small>${esc(x.dim)}</small></div></li>`).join("")}</ul></div><div><div class="tools"><input class="input" id="from" placeholder="Your name" value="${esc(S.reviewer)}"></div><div class="email" id="email"></div></div></div></div></div>`);
   const build = () => {
     const picked = items.filter((_, i) => $(`#m${i}`).checked), q = qs.filter((_, i) => $(`#q${i}`).checked);
