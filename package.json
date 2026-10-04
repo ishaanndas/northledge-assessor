@@ -9,7 +9,9 @@
     "assess": "node assess.mjs",
     "eval": "node eval.mjs",
     "report": "node report.mjs",
-    "serve": "node serve.mjs"
+    "serve": "node serve.mjs",
+    "smoke": "node scripts/smoke.mjs",
+    "deploy": "node scripts/smoke.mjs && railway up --detach && echo 'Deployed. Check the live app with: node scripts/smoke.mjs --url https://northledge-assessor-production.up.railway.app'"
   },
   "engines": {
     "node": ">=20"

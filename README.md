@@ -31,6 +31,7 @@ node serve.mjs                 # the app, at http://localhost:4950
 node assess.mjs lumina-health  # draft one company
 node eval.mjs --no-judge       # mechanical checks only, no model calls
 node selftest.mjs              # plant four defects and confirm the checks catch them
+npm run smoke                  # open every screen in a browser and fail on any error
 ```
 
 ## Where the decks come from
@@ -86,4 +87,4 @@ Four places it got something wrong:
 - **It flagged correct claims as wrong.** The first version of the number check reported a call's date and length as unsupported because they live in the document title, which the splitter had dropped. If I had not read the flagged claims I would have reported two false warnings as findings.
 - **It wrote a test that punished good behaviour.** An expectation for Quill Robotics forbade any claim containing "led perception". The model's claim was "The deck states Marsh led perception at Tesla", which is exactly right. The test had to learn the difference between asserting and attributing.
 - **It built a PowerPoint only its own parser could open.** To avoid a dependency it assembled the file by hand. My extractor read it fine; Google Slides and Keynote refused it. A file format is defined by the programs that open it.
-- **It undid too much.** During a refactor it reverted a whole file to undo one bad edit and took the editor with it. Caught on the first page load, restored from the last commit, re-applied carefully.
+- **It undid too much, twice.** During a refactor it reverted a whole file to undo one bad edit and took the editor with it; caught on the first page load. Later, adding the inbox connection screen, it replaced one page using an end marker that sat much further down the file, deleting the editor, the source viewer and autosave. That one shipped: the hosted app showed "fileUrl is not defined". The fix was the code, and also a smoke test that opens every screen in a browser before any deploy, which fails on exactly that error.

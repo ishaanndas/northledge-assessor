@@ -29,7 +29,8 @@ function workspace(c, current, body) {
   const st = assessmentState(c);
   const item = (key, label, small, href) => `<a class="stage ${key === current ? "on" : ""}" href="${href}"><span>${label}</span><small>${esc(small || "")}</small></a>`;
   const rail = `<div class="grp">${item("assessment", "Assessment", st.label, `#/c/${c.slug}`)}${item("sources", "Sources", `${c.sources.reduce((n, s) => n + s.passages, 0)} passages`, `#/c/${c.slug}/sources`)}</div>`;
-  $("#main").innerHTML = `<div class="ws"><nav class="rail"><div class="co"><b>${esc(c.name)}</b><span>${esc(c.one_liner || "")}${c.ask ? ` · ${esc(c.ask)}` : ""}</span></div>${rail}<div class="foot">${c.origin === "example" ? "Example company" : "Added " + fmt(c.created_at)}</div></nav><div class="content">${body}</div></div>`;
+  setTimeout(() => $("#delCompany")?.addEventListener("click", async () => { if (!confirm(`Delete ${c.name}? Its sources, draft and review are removed. If it came from the inbox, the message can be imported again.`)) return; try { await api(`/companies/${c.slug}`, { method: "DELETE" }); inboxCount = null; location.hash = "#/"; } catch (err) { alert(err.message); } }), 0);
+  $("#main").innerHTML = `<div class="ws"><nav class="rail"><div class="co"><b>${esc(c.name)}</b><span>${esc(c.one_liner || "")}${c.ask ? ` · ${esc(c.ask)}` : ""}</span></div>${rail}<div class="foot">${c.origin === "example" ? "Example company" : `Added ${fmt(c.created_at)}<br><button class="dellink" id="delCompany">Delete company</button>`}</div></nav><div class="content">${body}</div></div>`;
 }
 const stagehead = (title, right = "", state = "") => `<div class="stagehead"><h2>${title}</h2>${state ? `<span class="state">${state}</span>` : ""}<div class="r">${right}</div></div>`;
 
@@ -251,8 +252,297 @@ function connectFlow(provider, save) {
   document.body.appendChild(el); el.addEventListener("click", (e) => { if (e.target === el) el.remove(); }); render();
 }
 
+// ---------- sources ----------
+async function pageSources(slug, openPid) {
+  const c = await load(slug);
+  topbar([{ label: c.name }]);
+  const body = stagehead("Sources", c.record ? `<a class="btn" href="#/c/${slug}">Open assessment <span class="arr">→</span></a>` : `<a class="btn primary" href="#/c/${slug}?start=1">Draft assessment <span class="arr">→</span></a>`, "What the model reads. Click a passage to see where it came from.") +
+    `<div class="split" id="split" style="--side-w:${sideWidth()}px"><div class="docwrap"><div class="pad narrow">${c.design_note ? `<div class="callout" style="grid-template-columns:1fr;margin-bottom:28px"><div><div class="micro">Why this example exists</div><p style="margin-top:6px">${esc(c.design_note)}</p></div></div>` : ""}${c.intake?.via === "inbox" ? `<div class="callout" style="grid-template-columns:1fr;margin-bottom:28px"><div><div class="micro">Imported from the inbox</div><p style="margin-top:6px">${esc(c.intake.from)} · ${esc(c.intake.subject)}. ${(c.intake.notes || []).map(esc).join(" · ")}</p></div></div>` : ""}${c.sourceDocs.map((s) => `<div class="srcblock"><div class="sbh"><h3>${esc(s.key)}</h3><span class="ti">${esc(s.title)} · ${s.passages.length} passages${c.files?.[s.key] ? ` · <a href="${fileUrl(c, s.key)}" target="_blank">${esc(c.files[s.key].name)}</a>` : ""}</span></div>${s.passages.map((p) => `<div class="psg clickable" data-pid="${esc(p.id)}"><span class="id">${esc(p.id)}</span><span class="tx">${esc(p.text)}</span></div>`).join("")}</div>`).join("")}</div></div>
+    <div class="gutter" id="gutter" title="Drag to resize"></div><aside class="sources"><div class="h"><b id="sideTitle">Source</b><button id="closeSide" hidden>Close</button></div><div class="body" id="side"><p class="none">Click a passage and the page it came from opens here.</p></div></aside></div>`;
+  workspace(c, "sources", body);
+  wireGutter();
+  const show = (pid) => { $("#side").innerHTML = viewerHtml(c, pid, null); $("#split").classList.add("show"); $("#closeSide").hidden = false; document.querySelectorAll(".psg.lit").forEach((x) => x.classList.remove("lit")); document.querySelector(`.psg[data-pid="${CSS.escape(pid)}"]`)?.classList.add("lit"); };
+  $("#main").addEventListener("click", (e) => { const v = e.target.closest("[data-view]"); if (v) { show(v.dataset.view); return; } const p = e.target.closest(".psg[data-pid]"); if (p) show(p.dataset.pid); });
+  $("#closeSide").addEventListener("click", () => { $("#split").classList.remove("show"); $("#closeSide").hidden = true; });
+  if (openPid) { show(openPid); document.querySelector(`.psg[data-pid="${CSS.escape(openPid)}"]`)?.scrollIntoView({ block: "center" }); }
+}
+
+// ---------- review / partner ----------
+function docOpts(mode) { return { mode, decisions: S.decisions, overrides: S.overrides, selected: S.selected, reviewer: S.reviewer, note: S.note }; }
+function renderSide(c, browse) { $("#sideTitle").textContent = browse ? "All passages" : "Source"; $("#side").innerHTML = browse ? Doc.browse(c) : S.selected ? statementSide(c, S.selected, S.focusPid) : `<p class="none">Select a statement, or click a citation, and the source opens here.</p>`; }
+function splitView(c, mode) {
+  return `<div class="split" id="split" style="--side-w:${sideWidth()}px"><div class="docwrap"><article class="doc" id="doc">${Doc.document(c, docOpts(mode))}</article></div><div class="gutter" id="gutter" title="Drag to resize"></div><aside class="sources"><div class="h"><b id="sideTitle">Source</b><button id="browse">All passages</button><button id="closeSide" hidden>Close</button></div><div class="body" id="side">${S.selected ? statementSide(c, S.selected, S.focusPid) : `<p class="none">Select a statement, or click a citation, and the source opens here.</p>`}</div></aside></div>`;
+}
+function setPath(obj, path, value) {
+  const keys = path.split("."); let o = obj;
+  for (const k of keys.slice(0, -1)) o = o[k] ??= {};
+  o[keys[keys.length - 1]] = value;
+}
+
+// ---------- source viewer: the real page behind a passage ----------
+// PDF decks open at the page in the browser's viewer; everything else renders
+// the passage as a slide-shaped card so the reader still sees it "as a slide".
+const fileUrl = (c, key) => c.files?.[key] ? `/${c.origin === "example" ? "examples" : "companies"}/${c.slug}/files/${encodeURIComponent(c.files[key].name)}` : null;
+function slideCard(passageText, pid) {
+  const lines = passageText.split("\n");
+  const m = lines[0].match(/^Slide (\d+):?\s*(.*)$/);
+  const title = m ? m[2] || `Slide ${m[1]}` : lines[0];
+  const body = (m ? lines.slice(1) : lines.slice(1)).filter(Boolean);
+  return `<div class="slidecard"><div class="sc-title">${esc(title)}</div><div class="sc-body">${body.map((l) => `<p>${esc(l)}</p>`).join("")}</div><div class="sc-foot">${esc(pid)}</div></div>`;
+}
+function passageOf(c, pid) { return c.record?.passages?.[pid]?.text ?? c.sourceDocs?.find((s) => s.key === pid.split(":")[0])?.passages.find((p) => p.id === pid)?.text ?? ""; }
+function sourceTitle(c, key) { return c.sourceDocs?.find((s) => s.key === key)?.title || c.record?.sources?.find((s) => s.key === key)?.title || key; }
+function sourceLength(c, key) { return c.files?.[key]?.pages || c.sourceDocs?.find((s) => s.key === key)?.passages.length || c.record?.sources?.find((s) => s.key === key)?.passages || 0; }
+const hl = (text, quote) => (quote ? Doc.highlight(text, quote) : null) ?? esc(text);
+// The thing itself: a PDF page, a slide, or the passage as a page card, with the quoted words marked.
+function viewerHtml(c, pid, quote) {
+  const [key, n] = pid.split(":"), i = Number(n);
+  const file = c.files?.[key], url = fileUrl(c, key), text = passageOf(c, pid), total = sourceLength(c, key);
+  const lines = text.split("\n"), slideLike = /^Slide \d+/.test(lines[0]);
+  let body;
+  if (file?.kind === "pdf" && url) body = `<iframe class="pdf" src="${url}#page=${i}&toolbar=0&navpanes=0&view=Fit" title="${esc(file.name)} page ${i}"></iframe><div class="vquote">${hl(text, quote)}</div>`;
+  else if (slideLike) {
+    const m = lines[0].match(/^Slide (\d+):?\s*(.*)$/), title = m?.[2] || `Slide ${m?.[1] || i}`;
+    body = `<div class="slidecard"><div class="sc-title">${hl(title, quote)}</div><div class="sc-body">${lines.slice(1).filter(Boolean).map((l) => `<p>${hl(l, quote)}</p>`).join("")}</div><div class="sc-foot">${esc(pid)}</div></div>`;
+  } else body = `<div class="pagecard">${hl(text, quote)}</div>`;
+  const nav = `<div class="vnav"><button class="vb" data-view="${key}:${i - 1}" ${i <= 1 ? "disabled" : ""} title="Previous">←</button><span>${esc(sourceTitle(c, key))}${file ? "" : ""} · ${file?.kind === "pdf" ? "page" : slideLike ? "slide" : "passage"} ${i}${total ? ` of ${total}` : ""}</span><button class="vb" data-view="${key}:${i + 1}" ${total && i >= total ? "disabled" : ""} title="Next">→</button>${url ? `<a class="vb" href="${url}" target="_blank" title="Open the file">↗</a>` : ""}</div>`;
+  return `<div class="viewer" data-pid="${esc(pid)}">${nav}${body}</div>`;
+}
+// Side panel for a statement: the claim, then each cited source shown as itself.
+function statementSide(c, id, focusPid) {
+  const entry = Doc.statements(c.record.assessment).get(id);
+  if (!entry) return `<p class="none">Nothing selected.</p>`;
+  const { stmt, where } = entry, st = stmt.verification?.status || "verified";
+  const issues = (stmt.verification?.issues || []).join(", ").replace(/_/g, " ");
+  const cits = focusPid ? stmt.citations.filter((x) => x.passage_id === focusPid) : stmt.citations;
+  let h = `<div class="cl">${esc(stmt.text)}<div class="st"><span class="badge ${st === "verified" ? "green" : st === "warning" ? "amber" : "red"}">${st === "verified" ? "Quote verified" : st === "warning" ? "Warning: " + esc(issues) : "Not verified: " + esc(issues)}</span><span class="badge">${esc(where)}</span>${stmt.basis !== "stated" ? `<span class="badge">${stmt.basis}</span>` : ""}</div></div>`;
+  if (!stmt.citations.length) return h + `<p class="none">No citation.</p>`;
+  if (focusPid && stmt.citations.length > 1) h += `<button class="btn sm quiet" data-allsources="1" style="margin-bottom:10px">Show all ${stmt.citations.length} sources</button>`;
+  for (const cit of cits) {
+    const ps = c.record.passages[cit.passage_id];
+    if (!ps) { h += `<div class="src"><div class="sh"><span class="chip bad">${esc(cit.passage_id)}</span><span class="nm">no such passage</span></div></div>`; continue; }
+    h += viewerHtml(c, cit.passage_id, cit.quote);
+  }
+  return h;
+}
+
+// ---------- resizable side panel ----------
+function sideWidth() { const w = Number(localStorage.getItem("sideW")); return w >= 320 ? Math.min(w, Math.floor(innerWidth * 0.7)) : 420; }
+function wireGutter() {
+  const g = $("#gutter"), split = $("#split"); if (!g || !split) return;
+  g.addEventListener("pointerdown", (e) => {
+    e.preventDefault(); document.body.classList.add("is-resizing");
+    const move = (ev) => { const w = Math.max(320, Math.min(Math.floor(innerWidth * 0.7), Math.round(split.getBoundingClientRect().right - ev.clientX))); split.style.setProperty("--side-w", w + "px"); };
+    const up = () => { document.body.classList.remove("is-resizing"); document.removeEventListener("pointermove", move); document.removeEventListener("pointerup", up); document.removeEventListener("pointercancel", up); localStorage.setItem("sideW", String(parseInt(split.style.getPropertyValue("--side-w")) || 420)); };
+    document.addEventListener("pointermove", move); document.addEventListener("pointerup", up); document.addEventListener("pointercancel", up);
+  });
+  g.addEventListener("dblclick", () => { split.style.setProperty("--side-w", "420px"); localStorage.setItem("sideW", "420"); });
+}
+
+// ---------- editor ----------
+// Caret helpers for contenteditable blocks.
+const sel = () => window.getSelection();
+function caretAtStart(el) { const s = sel(); if (!s.rangeCount) return false; const r = s.getRangeAt(0).cloneRange(); r.selectNodeContents(el); r.setEnd(s.getRangeAt(0).startContainer, s.getRangeAt(0).startOffset); return r.toString().length === 0; }
+function caretAtEnd(el) { const s = sel(); if (!s.rangeCount) return false; const r = s.getRangeAt(0).cloneRange(); r.selectNodeContents(el); r.setStart(s.getRangeAt(0).endContainer, s.getRangeAt(0).endOffset); return r.toString().trim().length === 0; }
+function placeCaret(el, where = "end") { if (!el) return; el.focus(); const r = document.createRange(); r.selectNodeContents(el); r.collapse(where === "start"); const s = sel(); s.removeAllRanges(); s.addRange(r); }
+function splitAtCaret(el) { const s = sel(); const r = s.getRangeAt(0); const tail = document.createRange(); tail.setStart(r.endContainer, r.endOffset); tail.setEndAfter(el.lastChild || el); const frag = tail.extractContents(); const d = document.createElement("div"); d.appendChild(frag); return d.innerHTML; }
+const uid = () => Math.random().toString(36).slice(2, 9);
+const editableBlocks = () => [...$("#doc").querySelectorAll(".bc[contenteditable]")];
+const blockEl = (bc) => bc.closest(".blk");
+const keyOf = (bc) => bc.dataset.key;
+
+// Inserts live in S.overrides.inserts[anchorKey] = [{id,type,html}].
+function insertAfter(anchorKey, type = "p", html = "") {
+  const ins = (S.overrides.inserts ??= {});
+  const id = uid();
+  (ins[anchorKey] ??= []).unshift({ id, type, html });
+  // Blocks that were anchored to the anchor now follow the new block, so order is preserved.
+  if (ins[anchorKey].length > 1) { const rest = ins[anchorKey].splice(1); ins[`ins.${id}`] = [...rest, ...(ins[`ins.${id}`] || [])]; }
+  return `ins.${id}`;
+}
+function findInsert(key) { const id = key.replace(/^ins\./, ""); for (const [anchor, arr] of Object.entries(S.overrides.inserts || {})) { const i = arr.findIndex((x) => x.id === id); if (i >= 0) return { anchor, arr, i, item: arr[i] }; } return null; }
+function deleteInsert(key) {
+  const f = findInsert(key); if (!f) return;
+  const children = (S.overrides.inserts[key] || []); delete S.overrides.inserts[key];
+  f.arr.splice(f.i, 1, ...children);
+  if (!f.arr.length) delete S.overrides.inserts[f.anchor];
+}
+function readBlock(bc, c) {
+  const key = keyOf(bc), b = currentBlocks(c).find((x) => x.key === key); if (!b) return;
+  if (b.type === "claim") { const text = bc.innerText.replace(/ /g, " ").trim(); const orig = b.stmt.text; S.decisions[b.id] = text && text !== orig ? { action: "edit", text } : { action: "keep" }; }
+  else if (b.insert) { const f = findInsert(key); if (f) f.item.html = Doc.sanitize(bc.innerHTML); }
+  else if (b.field === "note") S.note = Doc.sanitize(bc.innerHTML);
+  else if (b.field === "reviewer") { S.reviewer = bc.innerText.trim(); localStorage.setItem("reviewer", S.reviewer); }
+  else if (b.field) setPath(S.overrides, b.field, bc.innerText.replace(/ /g, " ").trim());
+}
+let blocksCache = null;
+function currentBlocks(c) { return (blocksCache ??= Doc.buildBlocks(c, docOpts("review"))); }
+function renderDoc(c, mode) { blocksCache = null; const el = $("#doc"); const y = el.parentElement.scrollTop; el.innerHTML = Doc.document(c, docOpts(mode)); el.parentElement.scrollTop = y; }
+function focusKey(key, where = "end") { const bc = $("#doc").querySelector(`.bc[data-key="${CSS.escape(key)}"]`); placeCaret(bc, where); return bc; }
+function closeMenus() { document.querySelectorAll(".menu,.slash").forEach((m) => m.remove()); }
+function showMenu(items, x, y, cls = "menu") {
+  closeMenus();
+  const m = document.createElement("div"); m.className = cls; m.style.left = x + "px"; m.style.top = y + "px";
+  m.innerHTML = items.map((it, i) => it.sep ? `<div class="sep"></div>` : `<button data-i="${i}" class="${i === 0 ? "on" : ""}${it.danger ? " danger" : ""}"><span>${esc(it.label)}</span>${it.hint ? `<small>${esc(it.hint)}</small>` : ""}</button>`).join("");
+  document.body.appendChild(m);
+  m.addEventListener("mousedown", (e) => e.preventDefault());
+  m.addEventListener("click", (e) => { const b = e.target.closest("button[data-i]"); if (!b) return; closeMenus(); items[b.dataset.i].run(); });
+  return m;
+}
+
+function wireSplit(c, mode) {
+  const doc = $("#doc");
+  const showSource = (id, pid = null) => { S.selected = id; S.focusPid = pid; doc.querySelectorAll(".t-claim.lit").forEach((x) => x.classList.remove("lit")); doc.querySelector(`.t-claim[data-id="${id}"]`)?.classList.add("lit"); renderSide(c, false); $("#split").classList.add("show"); $("#closeSide").hidden = false; };
+  const change = () => { blocksCache = null; queueSave(); };
+  const rerender = () => { renderDoc(c, mode); };
+
+  doc.addEventListener("click", (e) => {
+    const blk = e.target.closest(".blk");
+    const act = e.target.closest("button[data-act]");
+    if (act && blk) { S.decisions[blk.dataset.id] = { action: act.dataset.act }; change(); rerender(); return; }
+    const gact = e.target.closest("button[data-gapact]");
+    if (gact && blk) { setPath(S.overrides, `missing.${blk.dataset.gap}.removed`, gact.dataset.gapact === "remove"); change(); rerender(); return; }
+    if (e.target.closest("button[data-handle]")) { e.preventDefault(); return; }
+    const chip = e.target.closest(".chip.ref[data-pid]");
+    if (chip && blk) { e.preventDefault(); showSource(blk.dataset.id, chip.dataset.pid); return; }
+    if (blk?.classList.contains("t-claim") && !e.target.closest("[contenteditable]")) showSource(blk.dataset.id);
+  });
+  doc.addEventListener("focusin", (e) => { const blk = e.target.closest(".t-claim"); if (blk && e.target.hasAttribute("contenteditable") && S.selected !== blk.dataset.id) showSource(blk.dataset.id); });
+
+  function openBlockMenu(key, rect) {
+    const b = currentBlocks(c).find((x) => x.key === key); if (!b) return;
+    const items = [];
+    if (b.type === "claim") items.push(b.decision.action === "remove" ? { label: "Restore claim", run: () => { S.decisions[b.id] = { action: "keep" }; change(); rerender(); } } : { label: "Remove claim", hint: "strikes through, keeps the citation", danger: true, run: () => { S.decisions[b.id] = { action: "remove" }; change(); rerender(); } });
+    if (b.type === "claim" && b.decision.action === "edit") items.push({ label: "Revert to the model's wording", run: () => { S.decisions[b.id] = { action: "keep" }; change(); rerender(); } });
+    if (b.type === "gap") items.push(b.removed ? { label: "Restore item", run: () => { setPath(S.overrides, `missing.${b.index}.removed`, false); change(); rerender(); } } : { label: "Remove item", danger: true, run: () => { setPath(S.overrides, `missing.${b.index}.removed`, true); change(); rerender(); } });
+    if (b.field && !b.insert && b.type !== "reviewer" && b.type !== "note") items.push({ label: "Revert to the model's wording", run: () => { setPath(S.overrides, b.field, ""); change(); rerender(); } });
+    if (!b.insert && (S.overrides.moves || {})[key]) items.push({ label: "Put back where the draft had it", run: () => { delete S.overrides.moves[key]; change(); rerender(); } });
+    if (b.insert) {
+      for (const [t, label] of Object.entries(Doc.INSERT_TYPES)) if (t !== b.type) items.push({ label: `Turn into ${label.toLowerCase()}`, run: () => { const f = findInsert(key); if (f) { f.item.type = t; if (t === "divider") f.item.html = ""; } change(); rerender(); focusKey(key); } });
+      items.push({ sep: true }, { label: "Delete block", danger: true, run: () => { deleteInsert(key); change(); rerender(); } });
+    }
+    items.push({ sep: true }, { label: "Move up", hint: "Alt+↑", run: () => moveBlock(key, -1) }, { label: "Move down", hint: "Alt+↓", run: () => moveBlock(key, 1) });
+    items.push({ sep: true }, { label: "Add a block below", hint: "Enter", run: () => { const k = insertAfter(key); change(); rerender(); focusKey(k, "start"); } });
+    showMenu(items, rect.left, rect.bottom + 4);
+  }
+
+  // Moving blocks. Inserted blocks move by re-anchoring; model blocks record a move override.
+  function placeAfter(key, anchorKey) {
+    if (key === anchorKey || anchorKey === key) return;
+    if (key.startsWith("ins.")) { const f = findInsert(key); if (!f) return; const item = f.item; deleteInsert(key); const ins = (S.overrides.inserts ??= {}); (ins[anchorKey] ??= []).unshift(item); if (ins[anchorKey].length > 1) { const rest = ins[anchorKey].splice(1); ins[key] = [...rest, ...(ins[key] || [])]; } }
+    else (S.overrides.moves ??= {})[key] = anchorKey; // keys contain dots, so no setPath here
+    change(); rerender();
+  }
+  function moveBlock(key, dir) {
+    const els = [...doc.querySelectorAll(".blk[data-key]")]; const i = els.findIndex((e) => e.dataset.key === key); if (i < 0) return;
+    const anchor = dir < 0 ? els[i - 2] : els[i + 1];
+    if (dir < 0 && i === 1) return; // already first movable position
+    if (!anchor) return;
+    placeAfter(key, anchor.dataset.key);
+    const el = doc.querySelector(`.blk[data-key="${CSS.escape(key)}"]`); el?.classList.add("flash"); el?.scrollIntoView({ block: "nearest" });
+    const bc = el?.querySelector(".bc[contenteditable]"); if (bc) placeCaret(bc, "end");
+  }
+  // Drag with pointer events (works with mouse, trackpad and automation alike).
+  let drag = null;
+  const clearDrop = () => { doc.querySelectorAll(".drop-before,.drop-after").forEach((e) => e.classList.remove("drop-before", "drop-after")); };
+  doc.addEventListener("pointerdown", (e) => {
+    const h = e.target.closest("button[data-handle]"); if (!h || e.button !== 0) return;
+    e.preventDefault();
+    const blk = h.closest(".blk");
+    drag = { key: h.dataset.handle, blk, startY: e.clientY, moved: false, target: null, after: true, ghost: null };
+    h.setPointerCapture?.(e.pointerId);
+  });
+  doc.addEventListener("pointermove", (e) => {
+    if (!drag) return;
+    if (!drag.moved) { if (Math.abs(e.clientY - drag.startY) < 4) return; drag.moved = true; drag.blk.classList.add("dragging"); document.body.classList.add("is-dragging"); closeMenus();
+      const g = drag.blk.cloneNode(true); g.className = "blk drag-ghost"; g.style.width = drag.blk.offsetWidth + "px"; document.body.appendChild(g); drag.ghost = g; }
+    drag.ghost.style.transform = `translate(${e.clientX + 12}px, ${e.clientY - 10}px)`;
+    const under = document.elementFromPoint(e.clientX, e.clientY)?.closest?.(".blk[data-key]");
+    clearDrop();
+    if (!under || under === drag.blk || under.closest(".drag-ghost")) { drag.target = null; return; }
+    const r = under.getBoundingClientRect(); drag.after = e.clientY > r.top + r.height / 2; drag.target = under;
+    under.classList.add(drag.after ? "drop-after" : "drop-before");
+    const wrap = doc.parentElement; if (e.clientY < 80) wrap.scrollTop -= 12; else if (e.clientY > window.innerHeight - 80) wrap.scrollTop += 12;
+  });
+  const endDrag = (e) => {
+    if (!drag) return;
+    const d = drag; drag = null;
+    d.ghost?.remove(); d.blk.classList.remove("dragging"); document.body.classList.remove("is-dragging"); clearDrop();
+    if (!d.moved) { if (e.type === "pointerup") openBlockMenu(d.key, d.blk.querySelector(".handle").getBoundingClientRect()); return; }
+    if (!d.target) return;
+    const els = [...doc.querySelectorAll(".blk[data-key]")]; const i = els.indexOf(d.target);
+    const anchor = d.after ? d.target : els[i - 1];
+    if (anchor && anchor.dataset.key !== d.key) { placeAfter(d.key, anchor.dataset.key); doc.querySelector(`.blk[data-key="${CSS.escape(d.key)}"]`)?.classList.add("flash"); }
+  };
+  doc.addEventListener("pointerup", endDrag);
+  doc.addEventListener("pointercancel", endDrag);
+
+  function slashMenu(bc) {
+    const key = keyOf(bc), rect = bc.getBoundingClientRect();
+    const types = Object.entries(Doc.INSERT_TYPES).map(([t, label]) => ({ label, run: () => { const f = findInsert(key); if (f) { f.item.type = t; f.item.html = ""; } bc.innerHTML = ""; change(); rerender(); const nb = focusKey(key, "start"); if (t === "divider") { const k = insertAfter(key); change(); rerender(); focusKey(k, "start"); } } }));
+    const m = showMenu(types, rect.left, rect.bottom + 4, "slash");
+    m.dataset.for = key;
+  }
+
+  doc.addEventListener("keydown", (e) => {
+    const bc = e.target.closest(".bc[contenteditable]"); if (!bc) return;
+    const key = keyOf(bc), b = currentBlocks(c).find((x) => x.key === key); if (!b) return;
+    const isEnter = e.key === "Enter" || e.key === "Return";
+    const open = document.querySelector(".slash");
+    if (open) {
+      const btns = [...open.querySelectorAll("button")], i = btns.findIndex((x) => x.classList.contains("on"));
+      if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); btns[i]?.classList.remove("on"); btns[(i + (e.key === "ArrowDown" ? 1 : btns.length - 1)) % btns.length].classList.add("on"); return; }
+      if (isEnter) { e.preventDefault(); btns[i]?.click(); return; }
+      if (e.key === "Escape" || e.key === "Backspace") { closeMenus(); if (e.key === "Escape") e.preventDefault(); return; }
+    }
+    if (e.key === "/" && b.insert && bc.innerText.trim() === "") { e.preventDefault(); slashMenu(bc); return; }
+    if (e.key === "Escape") { bc.blur(); return; }
+    if ((e.metaKey || e.ctrlKey) && b.rich && (e.key === "b" || e.key === "i")) { e.preventDefault(); document.execCommand(e.key === "b" ? "bold" : "italic"); readBlock(bc, c); change(); return; }
+    if (isEnter && !e.shiftKey) {
+      e.preventDefault();
+      if (b.type === "reviewer") { bc.blur(); return; }
+      let html = "";
+      if (b.rich && !caretAtEnd(bc)) { html = splitAtCaret(bc); readBlock(bc, c); }
+      const k = insertAfter(key, b.type === "bullet" && b.insert && bc.innerText.trim() ? "bullet" : "p", html);
+      change(); rerender(); focusKey(k, "start"); return;
+    }
+    if (e.key === "Backspace" && caretAtStart(bc) && bc.innerText.trim() === "") {
+      e.preventDefault();
+      if (b.insert) { const all = editableBlocks(); const i = all.findIndex((x) => keyOf(x) === key); deleteInsert(key); change(); rerender(); const prev = editableBlocks()[Math.max(0, i - 1)]; placeCaret(prev, "end"); return; }
+      if (b.type === "claim") { S.decisions[b.id] = { action: "remove" }; change(); rerender(); return; }
+      if (b.type === "gap") { setPath(S.overrides, `missing.${b.index}.removed`, true); change(); rerender(); return; }
+      return;
+    }
+    if (e.altKey && (e.key === "ArrowUp" || e.key === "ArrowDown") && !b.fixed) { e.preventDefault(); moveBlock(key, e.key === "ArrowUp" ? -1 : 1); return; }
+    if ((e.key === "ArrowUp" && caretAtStart(bc)) || (e.key === "ArrowDown" && caretAtEnd(bc))) {
+      const all = editableBlocks(), i = all.indexOf(bc), next = all[i + (e.key === "ArrowUp" ? -1 : 1)];
+      if (next) { e.preventDefault(); placeCaret(next, e.key === "ArrowUp" ? "end" : "start"); }
+    }
+  });
+  doc.addEventListener("paste", (e) => { const bc = e.target.closest(".bc[contenteditable]"); if (!bc) return; e.preventDefault(); document.execCommand("insertText", false, (e.clipboardData.getData("text/plain") || "").replace(/\r/g, "")); });
+  doc.addEventListener("input", (e) => { const bc = e.target.closest(".bc[contenteditable]"); if (!bc) return; readBlock(bc, c); blockEl(bc)?.classList.toggle("edited", bc.closest(".t-claim") && S.decisions[bc.closest(".t-claim").dataset.id]?.action === "edit"); queueSave(); });
+  document.addEventListener("click", (e) => { if (!e.target.closest(".menu,.slash,button[data-handle]")) closeMenus(); }, { capture: true });
+  $("#browse").addEventListener("click", () => { renderSide(c, true); $("#split").classList.add("show"); $("#closeSide").hidden = false; });
+  $("#closeSide").addEventListener("click", () => { $("#split").classList.remove("show"); $("#closeSide").hidden = true; });
+  $("#side").addEventListener("click", (e) => {
+    const v = e.target.closest("[data-view]"); if (v) { const vw = v.closest(".viewer"); const html = viewerHtml(c, v.dataset.view, null); vw.outerHTML = html; return; }
+    if (e.target.closest("[data-allsources]")) { S.focusPid = null; renderSide(c, false); }
+  });
+  wireGutter();
+}
+function queueSave() {
+  clearTimeout(S.saveTimer);
+  const el = $("#savestate"); if (el) el.textContent = "Saving…";
+  S.saveTimer = setTimeout(async () => {
+    const clean = Object.fromEntries(Object.entries(S.decisions).filter(([, d]) => d.action !== "keep").map(([k, d]) => [k, { action: d.action, text: d.text }]));
+    const doc = await api(`/companies/${S.slug}/review`, { method: "PUT", body: JSON.stringify({ reviewer: S.reviewer, note: S.note, decisions: clean, overrides: S.overrides }) });
+    S.saved = doc.updated; S.company.reviewDoc = doc;
+    const el2 = $("#savestate"); if (el2) el2.textContent = `Saved ${doc.updated.slice(11, 16)}`;
+    const st = document.querySelector('.stage[href$="/review"] small'); if (st) st.textContent = stageState(S.company, "review");
+  }, 700);
+}
 // ---------- the assessment: one document, several states ----------
-const RUN_ROWS = [["split", "Split"], ["draft", "Draft"], ["verify", "Verify"], ["repair", "Repair"], ["reverify", "Re-verify"], ["done", "Write"]];
+const RUN_ROWS = [["split", "Read the sources"], ["draft", "Write the draft"], ["verify", "Check every quote"], ["repair", "Fix failed quotes"], ["reverify", "Check again"], ["done", "Save"]];
 function runHtml(log, running, slug) {
   const by = Object.fromEntries(log.map((e) => [e.step, e]));
   const last = log.length ? log[log.length - 1].step : null;
@@ -262,27 +552,42 @@ function runHtml(log, running, slug) {
     const f = e?.failures ? `<ul class="f">${e.failures.map((x) => `<li>${esc(x.where)}: “${esc(x.quote.slice(0, 90))}” ${esc(x.reason)}</li>`).join("")}</ul>` : "";
     return `<div class="step ${cls}"><i></i><span class="k">${label}</span><span class="m">${skip ? "not needed" : esc(e?.message || "")}${f}</span></div>`;
   }).join("");
-  const err = log.find((e) => e.step === "error"), done = by.done;
-  return `<div class="run">${list}${err ? `<div class="step err"><i></i><span class="k">Error</span><span class="m">${esc(err.message)}</span></div>` : ""}${done ? `<div class="result"><span><b>${done.summary.verified}</b> of ${done.summary.statements} verified</span><span><b>${done.summary.warning}</b> warnings</span><span><b>${done.summary.failed}</b> unverified</span><span>${done.seconds}s</span><span style="margin-left:auto">Opening the draft…</span></div>` : ""}</div>`;
+  const err = log.find((e) => e.step === "error"), done = by.done, retry = log.filter((e) => e.step === "retry").pop();
+  const elapsed = !done && !err && running ? `<div class="step"><i></i><span class="k"></span><span class="m" style="color:var(--muted-foreground)">Usually two to three minutes. You can leave this page; the draft carries on and will be here when you come back.${retry ? ` ${esc(retry.message)}.` : ""}</span></div>` : "";
+  return `<div class="run">${list}${elapsed}${err ? `<div class="step err"><i></i><span class="k">Error</span><span class="m">${esc(err.message)}</span></div>` : ""}${done ? `<div class="result"><span><b>${done.summary.verified}</b> of ${done.summary.statements} verified</span><span><b>${done.summary.warning}</b> warnings</span><span><b>${done.summary.failed}</b> unverified</span><span>${done.seconds}s</span><span style="margin-left:auto">Opening the draft</span></div>` : ""}</div>`;
 }
-async function startDraft(slug, c) {
-  const out = $("#assessbody"); const log = [];
-  out.innerHTML = `<div class="pad">${runHtml(log, true, slug)}</div>`;
+// Drafting runs as a job on the server; the page starts it and polls. Leaving,
+// refreshing or losing the connection never loses it: opening the company
+// again picks the progress back up.
+let draftPoll = null;
+function stopPolling() { if (draftPoll) { clearInterval(draftPoll); draftPoll = null; } }
+async function startDraft(slug) {
   document.querySelectorAll("#startDraft,#redraft").forEach((b) => (b.disabled = true));
-  const res = await fetch(`/api/companies/${slug}/draft`, { method: "POST" });
-  if (!res.ok) { out.innerHTML = `<div class="pad"><p style="color:var(--bad)">${esc((await res.json().catch(() => ({}))).error || res.statusText)}</p></div>`; return; }
-  const rd = res.body.getReader(), dec = new TextDecoder(); let buf = "";
-  for (;;) {
-    const { value, done } = await rd.read(); if (done) break;
-    buf += dec.decode(value, { stream: true });
-    let i; while ((i = buf.indexOf("\n\n")) >= 0) { const line = buf.slice(0, i).replace(/^data: /, ""); buf = buf.slice(i + 2); if (line) { log.push(JSON.parse(line)); out.innerHTML = `<div class="pad">${runHtml(log, true, slug)}</div>`; } }
-  }
-  out.innerHTML = `<div class="pad">${runHtml(log, false, slug)}</div>`;
-  S.decisions = {}; S.overrides = {}; S.note = ""; S.saved = ""; blocksCache = null;
-  if (log.some((e) => e.step === "done")) setTimeout(() => pageAssessment(slug, new URLSearchParams()), 900);
-  else document.querySelectorAll("#startDraft,#redraft").forEach((b) => (b.disabled = false));
+  try { await api(`/companies/${slug}/draft`, { method: "POST" }); }
+  catch (err) { const out = $("#assessbody"); if (out) out.innerHTML = `<div class="pad"><p style="color:var(--red)">Could not start the draft: ${esc(err.message)}</p></div>`; return; }
+  followDraft(slug);
+}
+function followDraft(slug) {
+  stopPolling();
+  const startedHere = location.hash;
+  const tick = async () => {
+    if (location.hash.split("?")[0] !== startedHere.split("?")[0]) { stopPolling(); return; } // user left the page
+    let p; try { p = await api(`/companies/${slug}/progress`); } catch { return; } // transient; try again next tick
+    const out = $("#assessbody"); if (!out) return;
+    if (out.style.display === "contents") out.style.display = "block";
+    const log = p.log || [];
+    out.innerHTML = `<div class="pad">${runHtml(log, p.running, slug)}${!p.running && p.error ? `<div class="actions"><button class="btn primary" id="retryDraft">Try again</button></div>` : ""}${!p.running && !p.known && !p.drafted ? `<p style="margin-top:14px;color:var(--muted-foreground)">The draft was interrupted, probably because the app restarted. Nothing was lost; start it again.</p><div class="actions"><button class="btn primary" id="retryDraft">Draft again</button></div>` : ""}</div>`;
+    $("#retryDraft")?.addEventListener("click", () => startDraft(slug));
+    if (!p.running) {
+      stopPolling();
+      if (p.drafted && !p.error) { S.decisions = {}; S.overrides = {}; S.note = ""; S.saved = ""; blocksCache = null; setTimeout(() => pageAssessment(slug, new URLSearchParams()), 700); }
+      else document.querySelectorAll("#startDraft,#redraft").forEach((b) => (b.disabled = false));
+    }
+  };
+  tick(); draftPoll = setInterval(tick, 2000);
 }
 async function pageAssessment(slug, q = new URLSearchParams()) {
+  stopPolling();
   const c = await load(slug);
   const mode = q.get("mode") === "partner" ? "partner" : "review";
   if (q.get("s")) S.selected = q.get("s");
@@ -297,10 +602,13 @@ async function pageAssessment(slug, q = new URLSearchParams()) {
       `<div class="scroll" id="assessbody"><div class="pad narrow"><div class="statusline">${pill}</div>
       ${c.design_note ? `<div class="callout" style="grid-template-columns:1fr"><div><div class="micro">Why this example exists</div><p style="margin-top:6px">${esc(c.design_note)}</p></div></div>` : ""}
       ${c.intake?.via === "inbox" ? `<div class="callout" style="grid-template-columns:1fr"><div><div class="micro">Imported from the inbox</div><p style="margin-top:6px">${esc(c.intake.from)} · ${esc(c.intake.subject)}. ${(c.intake.notes || []).map(esc).join(" · ")}</p></div></div>` : ""}
-      <div class="seclabel" style="margin:8px 0 10px">What the draft will be built from</div><div class="srclist">${srcList}</div><p class="hint" style="margin-top:14px">Every statement in the draft will cite one of these passages. <a href="#/c/${slug}/sources">Read them</a>, or draft now; about two minutes.</p></div></div>`;
+      <div class="seclabel" style="margin:8px 0 10px">What the draft will be built from</div><div class="srclist">${srcList}</div>
+      ${c.intake?.suggestedWebsite && !c.sourceDocs.some((s) => s.key === "website") ? `<div class="suggest"><div><b>Website named in the deck:</b> ${esc(c.intake.suggestedWebsite)}<span>Not read automatically, because the address in a deck can belong to someone else. Add it if it is the right site.</span></div><button class="btn sm" id="addSite">Add as a source</button></div>` : ""}<p class="hint" style="margin-top:14px">Every statement in the draft will cite one of these passages. <a href="#/c/${slug}/sources">Read them</a>, or draft now; about two minutes.</p></div></div>`;
     workspace(c, "assessment", body);
-    $("#startDraft").addEventListener("click", () => startDraft(slug, c));
-    if (q.get("start") === "1" && !c.running) startDraft(slug, c);
+    $("#startDraft").addEventListener("click", () => startDraft(slug));
+    $("#addSite")?.addEventListener("click", async (e) => { e.target.disabled = true; e.target.textContent = "Reading the site…"; try { await api(`/companies/${slug}/website`, { method: "POST", body: JSON.stringify({ url: c.intake.suggestedWebsite }) }); pageAssessment(slug, new URLSearchParams()); } catch (err) { e.target.disabled = false; e.target.textContent = "Add as a source"; alert(err.message); } });
+    if (c.running) followDraft(slug);
+    else if (q.get("start") === "1") startDraft(slug);
     return;
   }
 
@@ -313,7 +621,8 @@ async function pageAssessment(slug, q = new URLSearchParams()) {
   const body = `<div class="stagehead"><h2>Assessment</h2>${pill}<div class="r">${right}</div></div><div id="assessbody" style="display:contents">${splitView(c, mode)}</div>`;
   workspace(c, "assessment", body);
   wireSplit(c, mode);
-  $("#redraft")?.addEventListener("click", () => { if (confirm("Draft again? This replaces the current draft and clears the review.")) { $("#assessbody").style.display = "block"; startDraft(slug, c); } });
+  $("#redraft")?.addEventListener("click", () => { if (confirm("Draft again? This replaces the current draft and clears the review.")) { $("#assessbody").style.display = "block"; startDraft(slug); } });
+  if (c.running) { $("#assessbody").style.display = "block"; followDraft(slug); }
   $("#exportBtn").addEventListener("click", (e) => { e.stopPropagation(); const m = $("#exportMenu"); m.hidden = !m.hidden; });
   document.addEventListener("click", () => { const m = $("#exportMenu"); if (m) m.hidden = true; }, { once: false });
   $("#exportMenu").addEventListener("click", async (e) => {
@@ -347,6 +656,7 @@ async function pageFollowup(slug) {
 
 // ---------- router ----------
 async function route() {
+  if (typeof stopPolling === "function" && !/^#\/c\//.test(location.hash)) stopPolling();
   const [hashPath, query = ""] = location.hash.replace(/^#\/?/, "").split("?");
   const p = hashPath.split("/").filter(Boolean);
   const q = new URLSearchParams(query);

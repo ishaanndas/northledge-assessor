@@ -20,6 +20,8 @@ Two switches on the Inbox page decide how far it goes on its own: **import on ar
 
 The connectors are set up per client rather than shipped as a universal button. Google and Microsoft each require the fund's own credentials for a read-only connection, and every fund routes deal flow differently: a shared deals@ address, a label, a forwarding rule, sometimes a Slack channel. The connection flow in the app explains what gets connected and what the fund has to provide, and keeps the settings so the connection goes live when the credentials exist.
 
+When an email gives a full link to the company's site, it is read too. A website address that only appears inside a deck is shown as a suggestion with an "Add as a source" button rather than read automatically, because the address in a deck can belong to someone else: one test deck named a domain that turned out to be an unrelated leather-goods shop.
+
 Two fallbacks remain for anything that did not come by email: drop in files (PDF, PowerPoint, Word, or a link to one) or paste a website link. Once a deck is read, by any route, the company's name, one-line description, round, website and founder bios are filled in from it, and the associate corrects whatever is wrong.
 
 ## Drafting
@@ -29,6 +31,8 @@ Each source is split at paragraph breaks into passages with short labels, such a
 It returns the assessment in a fixed shape every time: a summary a partner can read in two minutes, six to eight sections such as team, market and traction, where the sources disagree, what is missing, the strongest case against, and a list of anything in the inputs that tried to steer the reader. That shape has no slot for a score or a verdict, so neither can appear even by accident.
 
 Every sentence carries the label of the passage it came from and a short quote from it, thirty words at most. Each sentence also says whether the source states it, whether the tool worked it out from numbers in the source, or whether it is a point about something the source does not contain.
+
+Drafting runs in the background on the server. The page shows progress and can be closed or refreshed; coming back picks the progress up again, and the company list shows it as Drafting. If the connection to the AI drops partway through a reply, the step is retried once. If the server restarts mid-draft, the company simply shows as not drafted, ready to start again.
 
 ## Checking the quotes
 
@@ -58,6 +62,16 @@ A switch flips between Edit and Preview; Preview is what the partners receive. E
 | Filling the intake form from a deck | a few seconds, a few cents |
 
 At 150 companies a month, the AI spend is under $100.
+
+## Keeping it working
+
+A smoke test opens every screen in a real browser and calls every part of the app's interface, failing on any script error. It spends nothing, because it never starts a draft, and the deploy command will not publish unless it passes. It can also be pointed at the live app.
+
+```bash
+npm run smoke                                   # local
+node scripts/smoke.mjs --url https://northledge-assessor-production.up.railway.app
+npm run deploy                                  # smoke test, then publish
+```
 
 ## Where it runs
 

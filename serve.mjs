@@ -8,16 +8,36 @@ import { OUT_DIR, COMPANIES_DIR, listCompanies, loadCompany, findCompanyDir, out
 import { draftCompany } from "./lib/pipeline.mjs";
 import { extractFile, extractUrl } from "./lib/extract.mjs";
 import { prefillFromDeck } from "./lib/prefill.mjs";
-import { listInbox, importInboxMessage, INBOX_DIR, readSettings, writeSettings, startWatcher } from "./lib/inbox.mjs";
+import { listInbox, importInboxMessage, INBOX_DIR, readSettings, writeSettings, startWatcher, forgetImport } from "./lib/inbox.mjs";
 import { search } from "./lib/search.mjs";
 import { toMarkdownApplied, toPlainText, toDocx } from "./lib/export.mjs";
 import { markdownToHtml } from "./lib/markdown-html.mjs";
 
 const PORT = Number(process.env.PORT || 4950);
+// One bad request or a failed background job must never take the app down.
+process.on("unhandledRejection", (err) => console.error("unhandled rejection:", err?.message || err));
+process.on("uncaughtException", (err) => console.error("uncaught exception:", err?.message || err));
 const APP_DIR = path.join(ROOT, "app");
 const TYPES = { ".html": "text/html; charset=utf-8", ".json": "application/json", ".md": "text/markdown; charset=utf-8", ".js": "text/javascript", ".css": "text/css", ".pdf": "application/pdf", ".pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation", ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document" };
 const SOURCE_ORDER = ["deck", "website", "founders", "call-notes", "email"];
-const running = new Map(); // slug -> true while a draft is in flight
+// Drafts run as background jobs. The page starts one and then polls for
+// progress, so a dropped connection, a refresh or leaving the page never
+// loses track of it. Jobs are kept in memory; a restart mid-draft is detected
+// and reported rather than left looking busy forever.
+const jobs = new Map(); // slug -> { running, log: [], error, startedAt, finishedAt }
+const running = { has: (slug) => !!jobs.get(slug)?.running };
+function startDraftJob(slug) {
+  const cur = jobs.get(slug);
+  if (cur?.running) return cur;
+  const job = { running: true, log: [], error: null, startedAt: Date.now(), finishedAt: null };
+  jobs.set(slug, job);
+  const reviewPath = path.join(outDirFor(slug), "review.json");
+  if (fs.existsSync(reviewPath)) fs.unlinkSync(reviewPath); // a fresh draft supersedes the old review
+  draftCompany(slug, (e) => job.log.push(e.step === "done" ? { step: "done", message: e.message, summary: e.record.verification_summary, seconds: e.record.seconds, usage: e.record.usage } : e))
+    .catch((err) => { job.error = err.message || String(err); job.log.push({ step: "error", message: job.error }); console.error("draft failed", slug, job.error); })
+    .finally(() => { job.running = false; job.finishedAt = Date.now(); });
+  return job;
+}
 const UPLOADS = path.join(ROOT, "uploads"); // files kept between extract and create; gitignored
 const safeName = (n) => String(n).replace(/[^\w.\- ]+/g, "_").slice(0, 120) || "file";
 const FILE_KINDS = { ".pdf": "pdf", ".pptx": "pptx", ".docx": "docx", ".md": "text", ".txt": "text" };
@@ -173,23 +193,37 @@ async function api(req, res, url) {
     });
   }
 
-  if (action === "draft" && req.method === "POST") {
-    if (running.has(slug)) return send(res, 409, { error: "already running" });
-    res.writeHead(200, { "Content-Type": "text/event-stream", "Cache-Control": "no-store", Connection: "keep-alive" });
-    const emit = (e) => res.write(`data: ${JSON.stringify(e)}\n\n`);
-    running.set(slug, true);
+  // Add a website (or replace it) before drafting.
+  if (action === "website" && req.method === "POST") {
+    if (fs.existsSync(path.join(outDirFor(slug), "assessment.json"))) return send(res, 409, { error: "Already drafted. Draft again after adding sources." });
+    const b = await body(req);
     try {
-      // A fresh draft supersedes any review of the previous one.
-      const reviewPath = path.join(outDirFor(slug), "review.json");
-      if (fs.existsSync(reviewPath)) fs.unlinkSync(reviewPath);
-      await draftCompany(slug, (e) => emit(e.step === "done" ? { step: "done", message: e.message, summary: e.record.verification_summary, seconds: e.record.seconds, usage: e.record.usage } : e));
-    } catch (err) {
-      emit({ step: "error", message: err.message });
-    } finally {
-      running.delete(slug);
-      res.end();
-    }
-    return;
+      const r = await extractUrl(String(b.url || "").trim());
+      const sdir = path.join(dir, "sources"); const existing = fs.readdirSync(sdir);
+      for (const f of existing.filter((f) => /-website\.md$/.test(f))) fs.unlinkSync(path.join(sdir, f));
+      const n = Math.max(0, ...fs.readdirSync(sdir).map((f) => parseInt(f) || 0)) + 1;
+      fs.writeFileSync(path.join(sdir, `${String(n).padStart(2, "0")}-website.md`), r.text + "\n");
+      const cj = path.join(dir, "company.json"); const company = readJson(cj); if (company.intake) company.intake.suggestedWebsite = null; fs.writeFileSync(cj, JSON.stringify(company, null, 2));
+      return send(res, 200, { ok: true, paragraphs: r.meta.paragraphs, title: r.meta.title });
+    } catch (err) { return send(res, 422, { error: err.message }); }
+  }
+  // Delete a company created in the app (never the built-in examples).
+  if (!action && req.method === "DELETE") {
+    if (!dir.startsWith(COMPANIES_DIR)) return send(res, 403, { error: "The built-in examples cannot be deleted." });
+    if (running.has(slug)) return send(res, 409, { error: "A draft is running for this company." });
+    fs.rmSync(dir, { recursive: true, force: true }); jobs.delete(slug); forgetImport(slug);
+    return send(res, 200, { ok: true });
+  }
+
+  if (action === "draft" && req.method === "POST") {
+    const job = startDraftJob(slug);
+    return send(res, 202, { running: job.running, startedAt: job.startedAt });
+  }
+  if (action === "progress" && req.method === "GET") {
+    const job = jobs.get(slug);
+    const drafted = fs.existsSync(path.join(outDirFor(slug), "assessment.json"));
+    if (!job) return send(res, 200, { running: false, log: [], error: null, drafted, known: false });
+    return send(res, 200, { running: job.running, log: job.log, error: job.error, drafted, known: true, startedAt: job.startedAt, finishedAt: job.finishedAt });
   }
 
   // Export with the review applied: ?format=md|txt|docx
@@ -285,4 +319,4 @@ http
     if (err.code === "EADDRINUSE") { console.error(`Port ${PORT} is already in use. Another copy of the app is probably running; open http://localhost:${PORT} or stop it first (lsof -ti:${PORT} | xargs kill).`); process.exit(1); }
     throw err;
   })
-  .listen(PORT, () => { console.log(`app at http://localhost:${PORT}`); startWatcher({ companiesDir: COMPANIES_DIR, slugify, draft: (slug) => draftCompany(slug) }); });
+  .listen(PORT, () => { console.log(`app at http://localhost:${PORT}`); startWatcher({ companiesDir: COMPANIES_DIR, slugify, draft: (slug) => { startDraftJob(slug); } }); });
