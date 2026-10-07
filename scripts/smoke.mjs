@@ -86,7 +86,11 @@ try {
     const r = await fetch(`${base}/samples/${f}?download`);
     ok(`download ${f}`, r.status === 200 && /attachment/.test(r.headers.get("content-disposition") || "") && (await r.arrayBuffer()).byteLength > 10000);
   }
-  for (const d of ["", "/readme", "/brief", "/how-it-works", "/evaluation", "/next-steps", "/test-cases", "/prd", "/eval-report", "/test-decks"]) {
+  const cfg = (await getJson("/api/config")).body || {};
+  ok("GET /api/config", typeof cfg.demo === "boolean", cfg.demo ? "demo mode" : "");
+  const takeHomeOnly = ["/readme", "/brief", "/prd", "/eval-report"];
+  for (const d of ["", "/readme", "/brief", "/how-it-works", "/evaluation", "/next-steps", "/test-cases", "/demo-guide", "/prd", "/eval-report", "/test-decks"]) {
+    if (cfg.demo && takeHomeOnly.includes(d)) { const r = await fetch(base + "/docs" + d); ok(`hidden in demo: /docs${d}`, r.status === 404); continue; }
     const r = await fetch(base + "/docs" + d); ok(`GET /docs${d}`, r.status === 200);
   }
   const examples = list.filter((c) => c.origin === "example");

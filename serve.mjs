@@ -62,6 +62,49 @@ function moveFile(from, to) {
   try { fs.renameSync(from, to); }
   catch (err) { if (err.code !== "EXDEV") throw err; fs.copyFileSync(from, to); fs.unlinkSync(from); }
 }
+// ---- Demo mode (DEMO_MODE=1): the public copy linked from techbrig.co ----
+// New drafts are capped per visitor and per day, companies visitors add are
+// cleared after a day, edits to the built-in examples reset after two hours,
+// and documents that only make sense for the take-home are hidden.
+const DEMO = process.env.DEMO_MODE === "1";
+const LIMITS = {
+  draft: { ip: Number(process.env.DEMO_DRAFTS_PER_VISITOR || 3), day: Number(process.env.DEMO_DRAFTS_PER_DAY || 25) },
+  tags: { ip: 10, day: 100 },
+  prefill: { ip: 15, day: 200 },
+};
+const usage = { day: "", counts: new Map() };
+const visitor = (req) => String(req.headers["x-forwarded-for"] || req.socket.remoteAddress || "").split(",")[0].trim();
+// Returns an error message when the limit is reached, otherwise counts the use.
+function overLimit(kind, req) {
+  if (!DEMO) return null;
+  const today = new Date().toISOString().slice(0, 10);
+  if (usage.day !== today) { usage.day = today; usage.counts.clear(); }
+  const k = `${kind}:${visitor(req)}`, all = `${kind}:*`, L = LIMITS[kind];
+  const mine = usage.counts.get(k) || 0, total = usage.counts.get(all) || 0;
+  const what = kind === "draft" ? "new drafts" : kind === "tags" ? "tag suggestions" : "deck readings";
+  if (mine >= L.ip) return `The demo allows ${L.ip} ${what} per visitor per day, and that limit has been reached. The example companies are already drafted.`;
+  if (total >= L.day) return `The demo has reached today's limit of ${what}. The example companies are already drafted.`;
+  usage.counts.set(k, mine + 1); usage.counts.set(all, total + 1);
+  return null;
+}
+function demoSweep() {
+  if (!DEMO) return;
+  const now = Date.now();
+  for (const c of listCompanies()) {
+    try {
+      if (c.origin === "intake") {
+        const created = Date.parse(readJson(path.join(c.dir, "company.json"))?.created_at || 0);
+        if (now - created > 24 * 3600e3 && !running.has(c.slug)) { fs.rmSync(c.dir, { recursive: true, force: true }); jobs.delete(c.slug); forgetImport(c.slug); }
+      } else {
+        const out = outDirFor(c.slug);
+        for (const f of ["review.json", "sent.json"]) { const p = path.join(out, f); if (fs.existsSync(p) && now - fs.statSync(p).mtimeMs > 2 * 3600e3) fs.unlinkSync(p); }
+        const tp = path.join(out, "tags.json"), t = readTags(out);
+        if (t?.person && now - Date.parse(t.person.at || 0) > 2 * 3600e3) writeTags(out, { ...t, person: null });
+      }
+    } catch (e) { console.error("demo sweep", c.slug, e.message); }
+  }
+}
+
 // On start: remove company folders left half-made by a failed create (no company.json),
 // and uploads older than a day that were never turned into a company.
 function tidyCompanies() {
@@ -128,6 +171,7 @@ function slugify(name) {
 async function api(req, res, url) {
   const parts = url.pathname.split("/").filter(Boolean); // api, companies, slug?, action?
 
+  if (parts[1] === "config" && req.method === "GET") return send(res, 200, { demo: DEMO, draftsPerVisitor: LIMITS.draft.ip });
   if (parts[1] === "search" && req.method === "GET") return send(res, 200, search(url.searchParams.get("q") || ""));
   // Turn a file or a URL into source text. Files arrive as base64 JSON; no multipart parser needed.
   if (parts[1] === "extract" && req.method === "POST") {
@@ -159,6 +203,7 @@ async function api(req, res, url) {
   }
   // Propose the intake fields from the deck text.
   if (parts[1] === "prefill" && req.method === "POST") {
+    const lim = overLimit("prefill", req); if (lim) return send(res, 429, { error: lim });
     const b = await body(req);
     if (!b.deck?.trim()) return send(res, 400, { error: "deck text required" });
     try { return send(res, 200, await prefillFromDeck(b.deck)); } catch (err) { return send(res, 502, { error: err.message }); }
@@ -174,7 +219,8 @@ async function api(req, res, url) {
       if (b.disconnect) { const st = readSettings(); const p2 = { ...st.providers }; delete p2[b.disconnect]; patch.providers = p2; if (b.disconnect === "forward") patch.forwarding = null; }
       if (b.forwarding) patch.forwarding = { address: `deals-${Math.random().toString(36).slice(2, 8)}@inbound.assessments.example`, setAt: new Date().toISOString() };
       if (typeof b.autoImport === "boolean") patch.autoImport = b.autoImport;
-      if (typeof b.autoDraft === "boolean") patch.autoDraft = b.autoDraft;
+      if (typeof b.autoDraft === "boolean") patch.autoDraft = DEMO ? false : b.autoDraft; // the demo never drafts on its own
+      if (DEMO && patch.providers) for (const k of Object.keys(patch.providers)) patch.providers[k] = { ...patch.providers[k], account: "" };
       writeSettings(patch);
       return send(res, 200, listInbox().status);
     }
@@ -267,6 +313,7 @@ async function api(req, res, url) {
   }
 
   if (action === "draft" && req.method === "POST") {
+    if (!running.has(slug)) { const lim = overLimit("draft", req); if (lim) return send(res, 429, { error: lim }); }
     const job = startDraftJob(slug);
     return send(res, 202, { running: job.running, startedAt: job.startedAt });
   }
@@ -292,6 +339,7 @@ async function api(req, res, url) {
 
   // Tags: POST asks the AI again; PUT records the associate's choice.
   if (action === "tags" && req.method === "POST") {
+    { const lim = overLimit("tags", req); if (lim) return send(res, 429, { error: lim }); }
     if (running.has(slug)) return send(res, 409, { error: "A draft is running for this company." });
     const record = readJson(path.join(outDirFor(slug), "assessment.json"));
     if (!record) return send(res, 409, { error: "Draft the assessment first." });
@@ -332,18 +380,25 @@ async function api(req, res, url) {
 
 
 // ---- Documents, rendered from the markdown in the repo so the link stays clean ----
-const DOCS = [
+const DOCS_ALL = [
   { id: "readme", file: "README.md", title: "README", blurb: "How to run it, key decisions, what was cut, what comes next, how AI tools were used." },
   { id: "brief", file: "BRIEF.md", title: "Product brief", blurb: "Two pages: who it is for, what v1 does and does not do, how success is measured, the three biggest risks, and why there is no probability score." },
   { id: "how-it-works", file: "docs/TECHNICAL.md", title: "How it works", blurb: "The pipeline, the verifier, the editor, the app, and what a production version would change." },
   { id: "evaluation", file: "docs/EVALUATION.md", title: "Evaluation", blurb: "What the automated checks are, what they found on the committed run, what they cannot see, and how to evaluate after a year of real decisions." },
+  { id: "demo-guide", file: "docs/DEMO-GUIDE.md", title: "Demo guide", blurb: "A five-minute click-through for showing the screener: what to click and what to point out. The Tour button in the app covers the same steps." },
   { id: "next-steps", file: "docs/NEXT-STEPS.md", title: "Next steps", blurb: "What it would take to make this ready for real use: testing against real assessments with a fund, an engineering review, sign-in, security, the inbox connection, and the open questions." },
   { id: "prd", file: "docs/PRD.md", title: "Product requirements", blurb: "The longer version of the brief: requirements, metrics, risks, rollout, roadmap." },
   { id: "eval-report", file: "out/eval-report.md", title: "Eval run", blurb: "The raw output of the last evaluation run: every flagged statement with the judge's reason." },
   { id: "test-cases", file: "docs/TEST-CASES.md", title: "Test cases", blurb: "What each example company is, what was hidden in it to trip the tool up, why that would fool an AI tool, and what the tool did." },
   { id: "test-decks", file: "samples/README.md", title: "Test decks", blurb: "Download the test decks, one by one or as a zip, to try the tool yourself; plus everything planted in the trap deck." },
 ];
+// The demo copy shows only the product documents, not the take-home ones.
+const DEMO_HIDDEN = new Set(["readme", "brief", "prd", "eval-report"]);
+const DOCS = DOCS_ALL.filter((d) => !(DEMO && DEMO_HIDDEN.has(d.id)));
+const OWN = "https://northledge-assessor-production.up.railway.app";
 function docPage(title, bodyHtml, current) {
+  bodyHtml = bodyHtml.split(`href="${OWN}`).join('href="'); // links to this app stay on whichever copy is serving them
+  if (DEMO) bodyHtml = bodyHtml.split(OWN).join(process.env.PUBLIC_URL || "this demo");
   const nav = DOCS.map((d) => `<a href="/docs/${d.id}" class="${d.id === current ? "on" : ""}">${d.title}</a>`).join("");
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title} · Seed assessments</title><link rel="stylesheet" href="/app.css"><style>
   .docs{display:grid;grid-template-columns:240px minmax(0,1fr);min-height:calc(100vh - 56px)}
@@ -362,12 +417,12 @@ function docPage(title, bodyHtml, current) {
   .doclist{display:grid;gap:1px;background:var(--border-2);border:1px solid var(--border-2)}.doclist a{display:block;background:#fff;padding:16px 18px;text-decoration:none}.doclist a:hover{background:var(--muted)}.doclist b{display:block;font-weight:600;color:var(--heading);font-size:15px;margin-bottom:3px}.doclist span{font-size:13.5px;color:var(--muted-foreground)}
   @media (max-width:820px){.docs{grid-template-columns:1fr}.docs nav{position:static;height:auto;border-right:0;border-bottom:1px solid var(--border)}.prose{padding:24px 20px 80px}}
   </style></head><body>
-  <header class="top"><a class="name" href="/"><span class="mark">SA</span>Seed assessments</a><div class="crumbs"><span>/</span><a href="/docs">Docs</a>${current ? `<span>/</span><b>${title}</b>` : ""}</div><div class="right"><a class="navlink" href="/">Open the app</a><a class="navlink" href="https://github.com/ishaanndas/northledge-assessor">GitHub</a></div></header>
+  <header class="top"><a class="name" href="/"><span class="mark">SA</span>Seed assessments</a><div class="crumbs"><span>/</span><a href="/docs">Docs</a>${current ? `<span>/</span><b>${title}</b>` : ""}</div><div class="right"><a class="navlink" href="/">Open the app</a>${DEMO ? "" : `<a class="navlink" href="https://github.com/ishaanndas/northledge-assessor">GitHub</a>`}</div></header>
   <div class="docs"><nav><div class="seclabel">Documents</div>${nav}</nav><main class="prose">${bodyHtml}</main></div></body></html>`;
 }
 function docsIndex() {
   const list = DOCS.map((d) => `<a href="/docs/${d.id}"><b>${d.title}</b><span>${d.blurb}</span></a>`).join("");
-  return docPage("Docs", `<h1>Documents</h1><p>Everything that goes with the prototype. The app itself is at <a href="/">/</a>; the source is on <a href="https://github.com/ishaanndas/northledge-assessor">GitHub</a>.</p><div class="doclist">${list}</div>`, null);
+  return docPage("Docs", `<h1>Documents</h1><p>${DEMO ? "How the screener works, the test cases and the decks to try it with. The app itself is at <a href=\"/\">/</a>." : `Everything that goes with the prototype. The app itself is at <a href="/">/</a>; the source is on <a href="https://github.com/ishaanndas/northledge-assessor">GitHub</a>.`}</p><div class="doclist">${list}</div>`, null);
 }
 
 http
@@ -404,4 +459,5 @@ http
     if (err.code === "EADDRINUSE") { console.error(`Port ${PORT} is already in use. Another copy of the app is probably running; open http://localhost:${PORT} or stop it first (lsof -ti:${PORT} | xargs kill).`); process.exit(1); }
     throw err;
   })
-  .listen(PORT, () => { try { tidyCompanies(); } catch (e) { console.error("tidy failed", e.message); } console.log(`app at http://localhost:${PORT}`); startWatcher({ companiesDir: COMPANIES_DIR, slugify, draft: (slug) => { startDraftJob(slug); } }); });
+  .listen(PORT, () => { try { tidyCompanies(); } catch (e) { console.error("tidy failed", e.message); }
+    if (DEMO) { console.log("demo mode"); demoSweep(); setInterval(demoSweep, 15 * 60e3); } console.log(`app at http://localhost:${PORT}`); startWatcher({ companiesDir: COMPANIES_DIR, slugify, draft: (slug) => { startDraftJob(slug); } }); });

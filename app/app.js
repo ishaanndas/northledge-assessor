@@ -12,9 +12,20 @@ const fmt = (iso) => iso ? iso.replace("T", " ").slice(0, 16) : "";
 // ---------- shell ----------
 let inboxCount = null;
 function topbar(crumbs = [], right = "") {
-  $("#top").innerHTML = `<a class="name" href="#/"><span class="mark">SA</span>Seed assessments</a>${crumbs.length ? `<div class="crumbs">${crumbs.map((c, i) => `<span>/</span>${c.href ? `<a href="${c.href}">${esc(c.label)}</a>` : `<b>${esc(c.label)}</b>`}`).join("")}</div>` : ""}<button class="searchbox" id="openSearch"><span class="ico">⌕</span><span>Search companies, decks, claims…</span><kbd>⌘K</kbd></button><div class="right"><a class="navlink" href="#/inbox" id="inboxLink">Inbox${inboxCount ? ` <span class="count">${inboxCount}</span>` : ""}</a><a class="navlink" href="/docs">Docs</a>${right}</div>`;
+  $("#top").innerHTML = `<a class="name" href="#/"><span class="mark">SA</span>Seed assessments</a>${crumbs.length ? `<div class="crumbs">${crumbs.map((c, i) => `<span>/</span>${c.href ? `<a href="${c.href}">${esc(c.label)}</a>` : `<b>${esc(c.label)}</b>`}`).join("")}</div>` : ""}<button class="searchbox" id="openSearch"><span class="ico">⌕</span><span>Search companies, decks, claims…</span><kbd>⌘K</kbd></button><div class="right"><a class="navlink" href="#/inbox" id="inboxLink">Inbox${inboxCount ? ` <span class="count">${inboxCount}</span>` : ""}</a><button class="tourbtn" id="tourBtn">Tour</button><a class="navlink" href="/docs">Docs</a>${right}</div>`;
   $("#openSearch").addEventListener("click", openPalette);
+  $("#tourBtn").addEventListener("click", () => window.Tour?.start());
+  demoBar();
   if (inboxCount === null) api("/inbox").then((r) => { inboxCount = r.messages.filter((m) => !m.imported).length; const el = $("#inboxLink"); if (el) el.innerHTML = `Inbox${inboxCount ? ` <span class="count">${inboxCount}</span>` : ""}`; }).catch(() => {});
+}
+// On the public demo copy, one line says what is limited.
+let demoInfo = null;
+function demoBar() {
+  if (demoInfo === null) { demoInfo = false; fetch("/api/config").then((r) => r.json()).then((c) => { demoInfo = c.demo ? c : false; demoBar(); }).catch(() => {}); return; }
+  if (!demoInfo || $("#demobar")) return;
+  const bar = document.createElement("div"); bar.id = "demobar";
+  bar.innerHTML = `<span>Live demo</span><span class="sep">·</span><span>Up to ${demoInfo.draftsPerVisitor} new drafts per visitor per day</span><span class="sep">·</span><span>Companies you add are cleared after a day</span><span class="sep">·</span><button id="demoTour">Take the tour</button>`;
+  $("#top").after(bar); $("#demoTour").addEventListener("click", () => window.Tour?.start());
 }
 // The assessment's state, derived: nothing is set by hand.
 function assessmentState(c) {
