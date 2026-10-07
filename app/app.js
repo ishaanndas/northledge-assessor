@@ -6,13 +6,15 @@ const api = async (path, opts = {}) => {
   if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || r.statusText);
   return r.json();
 };
+// In the static demo build (window.STATIC), server paths map to bundled files.
+const U = (p) => (window.STATIC ? window.STATIC.url(p) : p);
 const S = { slug: null, company: null, selected: null, decisions: {}, overrides: {}, reviewer: localStorage.getItem("reviewer") || "", note: "", saveTimer: null, saved: "" };
 const fmt = (iso) => iso ? iso.replace("T", " ").slice(0, 16) : "";
 
 // ---------- shell ----------
 let inboxCount = null;
 function topbar(crumbs = [], right = "") {
-  $("#top").innerHTML = `<a class="name" href="#/"><span class="mark">SA</span>Seed assessments</a>${crumbs.length ? `<div class="crumbs">${crumbs.map((c, i) => `<span>/</span>${c.href ? `<a href="${c.href}">${esc(c.label)}</a>` : `<b>${esc(c.label)}</b>`}`).join("")}</div>` : ""}<button class="searchbox" id="openSearch"><span class="ico">⌕</span><span>Search companies, decks, claims…</span><kbd>⌘K</kbd></button><div class="right"><a class="navlink" href="#/inbox" id="inboxLink">Inbox${inboxCount ? ` <span class="count">${inboxCount}</span>` : ""}</a><button class="tourbtn" id="tourBtn">Tour</button><a class="navlink" href="/docs">Docs</a>${right}</div>`;
+  $("#top").innerHTML = `<a class="name" href="#/"><span class="mark">SA</span>Seed assessments</a>${crumbs.length ? `<div class="crumbs">${crumbs.map((c, i) => `<span>/</span>${c.href ? `<a href="${c.href}">${esc(c.label)}</a>` : `<b>${esc(c.label)}</b>`}`).join("")}</div>` : ""}<button class="searchbox" id="openSearch"><span class="ico">⌕</span><span>Search companies, decks, claims…</span><kbd>⌘K</kbd></button><div class="right"><a class="navlink" href="#/inbox" id="inboxLink">Inbox${inboxCount ? ` <span class="count">${inboxCount}</span>` : ""}</a><button class="tourbtn" id="tourBtn">Tour</button><a class="navlink" href="${U("/docs")}">Docs</a>${right}</div>`;
   $("#openSearch").addEventListener("click", openPalette);
   $("#tourBtn").addEventListener("click", () => window.Tour?.start());
   demoBar();
@@ -24,6 +26,12 @@ function demoBar() {
   if (demoInfo === null) { demoInfo = false; fetch("/api/config").then((r) => r.json()).then((c) => { demoInfo = c.demo ? c : false; demoBar(); }).catch(() => {}); return; }
   if (!demoInfo || $("#demobar")) return;
   const bar = document.createElement("div"); bar.id = "demobar";
+  if (demoInfo.static) {
+    bar.innerHTML = `<span>Interactive demo</span><span class="sep">·</span><span>Sample companies, running in your browser</span><span class="sep">·</span><span>Your changes stay on this device</span><span class="sep">·</span><button id="demoTour">Take the tour</button><span class="sep">·</span><button id="demoReset">Start over</button>`;
+    $("#top").after(bar); $("#demoTour").addEventListener("click", () => window.Tour?.start());
+    $("#demoReset").addEventListener("click", () => { if (confirm("Start over? Your edits, tags and added companies in this demo are cleared.")) window.STATIC.reset(); });
+    return;
+  }
   bar.innerHTML = `<span>Live demo</span><span class="sep">·</span><span>Up to ${demoInfo.draftsPerVisitor} new drafts per visitor per day</span><span class="sep">·</span><span>Companies you add are cleared after a day</span><span class="sep">·</span><button id="demoTour">Take the tour</button>`;
   $("#top").after(bar); $("#demoTour").addEventListener("click", () => window.Tour?.start());
 }
@@ -153,7 +161,7 @@ function pageNew() {
     <div class="deckzone" id="deckzone" data-drop="deck">
       <div class="dz-empty" id="dzEmpty"><div class="dz-icon">↓</div><b>Drop the deck here</b><span>PDF, PowerPoint or Word. Or <label class="dz-pick">choose a file<input type="file" accept=".pdf,.pptx,.docx,.md,.txt" data-into="deck"></label>, or paste a link below.</span>
         <div class="urlrow dz-url"><input class="input" placeholder="Link to the deck: a PDF, a Google Slides link or a Drive link" data-url="deck"><button class="btn sm" data-fetch="deck">Fetch</button></div>
-        <span class="dz-test">No deck to hand? <a href="/docs/test-decks" target="_blank">Download a test deck</a> or <a href="/samples/test-decks.zip?download">all of them as a zip</a>.</span></div>
+        <span class="dz-test">No deck to hand? <a href="${U("/docs/test-decks")}" target="_blank">Download a test deck</a> or <a href="${U("/samples/test-decks.zip?download")}">all of them as a zip</a>.</span></div>
       <div class="dz-busy" id="dzBusy" hidden><div class="spin"></div><b id="dzBusyText">Reading the deck…</b></div>
       <div class="dz-done" id="dzDone" hidden><div class="dz-file"><span class="k" id="dzKind">PDF</span><div><b id="dzName"></b><span id="dzMeta"></span></div><button class="btn sm quiet" type="button" id="dzReplace">Replace</button></div>
         <details class="dz-text"><summary>See the text that was read from it</summary><textarea class="textarea" name="deck" placeholder="Deck text"></textarea></details></div>
@@ -250,7 +258,7 @@ async function pageInbox() {
   const live = status.providers.filter((p) => p.state !== "off");
   const strip = `<div class="instrip"><span>${live.map((p) => `<span class="dot ${p.state === "connected" ? "on" : "wait"}"></span>${esc(p.id === "folder" ? "Sample emails" : p.name)}${p.state === "pending" ? " (waiting for credentials)" : ""}`).join('<span class="sep">·</span>')}</span><span class="sep">·</span><span>${status.automation.autoImport ? (status.automation.autoDraft ? "New emails are imported and drafted on arrival" : "New emails are imported on arrival") : "New emails wait here for you to import"}</span><a class="btn sm" href="#/settings">Inbox settings</a></div>`;
   const waiting = messages.filter((m) => !m.imported).length;
-  const rows = messages.map((m) => `<div class="msg ${m.imported ? "done" : ""}" data-id="${m.id}"><div class="who"><b>${esc(m.from)}</b><span>${esc(m.date)}</span></div><div class="subj">${esc(m.subject)}</div><div class="body">${esc(m.body.split("\n").map((l) => l.trim()).filter((l) => l && !/^(hi|hello|hey|dear)\b[^.!?]{0,30}[,!]?$/i.test(l))[0] || "")}</div><div class="att">${m.attachments.map((a) => `<a class="file" href="/inbox/${encodeURIComponent(m.id)}/${encodeURIComponent(a.name)}" target="_blank"><span class="k">${kindIcon(a.kind)}</span>${esc(a.name)}<span class="sz">${(a.bytes / 1024).toFixed(0)} KB</span></a>`).join("")}${m.links.map((l) => `<span class="file"><span class="k">URL</span>${esc(l.replace(/^https?:\/\//, ""))}</span>`).join("")}</div><div class="act">${m.imported ? `<span class="badge green">Imported</span><a class="btn sm" href="#/c/${m.imported.slug}">Open</a>` : `<button class="btn primary sm" data-import="${m.id}">Import as company <span class="arr">→</span></button>`}</div></div>`).join("");
+  const rows = messages.map((m) => `<div class="msg ${m.imported ? "done" : ""}" data-id="${m.id}"><div class="who"><b>${esc(m.from)}</b><span>${esc(m.date)}</span></div><div class="subj">${esc(m.subject)}</div><div class="body">${esc(m.body.split("\n").map((l) => l.trim()).filter((l) => l && !/^(hi|hello|hey|dear)\b[^.!?]{0,30}[,!]?$/i.test(l))[0] || "")}</div><div class="att">${m.attachments.map((a) => `<a class="file" href="${U(`/inbox/${encodeURIComponent(m.id)}/${encodeURIComponent(a.name)}`)}" target="_blank"><span class="k">${kindIcon(a.kind)}</span>${esc(a.name)}<span class="sz">${(a.bytes / 1024).toFixed(0)} KB</span></a>`).join("")}${m.links.map((l) => `<span class="file"><span class="k">URL</span>${esc(l.replace(/^https?:\/\//, ""))}</span>`).join("")}</div><div class="act">${m.imported ? `<span class="badge green">Imported</span><a class="btn sm" href="#/c/${m.imported.slug}">Open</a>` : `<button class="btn primary sm" data-import="${m.id}">Import as company <span class="arr">→</span></button>`}</div></div>`).join("");
   $("#main").innerHTML = `<div class="page"><div class="inner" style="max-width:960px"><div class="head"><h1>Inbox</h1><p class="sub">Emails with a deck attached, ready to turn into a company. ${waiting ? `${waiting} waiting.` : "Nothing waiting."}</p></div>
   ${strip}
   <div class="msgs">${rows || `<div class="empty">No emails with decks yet.</div>`}</div></div></div>`;
@@ -344,7 +352,7 @@ function setPath(obj, path, value) {
 // ---------- source viewer: the real page behind a passage ----------
 // PDF decks open at the page in the browser's viewer; everything else renders
 // the passage as a slide-shaped card so the reader still sees it "as a slide".
-const fileUrl = (c, key) => c.files?.[key] ? `/${c.origin === "example" ? "examples" : "companies"}/${c.slug}/files/${encodeURIComponent(c.files[key].name)}` : null;
+const fileUrl = (c, key) => c.files?.[key]?.url || (c.files?.[key] ? `/${c.origin === "example" ? "examples" : "companies"}/${c.slug}/files/${encodeURIComponent(c.files[key].name)}` : null);
 function slideCard(passageText, pid) {
   const lines = passageText.split("\n");
   const m = lines[0].match(/^Slide (\d+):?\s*(.*)$/);
@@ -615,7 +623,7 @@ function runHtml(log, running, slug) {
     return `<div class="step ${cls}"><i></i><span class="k">${label}</span><span class="m">${skip ? "not needed" : esc(e?.message || "")}${f}</span></div>`;
   }).join("");
   const err = log.find((e) => e.step === "error"), done = by.done, retry = log.filter((e) => e.step === "retry").pop();
-  const elapsed = !done && !err && running ? `<div class="step"><i></i><span class="k"></span><span class="m" style="color:var(--muted-foreground)">Usually two to three minutes. You can leave this page; the draft carries on and will be here when you come back.${retry ? ` ${esc(retry.message)}.` : ""}</span></div>` : "";
+  const elapsed = !done && !err && running ? `<div class="step"><i></i><span class="k"></span><span class="m" style="color:var(--muted-foreground)">${window.STATIC ? "This demo replays a real draft, so it takes a few seconds. The live version takes two to three minutes, and you can leave the page while it runs." : "Usually two to three minutes. You can leave this page; the draft carries on and will be here when you come back."}${retry ? ` ${esc(retry.message)}.` : ""}</span></div>` : "";
   return `<div class="run">${list}${elapsed}${err ? `<div class="step err"><i></i><span class="k">Error</span><span class="m">${esc(err.message)}</span></div>` : ""}${done ? `<div class="result"><span><b>${done.summary.verified}</b> of ${done.summary.statements} verified</span><span><b>${done.summary.warning}</b> warnings</span><span><b>${done.summary.failed}</b> unverified</span><span>${done.seconds}s</span><span style="margin-left:auto">${running ? "Suggesting tags" : "Opening the draft"}</span></div>` : ""}</div>`;
 }
 // Drafting runs as a job on the server; the page starts it and polls. Leaving,
@@ -785,7 +793,7 @@ function stmtLabel(c, id) {
 function sendToPartner(c) {
   const a = c.record.assessment, t = c.tags;
   const partners = (() => { try { return JSON.parse(localStorage.getItem("partners") || "[]"); } catch { return []; } })();
-  const link = `${location.origin}/#/c/${c.slug}?mode=partner`;
+  const link = `${location.href.split("#")[0]}#/c/${c.slug}?mode=partner`;
   const summary = (S.overrides?.summary ?? a.summary).replace(/<[^>]+>/g, "");
   const fitLine = t?.fit ? `Fit: ${t.fitLabel}${t.fitBy === "ai" ? " (AI suggestion)" : ""}.${t.tagLabels.length ? ` Tags: ${t.tagLabels.join(", ")}.` : ""}\n\n` : "";
   const subject = `Assessment: ${c.name}`;

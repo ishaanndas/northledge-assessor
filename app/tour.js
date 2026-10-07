@@ -77,7 +77,7 @@
     el.querySelector(".tour-n").textContent = `${i + 1} of ${STEPS.length}`;
     el.querySelector("h4").textContent = step.title;
     el.querySelector("p").textContent = step.body;
-    el.querySelector(".tour-links").innerHTML = (step.links || []).map(([t, u]) => `<a href="${u}" target="_blank">${t}</a>`).join("");
+    el.querySelector(".tour-links").innerHTML = (step.links || []).map(([t, u]) => `<a href="${window.STATIC ? window.STATIC.url(u) : u}" target="_blank">${t}</a>`).join("");
     el.querySelector('[data-t="back"]').disabled = i === 0;
     el.querySelector('[data-t="next"]').textContent = i === STEPS.length - 1 ? "Done" : "Next";
     el.classList.add("busy");
